@@ -27,6 +27,7 @@ import ScrollToTop from "./components/ScrollToTo";
 import { AuthProvider } from "./contexts/AuthContext";
 import { FavoritesProvider } from "./contexts/FavoritesContext";
 import toast from "react-hot-toast";
+import { ProfilePage } from "./pages/ProfilePage";
 
 // Payment Data Context
 const PaymentDataContext = createContext<{
@@ -129,7 +130,7 @@ function AppContent() {
         <Switch>
           <Route path="/">
             <Hero />
-            
+
           </Route>
           <Route path="/produtos">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -183,6 +184,9 @@ function AppContent() {
           </Route>
           <Route path="/sobre">
             <Sobre />
+          </Route>
+          <Route path="/meu-perfil">
+            <ProfilePage />
           </Route>
           <Route path="/terms">
             <TermsOfService />
