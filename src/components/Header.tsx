@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   ShoppingCart,
   Search,
@@ -8,7 +8,7 @@ import {
   User,
   LogOut,
 } from "lucide-react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { useAuth } from "../contexts/AuthContext";
 
 interface HeaderProps {
@@ -20,8 +20,54 @@ export const Header: React.FC<HeaderProps> = ({
   cartItemCount,
   onCartClick,
 }) => {
-  const { user, signOut } = useAuth()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  const { user, signOut } = useAuth();
+  const userMenuRef = useRef<HTMLDivElement>(null);
+
+  // Fechar menu ao clicar fora
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
+        setShowUserMenu(false);
+      }
+    };
+
+    if (showUserMenu) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showUserMenu]);
+
+  // Função para obter as iniciais do usuário
+  const getUserInitials = (user: any): string => {
+    if (user?.user_metadata?.full_name) {
+      return user.user_metadata.full_name
+        .split(' ')
+        .map((name: string) => name.charAt(0))
+        .join('')
+        .substring(0, 2)
+        .toUpperCase();
+    }
+
+    if (user?.email) {
+      return user.email.charAt(0).toUpperCase();
+    }
+
+    return 'U';
+  };
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      setShowUserMenu(false);
+    } catch (error) {
+      console.error('Erro ao fazer logout:', error);
+    }
+  };
 
   return (
     <header className="bg-white shadow-md border-b sticky top-0 z-50">
@@ -77,73 +123,96 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
 
           {/* User Actions */}
-          <div className="flex items-center gap-4">
-            {/* Favorites - only for logged in users */}
-            {user && (
-              <Link
-                to="/favorites"
-                className="relative p-2 text-gray-600 hover:text-indigo-600 transition-colors"
-                title="Meus Favoritos"
-              >
-                <Heart className="w-6 h-6" />
-              </Link>
-            )}
+          <div className="flex items-center space-x-4">
+            {/* Search */}
+            <div className="relative hidden md:block">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Search className="h-4 w-4 text-gray-400" />
+              </div>
+              <input
+                type="text"
+                placeholder="Buscar produtos..."
+                className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              />
+            </div>
+
+            {/* Favorites */}
+            <Link
+              to="/favorites"
+              className="p-2 rounded-full hover:bg-gray-100 transition-colors relative"
+            >
+              <Heart className="h-6 w-6 text-gray-600" />
+            </Link>
 
             {/* Cart */}
             <button
               onClick={onCartClick}
-              className="relative p-2 text-gray-600 hover:text-indigo-600 transition-colors"
+              className="p-2 rounded-full hover:bg-gray-100 transition-colors relative"
             >
-              <ShoppingCart className="w-6 h-6" />
+              <ShoppingCart className="h-6 w-6 text-gray-600" />
               {cartItemCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-indigo-600 text-white text-[10px] font-semibold rounded-full w-5 h-5 flex items-center justify-center shadow-md">
+                <span className="absolute -top-2 -right-2 bg-blue-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
                   {cartItemCount}
                 </span>
               )}
             </button>
 
-            {/* User Menu */}
+            {/* User */}
             {user ? (
-              <div className="relative flex items-center gap-2">
-                <span className="hidden md:block text-sm text-gray-600">
-                  Olá, {user.email?.split('@')[0]}
-                </span>
+              <div className="relative" ref={userMenuRef}>
                 <button
-                  onClick={() => signOut()}
-                  className="p-2 text-gray-600 hover:text-red-600 transition-colors"
-                  title="Sair"
+                  onClick={() => setShowUserMenu(!showUserMenu)}
+                  className="flex items-center justify-center w-8 h-8 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors font-medium text-sm"
                 >
-                  <LogOut className="w-5 h-5" />
+                  {getUserInitials(user)}
                 </button>
+
+                {/* User Menu Dropdown */}
+                {showUserMenu && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200">
+                    <div className="px-4 py-2 text-sm text-gray-700 border-b border-gray-100">
+                      <p className="font-medium">
+                        {user.user_metadata?.full_name || user.email}
+                      </p>
+                      <p className="text-xs text-gray-500">{user.email}</p>
+                    </div>
+
+                    <Link
+                      to="/profile"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                      onClick={() => setShowUserMenu(false)}
+                    >
+                      <User className="h-4 w-4 inline mr-2" />
+                      Meu Perfil
+                    </Link>
+
+                    <Link
+                      to="/favorites"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                      onClick={() => setShowUserMenu(false)}
+                    >
+                      <Heart className="h-4 w-4 inline mr-2" />
+                      Favoritos
+                    </Link>
+
+                    <button
+                      onClick={handleSignOut}
+                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                    >
+                      <LogOut className="h-4 w-4 inline mr-2" />
+                      Sair
+                    </button>
+                  </div>
+                )}
               </div>
             ) : (
-              <div className="hidden md:flex items-center gap-2">
-                <Link
-                  to="/login"
-                  className="px-4 py-2 text-sm text-gray-600 hover:text-indigo-600 transition-colors"
-                >
-                  Entrar
-                </Link>
-                <Link
-                  to="/register"
-                  className="px-4 py-2 bg-indigo-600 text-white text-sm rounded-lg hover:bg-indigo-700 transition-colors"
-                >
-                  Criar conta
-                </Link>
-              </div>
+              <Link
+                to="/login"
+                className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+              >
+                <User className="h-6 w-6 text-gray-600" />
+              </Link>
             )}
-
-            {/* Botão de Menu Mobile */}
-            <button
-              className="md:hidden p-2 text-gray-600 hover:text-indigo-600 transition-colors"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            >
-              {mobileMenuOpen ? (
-                <CloseIcon className="w-6 h-6" />
-              ) : (
-                <MenuIcon className="w-6 h-6" />
-              )}
-            </button>
           </div>
         </div>
       </div>
@@ -192,8 +261,8 @@ export const Header: React.FC<HeaderProps> = ({
                 </Link>
                 <button
                   onClick={() => {
-                    signOut()
-                    setMobileMenuOpen(false)
+                    handleSignOut();
+                    setMobileMenuOpen(false);
                   }}
                   className="py-3 hover:bg-gray-100 flex items-center justify-center gap-2 text-red-600"
                 >
