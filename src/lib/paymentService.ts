@@ -4,7 +4,7 @@ import type { Product } from "../types";
 export interface Payment {
   id: string;
   status: string;
-  email_cliente: string;
+  email: string;
   nome_cliente: string;
   valor: number;
   links_download: string[];
@@ -16,7 +16,7 @@ export interface Payment {
 export interface CreatePaymentData {
   id: string;
   status: string;
-  email_cliente: string;
+  email: string;
   nome_cliente: string;
   valor: number;
   links_download: string[];
@@ -76,7 +76,7 @@ export const paymentService = {
       const { data, error } = await supabase
         .from("pagamentos")
         .select("*")
-        .eq("email_cliente", email)
+        .eq("email", email)
         .order("created_at", { ascending: false });
 
       if (error) {
@@ -125,7 +125,7 @@ export const paymentService = {
       const { data, error } = await supabase
         .from("pagamentos")
         .select("*")
-        .eq("email_cliente", user.email)
+        .eq("email", user.email)
         .order("created_at", { ascending: false });
 
       if (error) {
@@ -152,7 +152,7 @@ export const paymentService = {
       const { data, error } = await supabase
         .from("pagamentos")
         .select("produtos")
-        .eq("email_cliente", user.email)
+        .eq("email", user.email)
         .eq("status", "approved");
 
       if (error) {
@@ -182,7 +182,7 @@ export const paymentService = {
       const { data, error } = await supabase
         .from("pagamentos")
         .select("links_download, produtos")
-        .eq("email_cliente", user.email)
+        .eq("email", user.email)
         .eq("status", "approved");
 
       if (error) {
