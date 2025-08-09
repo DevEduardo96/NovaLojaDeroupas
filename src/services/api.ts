@@ -69,7 +69,7 @@ export const api = {
     console.log("Criando pagamento:", data);
     
     try {
-      const response = await apiClient.post<PaymentData>("/payments/criar-pagamento", data);
+      const response = await apiClient.post<PaymentData>("/api/payments/criar-pagamento", data);
       console.log("Pagamento criado com sucesso:", response);
       return response;
     } catch (error) {
