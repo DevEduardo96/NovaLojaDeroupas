@@ -29,22 +29,37 @@ export const Login: React.FC = () => {
     setLoading(true)
     setError('')
 
+    // Validações no frontend
+    if (!formData.email.trim()) {
+      setError('Email é obrigatório')
+      setLoading(false)
+      return
+    }
+
+    if (!formData.password) {
+      setError('Senha é obrigatória')
+      setLoading(false)
+      return
+    }
+
+    // Validação básica de email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(formData.email)) {
+      setError('Formato de email inválido')
+      setLoading(false)
+      return
+    }
+
     try {
       const { error } = await signIn(formData.email, formData.password)
       
       if (error) {
-        if (error.message.includes('Invalid login credentials')) {
-          setError('Email ou senha incorretos')
-        } else if (error.message.includes('Email not confirmed')) {
-          setError('Por favor, confirme seu email antes de fazer login')
-        } else {
-          setError(error.message)
-        }
-      } else {
-        // Login bem-sucedido, redirecionamento será feito pelo useEffect
+        setError(error.message)
       }
+      // Login bem-sucedido, redirecionamento será feito pelo useEffect
     } catch (err) {
-      setError('Ocorreu um erro inesperado')
+      console.error('Login error:', err)
+      setError('Ocorreu um erro inesperado. Tente novamente')
     } finally {
       setLoading(false)
     }
