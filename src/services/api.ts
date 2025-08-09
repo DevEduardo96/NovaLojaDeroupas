@@ -69,7 +69,7 @@ export const api = {
     console.log("Criando pagamento:", data);
     
     try {
-      const response = await apiClient.post<PaymentData>("/api/payments/criar-pagamento", data);
+      const response = await apiClient.post<PaymentData>("api/payments/criar-pagamento", data);
       console.log("Pagamento criado com sucesso:", response);
       return response;
     } catch (error) {
@@ -98,7 +98,7 @@ export const api = {
     const paymentIdStr = String(paymentId);
 
     try {
-      const response = await apiClient.get<PaymentStatus>(`/api/payments/status/${paymentIdStr}`);
+      const response = await apiClient.get<PaymentStatus>(`api/payments/status/${paymentIdStr}`);
       console.log("Status obtido:", response);
       return response;
     } catch (error) {
@@ -167,7 +167,7 @@ export const api = {
     const paymentIdStr = String(paymentId);
 
     try {
-      const response = await apiClient.get<PaymentStatus>(`/api/payments/status/${paymentIdStr}`);
+      const response = await apiClient.get<PaymentStatus>(`api/payments/status/${paymentIdStr}`);
       
       // Extrair links de download da resposta de status
       if (response && response.download_links) {
