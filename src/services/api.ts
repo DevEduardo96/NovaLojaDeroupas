@@ -1,64 +1,100 @@
-// SUBSTITUA o conteúdo do seu src/services/api.ts por este código:
+// src/services/api.ts
+// ARQUIVO COMPLETO - SUBSTITUA TODO O CONTEÚDO DO SEU api.ts POR ESTE CÓDIGO
 
-import { apiClient } from "./apiClient";
 import {
   Product,
   PaymentData,
   PaymentStatus,
   DownloadResponse,
   CreatePaymentRequest,
-  ApiResponse,
-  PaginatedResponse,
   ProductFilters,
 } from "../types";
 
-// URL base do backend - CORREÇÃO DEFINITIVA
+// ===== CONFIGURAÇÃO DA URL BASE =====
 const BACKEND_URL = import.meta.env.VITE_API_BASE_URL || "https://backend-nectix.onrender.com/api";
 
+// Log para debug
 console.log("🔧 [API] Backend URL configurada:", BACKEND_URL);
+console.log("🔧 [API] Variável de ambiente VITE_API_BASE_URL:", import.meta.env.VITE_API_BASE_URL);
 
-// Cliente HTTP personalizado para garantir URLs corretas
+// ===== CLIENTE HTTP PERSONALIZADO =====
 const makeRequest = async <T>(endpoint: string, options: RequestInit = {}): Promise<T> => {
   const url = `${BACKEND_URL}${endpoint}`;
   console.log(`🌐 [API] Fazendo requisição para: ${url}`);
   
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 segundos
+
   try {
     const response = await fetch(url, {
       ...options,
+      signal: controller.signal,
       headers: {
         "Content-Type": "application/json",
         ...options.headers,
       },
     });
 
+    clearTimeout(timeoutId);
+    console.log(`📡 [API] Resposta recebida: ${response.status} ${response.statusText}`);
+
     if (!response.ok) {
       let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+      
       try {
-        const errorData = await response.json();
-        errorMessage = errorData.error || errorData.message || errorMessage;
-      } catch {
-        // Se não conseguir parsear o erro, usa a mensagem padrão
+        const contentType = response.headers.get("content-type");
+        if (contentType && contentType.includes("application/json")) {
+          const errorData = await response.json();
+          errorMessage = errorData.error || errorData.message || errorMessage;
+        } else {
+          const errorText = await response.text();
+          errorMessage = errorText || errorMessage;
+        }
+      } catch (parseError) {
+        console.warn("[API] Não foi possível parsear erro da resposta:", parseError);
       }
+      
       throw new Error(errorMessage);
     }
 
-    return await response.json();
+    // Parse da resposta
+    const text = await response.text();
+    if (!text) {
+      return null as T;
+    }
+
+    try {
+      return JSON.parse(text);
+    } catch (parseError) {
+      console.error("[API] Erro ao parsear JSON:", parseError);
+      throw new Error("Resposta inválida do servidor");
+    }
   } catch (error) {
-    console.error(`❌ [API] Erro na requisição para ${url}:`, error);
-    throw error;
+    clearTimeout(timeoutId);
+    
+    if (error instanceof Error) {
+      if (error.name === "AbortError") {
+        throw new Error("Timeout: Requisição demorou muito para responder");
+      }
+      console.error(`❌ [API] Erro na requisição para ${url}:`, error);
+      throw error;
+    }
+    
+    throw new Error("Erro desconhecido na requisição");
   }
 };
 
+// ===== API PRINCIPAL =====
 export const api = {
   // ===== PRODUTOS =====
   async getProducts(filters?: ProductFilters): Promise<Product[]> {
     try {
-      // Se não houver filtros, busca todos os produtos
+      console.log("📦 [API] Buscando produtos...", filters);
+      
       if (!filters || Object.keys(filters).length === 0) {
         return await makeRequest<Product[]>("/products");
       }
 
-      // Constrói query string com filtros
       const params = new URLSearchParams();
       if (filters.category) params.append("category", filters.category);
       if (filters.search) params.append("search", filters.search);
@@ -68,56 +104,74 @@ export const api = {
 
       return await makeRequest<Product[]>(`/products?${params.toString()}`);
     } catch (error) {
-      console.error("Erro ao buscar produtos:", error);
-      // Fallback para dados mockados em caso de erro
+      console.error("❌ [API] Erro ao buscar produtos:", error);
+      console.log("🔄 [API] Retornando produtos mock como fallback");
       return this.getMockProducts();
     }
   },
 
   async getProductById(id: number): Promise<Product | null> {
     try {
+      console.log(`📦 [API] Buscando produto por ID: ${id}`);
       return await makeRequest<Product>(`/products/${id}`);
     } catch (error) {
-      console.error(`Erro ao buscar produto ${id}:`, error);
+      console.error(`❌ [API] Erro ao buscar produto ${id}:`, error);
       return null;
     }
   },
 
   async getProductsByCategory(category: string): Promise<Product[]> {
     try {
+      console.log(`📦 [API] Buscando produtos da categoria: ${category}`);
       return await makeRequest<Product[]>(`/products/category/${category}`);
     } catch (error) {
-      console.error(`Erro ao buscar produtos da categoria ${category}:`, error);
+      console.error(`❌ [API] Erro ao buscar produtos da categoria ${category}:`, error);
       return [];
     }
   },
 
   async searchProducts(query: string): Promise<Product[]> {
     try {
+      console.log(`🔍 [API] Buscando produtos com query: "${query}"`);
       return await makeRequest<Product[]>(`/products/search?q=${encodeURIComponent(query)}`);
     } catch (error) {
-      console.error(`Erro ao buscar produtos com query "${query}":`, error);
+      console.error(`❌ [API] Erro ao buscar produtos com query "${query}":`, error);
       return [];
     }
   },
 
   // ===== PAGAMENTOS =====
   async createPayment(data: CreatePaymentRequest): Promise<PaymentData> {
-    console.log("💳 [API] Criando pagamento:", data);
+    console.log("💳 [API] Criando pagamento:", {
+      cliente: data.nomeCliente,
+      email: data.email,
+      total: data.total,
+      itens: data.carrinho.length
+    });
     
     try {
       const response = await makeRequest<PaymentData>("/payments/criar-pagamento", {
         method: "POST",
         body: JSON.stringify(data),
       });
-      console.log("✅ [API] Pagamento criado com sucesso:", response);
+      
+      console.log("✅ [API] Pagamento criado com sucesso:", {
+        id: response.id,
+        status: response.status
+      });
+      
       return response;
     } catch (error) {
       console.error("❌ [API] Erro ao criar pagamento:", error);
       
-      // Fallback para modo de demonstração quando o servidor está offline
-      if (error instanceof Error && (error.message.includes('500') || error.message.includes('Endpoint não encontrado'))) {
-        console.log("🔄 [API] Servidor offline, usando modo de demonstração...");
+      // Fallback para modo de demonstração
+      if (error instanceof Error && (
+        error.message.includes('500') || 
+        error.message.includes('Endpoint não encontrado') ||
+        error.message.includes('503') ||
+        error.message.includes('Timeout')
+      )) {
+        console.log("🔄 [API] Servidor offline/indisponível, usando modo demonstração...");
         return this.createMockPayment(data);
       }
       
@@ -125,12 +179,149 @@ export const api = {
     }
   },
 
-  // ===== PAGAMENTO MOCK (FALLBACK) =====
+  // ===== STATUS DE PAGAMENTO =====
+  async getPaymentStatus(paymentId: string | number): Promise<PaymentStatus> {
+    console.log("📊 [API] Consultando status do pagamento:", paymentId);
+
+    if (!paymentId) {
+      throw new Error("ID do pagamento é obrigatório");
+    }
+
+    const paymentIdStr = String(paymentId);
+
+    // Se for pagamento mock, usar lógica mock
+    if (paymentIdStr.startsWith('mock_')) {
+      console.log("🎭 [API] Detectado pagamento mock, usando lógica de demonstração");
+      return this.getMockPaymentStatus(paymentIdStr);
+    }
+
+    try {
+      const response = await makeRequest<PaymentStatus>(`/payments/status/${paymentIdStr}`);
+      console.log("✅ [API] Status obtido:", response);
+      return response;
+    } catch (error) {
+      console.error("❌ [API] Erro ao consultar status do pagamento:", error);
+      
+      // Fallback para status pending se o endpoint não existir
+      if (error instanceof Error && (
+        error.message.includes('404') || 
+        error.message.includes('Endpoint não encontrado') ||
+        error.message.includes('Not Found')
+      )) {
+        console.log("🔄 [API] Endpoint não encontrado, retornando status pending...");
+        return {
+          id: paymentIdStr,
+          status: "pending",
+          paymentId: paymentIdStr,
+        };
+      }
+      
+      throw error;
+    }
+  },
+
+  // ===== LINKS DE DOWNLOAD =====
+  async getDownloadLinks(paymentId: string | number): Promise<DownloadResponse> {
+    console.log("📥 [API] Buscando links de download para pagamento:", paymentId);
+
+    if (!paymentId) {
+      throw new Error("ID do pagamento é obrigatório");
+    }
+
+    const paymentIdStr = String(paymentId);
+
+    // Se for pagamento mock, usar links mock
+    if (paymentIdStr.startsWith('mock_')) {
+      console.log("🎭 [API] Detectado pagamento mock, retornando links de demonstração");
+      return this.getMockDownloadLinks(paymentIdStr);
+    }
+
+    try {
+      const response = await makeRequest<PaymentStatus>(`/payments/status/${paymentIdStr}`);
+      
+      // Verificar se há links de download na resposta
+      if (response && response.download_links && Array.isArray(response.download_links)) {
+        console.log("✅ [API] Links de download encontrados:", response.download_links.length);
+        
+        return {
+          links: response.download_links.map((link: any) => link.download_url || link),
+          products: response.download_links.map((link: any, index: number) => ({
+            id: link.produto_id || index + 1,
+            name: link.nome || `Produto ${index + 1}`,
+            description: `Download: ${link.nome || `Produto ${index + 1}`}`,
+            price: 0,
+            image_url: "https://images.pexels.com/photos/196644/pexels-photo-196644.jpeg?auto=compress&cs=tinysrgb&w=500",
+            category: "Digital",
+            download_url: link.download_url || link,
+            quantity: link.quantidade || 1
+          })),
+          customerName: "Cliente",
+          total: response.transaction_amount || 0,
+          downloadedAt: new Date().toISOString(),
+          expiresIn: "7 dias"
+        };
+      }
+      
+      // Se não há links, retornar estrutura vazia
+      console.log("⚠️ [API] Nenhum link de download encontrado");
+      return {
+        links: [],
+        products: [],
+        customerName: "Cliente",
+        total: response.transaction_amount || 0,
+        downloadedAt: new Date().toISOString(),
+        expiresIn: "7 dias"
+      };
+    } catch (error) {
+      console.error("❌ [API] Erro ao obter links de download:", error);
+      
+      // Fallback para links mock em caso de erro
+      if (error instanceof Error && (
+        error.message.includes('404') || 
+        error.message.includes('Endpoint não encontrado') ||
+        error.message.includes('Not Found')
+      )) {
+        console.log("🔄 [API] Endpoint de download não encontrado, retornando links mock...");
+        return this.getMockDownloadLinks(paymentIdStr);
+      }
+      
+      throw error;
+    }
+  },
+
+  // ===== UTILITÁRIOS =====
+  async wakeUpServer(): Promise<void> {
+    try {
+      console.log("⏰ [API] Acordando servidor...");
+      const healthUrl = BACKEND_URL.replace('/api', '/health');
+      console.log("🩺 [API] Testando health check:", healthUrl);
+      
+      const response = await fetch(healthUrl, {
+        method: "GET",
+        signal: AbortSignal.timeout(10000), // 10 segundos para wake up
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        console.log("✅ [API] Servidor está ativo:", data);
+      } else {
+        console.warn("⚠️ [API] Servidor respondeu mas com erro:", response.status);
+      }
+    } catch (error) {
+      console.warn("❌ [API] Falha ao acordar servidor:", error);
+    }
+  },
+
+  // ===== FUNÇÕES MOCK (DEMONSTRAÇÃO) =====
   createMockPayment(data: CreatePaymentRequest): PaymentData {
-    const mockPaymentId = `mock_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    const timestamp = Date.now();
+    const randomId = Math.random().toString(36).substr(2, 9);
+    const mockPaymentId = `mock_${timestamp}_${randomId}`;
     
-    // Simula um QR Code PIX (base64 de uma imagem simples)
-    const mockQRCode = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==";
+    console.log("🎭 [API] Criando pagamento mock:", mockPaymentId);
+    
+    // QR Code mock (imagem 1x1 pixel transparente)
+    const mockQRCode = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==";
     
     return {
       id: mockPaymentId,
@@ -142,8 +333,8 @@ export const api = {
         "https://example.com/download/produto1.pdf",
         "https://example.com/download/produto2.pdf"
       ],
-      produtos: data.carrinho.map(item => ({
-        id: item.id,
+      produtos: data.carrinho.map((item, index) => ({
+        id: typeof item.id === 'number' ? item.id : index + 1,
         name: item.name,
         description: `Descrição do ${item.name}`,
         price: data.total / data.carrinho.length,
@@ -158,239 +349,137 @@ export const api = {
     };
   },
 
-  // 🔧 CORREÇÃO CRÍTICA: Status do pagamento
-  async getPaymentStatus(paymentId: string | number): Promise<PaymentStatus> {
-    console.log("📊 [API] Consultando status do pagamento:", paymentId);
-
-    if (!paymentId) {
-      throw new Error("ID do pagamento é obrigatório");
-    }
-
-    // Converter para string
-    const paymentIdStr = String(paymentId);
-
-    try {
-      const response = await makeRequest<PaymentStatus>(`/payments/status/${paymentIdStr}`);
-      console.log("✅ [API] Status obtido:", response);
-      return response;
-    } catch (error) {
-      console.error("❌ [API] Erro ao consultar status do pagamento:", error);
-      
-      // Se for pagamento mock, usar status mock
-      if (paymentIdStr.startsWith('mock_')) {
-        console.log("🔄 [API] Consultando status de pagamento mock...");
-        return this.getMockPaymentStatus(paymentIdStr);
-      }
-      
-      // Tratamento melhor do erro 404
-      if (error instanceof Error && (
-        error.message.includes('404') || 
-        error.message.includes('Endpoint não encontrado') ||
-        error.message.includes('Not Found')
-      )) {
-        console.log("🔄 [API] Endpoint não encontrado, retornando status temporário...");
-        return {
-          id: paymentIdStr,
-          status: "pending",
-          paymentId: paymentIdStr,
-        };
-      }
-      
-      throw error;
-    }
-  },
-
   getMockPaymentStatus(paymentId: string): PaymentStatus {
-    const paymentIdStr = String(paymentId);
-    const parts = paymentIdStr.split('_');
+    console.log("🎭 [API] Obtendo status mock para:", paymentId);
+    
+    const parts = paymentId.split('_');
     
     if (parts.length >= 2) {
       const timestamp = parseInt(parts[1]);
+      
       if (!isNaN(timestamp)) {
         const elapsed = Date.now() - timestamp;
-        // Se passou mais de 30 segundos, considera como aprovado
-        const status = elapsed > 30000 ? "approved" : "pending";
         
-        return {
-          id: paymentIdStr,
-          status,
-          paymentId: paymentIdStr
-        };
+        // Simula aprovação após 30 segundos
+        if (elapsed > 30000) {
+          console.log("✅ [API] Mock: Pagamento aprovado (passou dos 30s)");
+          return {
+            id: paymentId,
+            status: "approved",
+            paymentId: paymentId,
+            transaction_amount: 99.99
+          };
+        } else {
+          const remainingSeconds = Math.ceil((30000 - elapsed) / 1000);
+          console.log(`⏳ [API] Mock: Aguardando aprovação (${remainingSeconds}s restantes)`);
+          return {
+            id: paymentId,
+            status: "pending",
+            paymentId: paymentId
+          };
+        }
       }
     }
     
-    // Fallback se não conseguir parsear o timestamp
+    // Fallback
     return {
-      id: paymentIdStr,
+      id: paymentId,
       status: "pending",
-      paymentId: paymentIdStr
+      paymentId: paymentId
     };
   },
 
-  // 🔧 CORREÇÃO: Links de download
-  async getDownloadLinks(paymentId: string | number): Promise<DownloadResponse> {
-    console.log("📥 [API] Buscando links de download:", paymentId);
-
-    if (!paymentId) {
-      throw new Error("ID do pagamento é obrigatório");
-    }
-
-    // Converter para string
-    const paymentIdStr = String(paymentId);
-
-    try {
-      const response = await makeRequest<PaymentStatus>(`/payments/status/${paymentIdStr}`);
-      
-      // Extrair links de download da resposta de status
-      if (response && response.download_links) {
-        return {
-          links: response.download_links.map((link: any) => link.download_url),
-          products: response.download_links.map((link: any) => ({
-            id: link.produto_id,
-            name: link.nome,
-            description: `Download: ${link.nome}`,
-            price: 0,
-            image_url: "https://images.pexels.com/photos/196644/pexels-photo-196644.jpeg?auto=compress&cs=tinysrgb&w=500",
-            category: "Digital",
-            download_url: link.download_url
-          })),
-          customerName: "Cliente",
-          total: response.transaction_amount || 0,
-          downloadedAt: new Date().toISOString(),
-          expiresIn: "7 dias"
-        };
-      }
-      
-      // Se não há links de download, retornar estrutura vazia
-      return {
-        links: [],
-        products: [],
-        customerName: "Cliente",
-        total: response.transaction_amount || 0,
-        downloadedAt: new Date().toISOString(),
-        expiresIn: "7 dias"
-      };
-    } catch (error) {
-      console.error("❌ [API] Erro ao obter links de download:", error);
-      
-      // Se for pagamento mock
-      if (paymentIdStr.startsWith('mock_')) {
-        console.log("🔄 [API] Obtendo links de download mock...");
-        return this.getMockDownloadLinks(paymentIdStr);
-      }
-      
-      // Tratamento para endpoint não encontrado
-      if (error instanceof Error && (
-        error.message.includes('404') || 
-        error.message.includes('Endpoint não encontrado') ||
-        error.message.includes('Not Found')
-      )) {
-        console.log("🔄 [API] Endpoint de download não encontrado, retornando links mock...");
-        return this.getMockDownloadLinks(paymentIdStr);
-      }
-      
-      throw error;
-    }
-  },
-
   getMockDownloadLinks(paymentId: string): DownloadResponse {
-    const paymentIdStr = String(paymentId);
+    console.log("🎭 [API] Gerando links de download mock para:", paymentId);
     
     return {
       links: [
-        "https://example.com/download/produto1.pdf",
-        "https://example.com/download/produto2.pdf",
-        "https://example.com/download/bonus.pdf"
+        "https://www.learningcontainer.com/wp-content/uploads/2019/09/sample-pdf-file.pdf",
+        "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
+        "https://filesamples.com/samples/document/pdf/sample1.pdf"
       ],
       products: [
         {
           id: 1,
-          name: "Produto Digital Demo",
-          description: "Descrição do produto digital de demonstração",
-          price: 39.9,
+          name: "Produto Demo 1",
+          description: "Primeiro produto digital de demonstração",
+          price: 49.99,
           image_url: "https://images.pexels.com/photos/196644/pexels-photo-196644.jpeg?auto=compress&cs=tinysrgb&w=500",
           category: "Digital",
-          download_url: "https://example.com/download/produto1.pdf"
+          download_url: "https://www.learningcontainer.com/wp-content/uploads/2019/09/sample-pdf-file.pdf",
+          quantity: 1
+        },
+        {
+          id: 2,
+          name: "Produto Demo 2", 
+          description: "Segundo produto digital de demonstração",
+          price: 29.99,
+          image_url: "https://images.pexels.com/photos/265087/pexels-photo-265087.jpeg?auto=compress&cs=tinysrgb&w=500",
+          category: "Digital",
+          download_url: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
+          quantity: 1
         }
       ],
       customerName: "Cliente Demo",
-      total: 39.9,
+      total: 79.98,
       downloadedAt: new Date().toISOString(),
       expiresIn: "7 dias"
     };
   },
 
-  // ===== UTILITÁRIOS =====
-  async wakeUpServer(): Promise<void> {
-    try {
-      console.log("⏰ [API] Acordando servidor...");
-      const healthUrl = BACKEND_URL.replace('/api', '/health');
-      const response = await fetch(healthUrl, {
-        method: "GET",
-        signal: AbortSignal.timeout(5000),
-      });
-      
-      if (response.ok) {
-        console.log("✅ [API] Servidor está ativo");
-      } else {
-        console.warn("⚠️ [API] Servidor não está respondendo");
-      }
-    } catch (error) {
-      console.warn("❌ [API] Falha ao acordar servidor:", error);
-    }
-  },
-
-  // ===== DADOS MOCKADOS (FALLBACK) =====
+  // ===== PRODUTOS MOCK =====
   getMockProducts(): Product[] {
+    console.log("🎭 [API] Retornando produtos mock");
+    
     return [
       {
         id: 1,
         name: "Curso Completo de React.js",
-        price: 0.1,
-        description: "Aprenda React.js do básico ao avançado com projetos práticos",
+        price: 149.99,
+        description: "Aprenda React.js do básico ao avançado com projetos práticos e reais",
         category: "Programação",
         image_url: "https://images.pexels.com/photos/11035380/pexels-photo-11035380.jpeg?auto=compress&cs=tinysrgb&w=500",
       },
       {
         id: 2,
         name: "E-book: Design System Completo",
-        price: 79.9,
-        description: "Guia completo para criar e manter design systems eficazes",
+        price: 79.90,
+        description: "Guia completo para criar e manter design systems eficazes e escaláveis",
         category: "Design",
         image_url: "https://images.pexels.com/photos/196644/pexels-photo-196644.jpeg?auto=compress&cs=tinysrgb&w=500",
       },
       {
         id: 3,
         name: "Template Premium Dashboard",
-        price: 89.9,
-        description: "Template profissional para dashboards administrativos",
+        price: 89.90,
+        description: "Template profissional para dashboards administrativos modernos",
         category: "Templates",
         image_url: "https://images.pexels.com/photos/265087/pexels-photo-265087.jpeg?auto=compress&cs=tinysrgb&w=500",
       },
       {
         id: 4,
         name: "Masterclass: Marketing Digital",
-        price: 199.9,
-        description: "Estratégias avançadas de marketing digital para 2024",
+        price: 199.90,
+        description: "Estratégias avançadas de marketing digital para 2024 e além",
         category: "Marketing",
         image_url: "https://images.pexels.com/photos/265087/pexels-photo-265087.jpeg?auto=compress&cs=tinysrgb&w=500",
       },
       {
         id: 5,
         name: "Pack de Ícones Premium",
-        price: 39.9,
-        description: "Coleção com mais de 1000 ícones vetoriais premium",
+        price: 39.90,
+        description: "Coleção exclusiva com mais de 1000 ícones vetoriais premium",
         category: "Design",
         image_url: "https://images.pexels.com/photos/196644/pexels-photo-196644.jpeg?auto=compress&cs=tinysrgb&w=500",
       },
       {
         id: 6,
         name: "Curso Node.js Avançado",
-        price: 179.9,
-        description: "Desenvolvimento backend avançado com Node.js e Express",
+        price: 179.90,
+        description: "Desenvolvimento backend profissional com Node.js, Express e MongoDB",
         category: "Programação",
         image_url: "https://images.pexels.com/photos/11035380/pexels-photo-11035380.jpeg?auto=compress&cs=tinysrgb&w=500",
       },
     ];
-  },
+  }
 };
