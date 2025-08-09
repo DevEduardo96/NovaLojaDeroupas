@@ -170,13 +170,6 @@ export const Header: React.FC<HeaderProps> = ({
                 {/* User Menu Dropdown */}
                 {showUserMenu && (
                   <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200">
-                    <div className="px-4 py-2 text-sm text-gray-700 border-b border-gray-100">
-                      <p className="font-medium">
-                        {user.user_metadata?.full_name || user.email}
-                      </p>
-                      <p className="text-xs text-gray-500">{user.email}</p>
-                    </div>
-
                     <Link
                       to="/meu-perfil"
                       className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
