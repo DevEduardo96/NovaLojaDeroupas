@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, createContext, useContext } from "react";
 import { Router, Route, Switch, useLocation } from "wouter";
 import { Header } from "./components/Header";
 import { Cart } from "./components/Cart";
@@ -9,7 +9,6 @@ import { CheckoutForm } from "./components/CheckoutForm";
 import { PaymentStatus } from "./components/PaymentStatus";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { useCart } from "./hooks/useCart";
-import { useState, createContext, useContext } from "react";
 import { api } from "./services/api";
 import type { Product, PaymentData } from "./types";
 import { Login } from "./pages/Login";
@@ -48,21 +47,7 @@ function AppContent() {
   } = useCart();
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
-  const [showProductDetails, setShowProductDetails] = useState(false);
-  const [selectedProductId, setSelectedProductId] = useState<number | null>(
-    null
-  );
   const { paymentData, setPaymentData } = useContext(PaymentDataContext);
-
-  const handleShowProductDetails = (product: Product) => {
-    setSelectedProductId(product.id);
-    setShowProductDetails(true);
-  };
-
-  const handleBackFromDetails = () => {
-    setShowProductDetails(false);
-    setSelectedProductId(null);
-  };
 
   const handlePaymentSubmit = async (customerData: {
     nomeCliente: string;
@@ -89,36 +74,6 @@ function AppContent() {
     }
   };
 
-  // Show product details if selected
-  if (showProductDetails && selectedProductId) {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        <Header
-          cartItemCount={getItemCount()}
-          onCartClick={() => setIsCartOpen(true)}
-        />
-        <SupabaseProductDetail
-          productId={selectedProductId}
-          onBack={handleBackFromDetails}
-          onAddToCart={addToCart}
-        />
-        <Cart
-          items={items}
-          isOpen={isCartOpen}
-          onClose={() => setIsCartOpen(false)}
-          onUpdateQuantity={updateQuantity}
-          onRemoveItem={removeFromCart}
-          onCheckout={() => {
-            setIsCartOpen(false);
-            setLocation("/checkout");
-          }}
-          total={getTotal()}
-        />
-        <WhatsAppButton />
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-gray-50">
       <Header
@@ -130,16 +85,27 @@ function AppContent() {
         <Switch>
           <Route path="/">
             <Hero />
-
           </Route>
+
           <Route path="/produtos">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
               <SupabaseProductGrid
                 onAddToCart={addToCart}
-                onProductClick={handleShowProductDetails}
+                onProductClick={(product) => setLocation(`/produto/${product.id}`)}
               />
             </div>
           </Route>
+
+          <Route path="/produto/:id">
+            {(params) => (
+              <SupabaseProductDetail
+                productId={Number(params.id)}
+                onBack={() => setLocation("/produtos")}
+                onAddToCart={addToCart}
+              />
+            )}
+          </Route>
+
           <Route path="/login">
             <Login />
           </Route>
@@ -150,7 +116,7 @@ function AppContent() {
             <ProtectedRoute>
               <Favorites
                 onAddToCart={addToCart}
-                onProductClick={handleShowProductDetails}
+                onProductClick={(product) => setLocation(`/produto/${product.id}`)}
               />
             </ProtectedRoute>
           </Route>
