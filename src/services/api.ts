@@ -1,4 +1,4 @@
-// SUBSTITUA COMPLETAMENTE o conteúdo do arquivo src/services/api.ts por este código:
+// SUBSTITUA o conteúdo do seu src/services/api.ts por este código:
 
 import { apiClient } from "./apiClient";
 import {
@@ -12,13 +12,50 @@ import {
   ProductFilters,
 } from "../types";
 
+// URL base do backend - CORREÇÃO DEFINITIVA
+const BACKEND_URL = import.meta.env.VITE_API_BASE_URL || "https://backend-nectix.onrender.com/api";
+
+console.log("🔧 [API] Backend URL configurada:", BACKEND_URL);
+
+// Cliente HTTP personalizado para garantir URLs corretas
+const makeRequest = async <T>(endpoint: string, options: RequestInit = {}): Promise<T> => {
+  const url = `${BACKEND_URL}${endpoint}`;
+  console.log(`🌐 [API] Fazendo requisição para: ${url}`);
+  
+  try {
+    const response = await fetch(url, {
+      ...options,
+      headers: {
+        "Content-Type": "application/json",
+        ...options.headers,
+      },
+    });
+
+    if (!response.ok) {
+      let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+      try {
+        const errorData = await response.json();
+        errorMessage = errorData.error || errorData.message || errorMessage;
+      } catch {
+        // Se não conseguir parsear o erro, usa a mensagem padrão
+      }
+      throw new Error(errorMessage);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error(`❌ [API] Erro na requisição para ${url}:`, error);
+    throw error;
+  }
+};
+
 export const api = {
   // ===== PRODUTOS =====
   async getProducts(filters?: ProductFilters): Promise<Product[]> {
     try {
       // Se não houver filtros, busca todos os produtos
       if (!filters || Object.keys(filters).length === 0) {
-        return await apiClient.get<Product[]>("/products");
+        return await makeRequest<Product[]>("/products");
       }
 
       // Constrói query string com filtros
@@ -29,7 +66,7 @@ export const api = {
       if (filters.minPrice) params.append("minPrice", filters.minPrice.toString());
       if (filters.maxPrice) params.append("maxPrice", filters.maxPrice.toString());
 
-      return await apiClient.get<Product[]>(`/products?${params.toString()}`);
+      return await makeRequest<Product[]>(`/products?${params.toString()}`);
     } catch (error) {
       console.error("Erro ao buscar produtos:", error);
       // Fallback para dados mockados em caso de erro
@@ -39,7 +76,7 @@ export const api = {
 
   async getProductById(id: number): Promise<Product | null> {
     try {
-      return await apiClient.get<Product>(`/products/${id}`);
+      return await makeRequest<Product>(`/products/${id}`);
     } catch (error) {
       console.error(`Erro ao buscar produto ${id}:`, error);
       return null;
@@ -48,7 +85,7 @@ export const api = {
 
   async getProductsByCategory(category: string): Promise<Product[]> {
     try {
-      return await apiClient.get<Product[]>(`/products/category/${category}`);
+      return await makeRequest<Product[]>(`/products/category/${category}`);
     } catch (error) {
       console.error(`Erro ao buscar produtos da categoria ${category}:`, error);
       return [];
@@ -57,7 +94,7 @@ export const api = {
 
   async searchProducts(query: string): Promise<Product[]> {
     try {
-      return await apiClient.get<Product[]>(`/products/search?q=${encodeURIComponent(query)}`);
+      return await makeRequest<Product[]>(`/products/search?q=${encodeURIComponent(query)}`);
     } catch (error) {
       console.error(`Erro ao buscar produtos com query "${query}":`, error);
       return [];
@@ -66,18 +103,21 @@ export const api = {
 
   // ===== PAGAMENTOS =====
   async createPayment(data: CreatePaymentRequest): Promise<PaymentData> {
-    console.log("Criando pagamento:", data);
+    console.log("💳 [API] Criando pagamento:", data);
     
     try {
-      const response = await apiClient.post<PaymentData>("/api/payments/criar-pagamento", data);
-      console.log("Pagamento criado com sucesso:", response);
+      const response = await makeRequest<PaymentData>("/payments/criar-pagamento", {
+        method: "POST",
+        body: JSON.stringify(data),
+      });
+      console.log("✅ [API] Pagamento criado com sucesso:", response);
       return response;
     } catch (error) {
-      console.error("Erro ao criar pagamento:", error);
+      console.error("❌ [API] Erro ao criar pagamento:", error);
       
       // Fallback para modo de demonstração quando o servidor está offline
-      if (error instanceof Error && error.message.includes('500')) {
-        console.log("Servidor offline, usando modo de demonstração...");
+      if (error instanceof Error && (error.message.includes('500') || error.message.includes('Endpoint não encontrado'))) {
+        console.log("🔄 [API] Servidor offline, usando modo de demonstração...");
         return this.createMockPayment(data);
       }
       
@@ -118,37 +158,37 @@ export const api = {
     };
   },
 
-  // 🔧 CORREÇÃO CRÍTICA: Aceita string | number e converte para string
+  // 🔧 CORREÇÃO CRÍTICA: Status do pagamento
   async getPaymentStatus(paymentId: string | number): Promise<PaymentStatus> {
-    console.log("Consultando status do pagamento:", paymentId);
+    console.log("📊 [API] Consultando status do pagamento:", paymentId);
 
     if (!paymentId) {
       throw new Error("ID do pagamento é obrigatório");
     }
 
-    // 🔧 CORREÇÃO: Converter para string antes de usar startsWith
+    // Converter para string
     const paymentIdStr = String(paymentId);
 
     try {
-      const response = await apiClient.get<PaymentStatus>(`/payments/status/${paymentIdStr}`);
-      console.log("Status obtido:", response);
+      const response = await makeRequest<PaymentStatus>(`/payments/status/${paymentIdStr}`);
+      console.log("✅ [API] Status obtido:", response);
       return response;
     } catch (error) {
-      console.error("Erro ao consultar status do pagamento:", error);
+      console.error("❌ [API] Erro ao consultar status do pagamento:", error);
       
-      // 🔧 CORREÇÃO: Usar a versão string para startsWith
+      // Se for pagamento mock, usar status mock
       if (paymentIdStr.startsWith('mock_')) {
-        console.log("Consultando status de pagamento mock...");
+        console.log("🔄 [API] Consultando status de pagamento mock...");
         return this.getMockPaymentStatus(paymentIdStr);
       }
       
-      // 🔧 CORREÇÃO: Tratamento melhor do erro 404
+      // Tratamento melhor do erro 404
       if (error instanceof Error && (
         error.message.includes('404') || 
         error.message.includes('Endpoint não encontrado') ||
         error.message.includes('Not Found')
       )) {
-        console.log("Endpoint não encontrado, retornando status temporário...");
+        console.log("🔄 [API] Endpoint não encontrado, retornando status temporário...");
         return {
           id: paymentIdStr,
           status: "pending",
@@ -187,19 +227,19 @@ export const api = {
     };
   },
 
-  // 🔧 CORREÇÃO: Aceita string | number
+  // 🔧 CORREÇÃO: Links de download
   async getDownloadLinks(paymentId: string | number): Promise<DownloadResponse> {
-    console.log("Buscando links de download:", paymentId);
+    console.log("📥 [API] Buscando links de download:", paymentId);
 
     if (!paymentId) {
       throw new Error("ID do pagamento é obrigatório");
     }
 
-    // 🔧 CORREÇÃO: Converter para string
+    // Converter para string
     const paymentIdStr = String(paymentId);
 
     try {
-      const response = await apiClient.get<PaymentStatus>(`/payments/status/${paymentIdStr}`);
+      const response = await makeRequest<PaymentStatus>(`/payments/status/${paymentIdStr}`);
       
       // Extrair links de download da resposta de status
       if (response && response.download_links) {
@@ -230,24 +270,22 @@ export const api = {
         downloadedAt: new Date().toISOString(),
         expiresIn: "7 dias"
       };
-      console.log("Links de download obtidos:", response);
-      // Retornar a resposta que foi construída acima
     } catch (error) {
-      console.error("Erro ao obter links de download:", error);
+      console.error("❌ [API] Erro ao obter links de download:", error);
       
-      // 🔧 CORREÇÃO: Usar versão string
+      // Se for pagamento mock
       if (paymentIdStr.startsWith('mock_')) {
-        console.log("Obtendo links de download mock...");
+        console.log("🔄 [API] Obtendo links de download mock...");
         return this.getMockDownloadLinks(paymentIdStr);
       }
       
-      // 🔧 CORREÇÃO: Tratamento para endpoint não encontrado
+      // Tratamento para endpoint não encontrado
       if (error instanceof Error && (
         error.message.includes('404') || 
         error.message.includes('Endpoint não encontrado') ||
         error.message.includes('Not Found')
       )) {
-        console.log("Endpoint de download não encontrado, retornando links mock...");
+        console.log("🔄 [API] Endpoint de download não encontrado, retornando links mock...");
         return this.getMockDownloadLinks(paymentIdStr);
       }
       
@@ -282,65 +320,23 @@ export const api = {
     };
   },
 
-  // ===== USUÁRIOS =====
-  async getUserProfile(): Promise<any> {
-    try {
-      return await apiClient.get("/users/profile");
-    } catch (error) {
-      console.error("Erro ao buscar perfil do usuário:", error);
-      throw error;
-    }
-  },
-
-  async updateUserProfile(data: any): Promise<any> {
-    try {
-      return await apiClient.put("/users/profile", data);
-    } catch (error) {
-      console.error("Erro ao atualizar perfil do usuário:", error);
-      throw error;
-    }
-  },
-
-  // ===== FAVORITOS =====
-  async getFavorites(): Promise<Product[]> {
-    try {
-      return await apiClient.get<Product[]>("/favorites");
-    } catch (error) {
-      console.error("Erro ao buscar favoritos:", error);
-      return [];
-    }
-  },
-
-  async addToFavorites(productId: number): Promise<void> {
-    try {
-      await apiClient.post("/favorites", { productId });
-    } catch (error) {
-      console.error("Erro ao adicionar aos favoritos:", error);
-      throw error;
-    }
-  },
-
-  async removeFromFavorites(productId: number): Promise<void> {
-    try {
-      await apiClient.delete(`/favorites/${productId}`);
-    } catch (error) {
-      console.error("Erro ao remover dos favoritos:", error);
-      throw error;
-    }
-  },
-
   // ===== UTILITÁRIOS =====
   async wakeUpServer(): Promise<void> {
     try {
-      console.log("Acordando servidor...");
-      const isHealthy = await apiClient.healthCheck();
-      if (isHealthy) {
-        console.log("Servidor está ativo");
+      console.log("⏰ [API] Acordando servidor...");
+      const healthUrl = BACKEND_URL.replace('/api', '/health');
+      const response = await fetch(healthUrl, {
+        method: "GET",
+        signal: AbortSignal.timeout(5000),
+      });
+      
+      if (response.ok) {
+        console.log("✅ [API] Servidor está ativo");
       } else {
-        console.warn("Servidor não está respondendo");
+        console.warn("⚠️ [API] Servidor não está respondendo");
       }
     } catch (error) {
-      console.warn("Falha ao acordar servidor:", error);
+      console.warn("❌ [API] Falha ao acordar servidor:", error);
     }
   },
 
