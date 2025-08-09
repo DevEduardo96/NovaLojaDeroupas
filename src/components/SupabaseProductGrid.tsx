@@ -150,10 +150,10 @@ const SupabaseProductGrid: React.FC<SupabaseProductGridProps> = ({
 
   return (
     <div className="p-4">
-      {/* Filtros e busca */}
+      {/* Filtros e busca - Mais compacto */}
       {showFilter && (
-        <div className="bg-white rounded-lg shadow-sm border p-6 mb-8">
-          <div className="flex flex-col md:flex-row gap-4">
+        <div className="bg-white rounded-xl shadow-sm border p-4 mb-6">
+          <div className="flex flex-col md:flex-row gap-3">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
               <Input
@@ -161,7 +161,7 @@ const SupabaseProductGrid: React.FC<SupabaseProductGridProps> = ({
                 placeholder="Buscar produtos..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10"
+                className="pl-10 h-10"
               />
             </div>
 
@@ -170,9 +170,9 @@ const SupabaseProductGrid: React.FC<SupabaseProductGridProps> = ({
               <Select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
-                className="min-w-[150px]"
+                className="min-w-[140px] h-10"
               >
-                <option value="">Todas as categorias</option>
+                <option value="">Todas</option>
                 {categories.map((category) => (
                   <option key={category}>{category}</option>
                 ))}
@@ -182,21 +182,21 @@ const SupabaseProductGrid: React.FC<SupabaseProductGridProps> = ({
             <Select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="min-w-[150px]"
+              className="min-w-[130px] h-10"
             >
-              <option value="newest">Mais recentes</option>
+              <option value="newest">Recentes</option>
               <option value="preco-low">Menor preço</option>
               <option value="preco-high">Maior preço</option>
               <option value="name">Nome A-Z</option>
             </Select>
           </div>
-          <p className="mt-4 text-sm text-gray-600">
+          <p className="mt-3 text-xs text-gray-500">
             {filteredProducts.length} produto(s) encontrado(s)
           </p>
         </div>
       )}
 
-      {/* Lista de produtos */}
+      {/* Lista de produtos - Grid mais denso */}
       {filteredProducts.length === 0 ? (
         <div className="text-center py-12">
           <p className="text-gray-500 text-lg">Nenhum produto encontrado</p>
@@ -205,44 +205,50 @@ const SupabaseProductGrid: React.FC<SupabaseProductGridProps> = ({
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
           {filteredProducts.map((product) => (
             <div
               key={product.id}
               onClick={() => handleClickProduct(product)}
-              className="bg-white rounded-2xl shadow-sm hover:shadow-md transition-all cursor-pointer overflow-hidden group"
+              className="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 cursor-pointer overflow-hidden group border border-gray-100 hover:border-blue-200"
             >
-              {/* Imagem e badges */}
+              {/* Imagem compacta */}
               <div className="relative">
                 <img
                   src={product.image_url}
                   alt={product.name}
-                  className="w-full h-50 object-cover"
+                  className="w-full h-32 sm:h-40 object-cover group-hover:scale-105 transition-transform duration-300"
                   onError={(e) =>
                     ((e.target as HTMLImageElement).src =
                       "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&h=400&fit=crop")
                   }
                 />
-                <div className="absolute top-4 left-4">
-                  <span className="px-3 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full">
+                
+                {/* Badge categoria */}
+                <div className="absolute top-2 left-2">
+                  <span className="px-2 py-1 bg-black bg-opacity-70 text-white text-xs font-medium rounded-md backdrop-blur-sm">
                     {product.category}
                   </span>
                 </div>
-                <div className="absolute top-4 right-4">
-                  <div className="flex items-center bg-white bg-opacity-90 rounded-full px-2 py-1">
+                
+                {/* Rating */}
+                <div className="absolute top-2 right-2">
+                  <div className="flex items-center bg-white bg-opacity-90 rounded-lg px-2 py-1 backdrop-blur-sm">
                     <Star className="w-3 h-3 text-yellow-400 mr-1" />
                     <span className="text-xs font-semibold text-gray-800">
                       4.8
                     </span>
                   </div>
                 </div>
+                
+                {/* Botão favorito */}
                 {user && (
                   <button
                     onClick={(e) => handleToggleFavorite(product.id, e)}
-                    className="absolute top-2 right-2 p-2 bg-white bg-opacity-90 rounded-full hover:bg-opacity-100"
+                    className="absolute bottom-2 right-2 p-1.5 bg-white bg-opacity-90 rounded-full hover:bg-opacity-100 transition-all shadow-sm"
                   >
                     <Heart
-                      className={`h-4 w-4 ${
+                      className={`h-3 w-3 ${
                         isFavorite(product.id)
                           ? "text-red-500 fill-current"
                           : "text-gray-400"
@@ -252,50 +258,47 @@ const SupabaseProductGrid: React.FC<SupabaseProductGridProps> = ({
                 )}
               </div>
 
-              {/* Conteúdo */}
-              <div className="p-6 w-full">
-                <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-2">
+              {/* Conteúdo compacto */}
+              <div className="p-3">
+                <h3 className="text-sm font-semibold text-gray-900 mb-1 line-clamp-2 leading-tight">
                   {product.name}
                 </h3>
-                <p className="text-gray-600 text-sm mb-4 line-clamp-2">
-                  {product.description}
-                </p>
-
-                {/* Preços + Download */}
-                <div className="mb-6">
-                  <div className="flex flex-wrap items-center gap-4">
-                    <span className="text-2xl font-bold text-blue-600">
+                
+                {/* Preço em destaque */}
+                <div className="mb-3">
+                  <div className="flex items-center gap-2">
+                    <span className="text-lg font-bold text-blue-600">
                       {formatPrice(product.price)}
                     </span>
                     {product.original_price && (
-                      <h5 className="text-lg font-bold text-red-500 line-through">
+                      <span className="text-xs text-gray-400 line-through">
                         {formatPrice(product.original_price)}
-                      </h5>
+                      </span>
                     )}
-                    <div className="flex items-center text-gray-500 text-sm">
-                      <Download className="w-4 h-4 mr-1" />
-                      <span>Download Digital</span>
-                    </div>
+                  </div>
+                  <div className="flex items-center text-gray-500 text-xs mt-1">
+                    <Download className="w-3 h-3 mr-1" />
+                    <span>Digital</span>
                   </div>
                 </div>
 
-                {/* Botões */}
+                {/* Botões compactos */}
                 {showActions && (
-                  <div className="space-y-3">
+                  <div className="flex gap-2">
                     <button
                       onClick={() => handleClickProduct(product)}
-                      className="w-full flex items-center justify-center space-x-2 bg-gray-100 text-gray-700 py-3 rounded-lg font-medium hover:bg-gray-200"
+                      className="flex-1 flex items-center justify-center bg-gray-50 text-gray-700 py-2 px-2 rounded-lg text-xs font-medium hover:bg-gray-100 transition-colors"
                     >
-                      <Eye className="w-4 h-4" />
-                      <span>Ver Detalhes</span>
+                      <Eye className="w-3 h-3 mr-1" />
+                      <span className="hidden sm:inline">Ver</span>
                     </button>
 
                     <button
                       onClick={(e) => handleAddToCart(product, e)}
-                      className="w-full flex items-center justify-center space-x-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-lg font-medium hover:from-blue-700 hover:to-purple-700 transition-all duration-200 transform hover:scale-[1.02]"
+                      className="flex-1 flex items-center justify-center bg-gradient-to-r from-blue-600 to-blue-700 text-white py-2 px-2 rounded-lg text-xs font-medium hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-sm"
                     >
-                      <ShoppingCart className="w-4 h-4" />
-                      <span>Adicionar ao Carrinho</span>
+                      <ShoppingCart className="w-3 h-3 mr-1" />
+                      <span className="hidden sm:inline">Add</span>
                     </button>
                   </div>
                 )}
