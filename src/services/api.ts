@@ -150,7 +150,7 @@ export const api = {
     });
     
     try {
-      const response = await makeRequest<PaymentData>("api/payments/criar-pagamento", {
+      const response = await makeRequest<PaymentData>("/api/payments/criar-pagamento", {
         method: "POST",
         body: JSON.stringify(data),
       });
@@ -196,7 +196,7 @@ export const api = {
     }
 
     try {
-      const response = await makeRequest<PaymentStatus>(`api/payments/status/${paymentIdStr}`);
+      const response = await makeRequest<PaymentStatus>(`/api/payments/status/${paymentIdStr}`);
       console.log("✅ [API] Status obtido:", response);
       return response;
     } catch (error) {
