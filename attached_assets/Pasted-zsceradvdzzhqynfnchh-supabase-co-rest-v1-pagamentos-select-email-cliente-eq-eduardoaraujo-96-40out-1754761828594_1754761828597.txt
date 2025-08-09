@@ -1,0 +1,130 @@
+zsceradvdzzhqynfnchh.supabase.co/rest/v1/pagamentos?select=*&email_cliente=eq.eduardoaraujo_96%40outlook.com&order=created_at.desc:1  Failed to load resource: the server responded with a status of 400 ()
+index-D8ezt63Y.js:503 Error fetching user payments: Object
+getUserPayments @ index-D8ezt63Y.js:503
+index-D8ezt63Y.js:503 Error in getUserPayments: Error: Failed to fetch user payments: column pagamentos.email_cliente does not exist
+    at Object.getUserPayments (index-D8ezt63Y.js:503:11878)
+    at async l (index-D8ezt63Y.js:503:13213)
+getUserPayments @ index-D8ezt63Y.js:503
+index-D8ezt63Y.js:503 Error in usePayments: Error: Failed to fetch user payments: column pagamentos.email_cliente does not exist
+    at Object.getUserPayments (index-D8ezt63Y.js:503:11878)
+    at async l (index-D8ezt63Y.js:503:13213)
+l @ index-D8ezt63Y.js:503
+zsceradvdzzhqynfnchh.supabase.co/rest/v1/pagamentos?select=*&email_cliente=eq.eduardoaraujo_96%40outlook.com&order=created_at.desc:1  Failed to load resource: the server responded with a status of 400 ()
+index-D8ezt63Y.js:503 Error fetching user payments: Object
+getUserPayments @ index-D8ezt63Y.js:503
+index-D8ezt63Y.js:503 Error in getUserPayments: Error: Failed to fetch user payments: column pagamentos.email_cliente does not exist
+    at Object.getUserPayments (index-D8ezt63Y.js:503:11878)
+    at async l (index-D8ezt63Y.js:503:13213)
+getUserPayments @ index-D8ezt63Y.js:503
+index-D8ezt63Y.js:503 Error in usePayments: Error: Failed to fetch user payments: column pagamentos.email_cliente does not exist
+    at Object.getUserPayments (index-D8ezt63Y.js:503:11878)
+    at async l (index-D8ezt63Y.js:503:13213)
+l @ index-D8ezt63Y.js:503
+zsceradvdzzhqynfnchh.supabase.co/rest/v1/pagamentos?select=*&email_cliente=eq.eduardoaraujo_96%40outlook.com&order=created_at.desc:1  Failed to load resource: the server responded with a status of 400 ()
+index-D8ezt63Y.js:503 Error fetching user payments: Object
+getUserPayments @ index-D8ezt63Y.js:503
+index-D8ezt63Y.js:503 Error in getUserPayments: Error: Failed to fetch user payments: column pagamentos.email_cliente does not exist
+    at Object.getUserPayments (index-D8ezt63Y.js:503:11878)
+    at async l (index-D8ezt63Y.js:503:13213)
+getUserPayments @ index-D8ezt63Y.js:503
+index-D8ezt63Y.js:503 Error in usePayments: Error: Failed to fetch user payments: column pagamentos.email_cliente does not exist
+    at Object.getUserPayments (index-D8ezt63Y.js:503:11878)
+    at async l (index-D8ezt63Y.js:503:13213)
+l @ index-D8ezt63Y.js:503
+zsceradvdzzhqynfnchh.supabase.co/rest/v1/pagamentos?select=*&email_cliente=eq.eduardoaraujo_96%40outlook.com&order=created_at.desc:1  Failed to load resource: the server responded with a status of 400 ()
+index-D8ezt63Y.js:503 Error fetching user payments: Object
+getUserPayments @ index-D8ezt63Y.js:503
+index-D8ezt63Y.js:503 Error in getUserPayments: Error: Failed to fetch user payments: column pagamentos.email_cliente does not exist
+    at Object.getUserPayments (index-D8ezt63Y.js:503:11878)
+    at async l (index-D8ezt63Y.js:503:13213)
+getUserPayments @ index-D8ezt63Y.js:503
+index-D8ezt63Y.js:503 Error in usePayments: Error: Failed to fetch user payments: column pagamentos.email_cliente does not exist
+    at Object.getUserPayments (index-D8ezt63Y.js:503:11878)
+    at async l (index-D8ezt63Y.js:503:13213)
+l @ index-D8ezt63Y.js:503
+zsceradvdzzhqynfnchh.supabase.co/rest/v1/pagamentos?select=*&email_cliente=eq.eduardoaraujo_96%40outlook.com&order=created_at.desc:1  Failed to load resource: the server responded with a status of 400 ()
+index-D8ezt63Y.js:503 Error fetching user payments: Object
+getUserPayments @ index-D8ezt63Y.js:503
+index-D8ezt63Y.js:503 Error in getUserPayments: Error: Failed to fetch user payments: column pagamentos.email_cliente does not exist
+    at Object.getUserPayments (index-D8ezt63Y.js:503:11878)
+    at async l (index-D8ezt63Y.js:503:13213)
+getUserPayments @ index-D8ezt63Y.js:503
+index-D8ezt63Y.js:503 Error in usePayments: Error: Failed to fetch user payments: column pagamentos.email_cliente does not exist
+    at Object.getUserPayments (index-D8ezt63Y.js:503:11878)
+    at async l (index-D8ezt63Y.js:503:13213)
+l @ index-D8ezt63Y.js:503
+zsceradvdzzhqynfnchh.supabase.co/rest/v1/pagamentos?select=*&email_cliente=eq.eduardoaraujo_96%40outlook.com&order=created_at.desc:1  Failed to load resource: the server responded with a status of 400 ()
+index-D8ezt63Y.js:503 Error fetching user payments: Object
+getUserPayments @ index-D8ezt63Y.js:503
+index-D8ezt63Y.js:503 Error in getUserPayments: Error: Failed to fetch user payments: column pagamentos.email_cliente does not exist
+    at Object.getUserPayments (index-D8ezt63Y.js:503:11878)
+    at async l (index-D8ezt63Y.js:503:13213)
+getUserPayments @ index-D8ezt63Y.js:503
+index-D8ezt63Y.js:503 Error in usePayments: Error: Failed to fetch user payments: column pagamentos.email_cliente does not exist
+    at Object.getUserPayments (index-D8ezt63Y.js:503:11878)
+    at async l (index-D8ezt63Y.js:503:13213)
+l @ index-D8ezt63Y.js:503
+zsceradvdzzhqynfnchh.supabase.co/rest/v1/pagamentos?select=*&email_cliente=eq.eduardoaraujo_96%40outlook.com&order=created_at.desc:1  Failed to load resource: the server responded with a status of 400 ()
+index-D8ezt63Y.js:503 Error fetching user payments: Object
+getUserPayments @ index-D8ezt63Y.js:503
+index-D8ezt63Y.js:503 Error in getUserPayments: Error: Failed to fetch user payments: column pagamentos.email_cliente does not exist
+    at Object.getUserPayments (index-D8ezt63Y.js:503:11878)
+    at async l (index-D8ezt63Y.js:503:13213)
+getUserPayments @ index-D8ezt63Y.js:503
+index-D8ezt63Y.js:503 Error in usePayments: Error: Failed to fetch user payments: column pagamentos.email_cliente does not exist
+    at Object.getUserPayments (index-D8ezt63Y.js:503:11878)
+    at async l (index-D8ezt63Y.js:503:13213)
+l @ index-D8ezt63Y.js:503
+zsceradvdzzhqynfnchh.supabase.co/rest/v1/pagamentos?select=*&email_cliente=eq.eduardoaraujo_96%40outlook.com&order=created_at.desc:1  Failed to load resource: the server responded with a status of 400 ()
+index-D8ezt63Y.js:503 Error fetching user payments: Object
+getUserPayments @ index-D8ezt63Y.js:503
+index-D8ezt63Y.js:503 Error in getUserPayments: Error: Failed to fetch user payments: column pagamentos.email_cliente does not exist
+    at Object.getUserPayments (index-D8ezt63Y.js:503:11878)
+    at async l (index-D8ezt63Y.js:503:13213)
+getUserPayments @ index-D8ezt63Y.js:503
+index-D8ezt63Y.js:503 Error in usePayments: Error: Failed to fetch user payments: column pagamentos.email_cliente does not exist
+    at Object.getUserPayments (index-D8ezt63Y.js:503:11878)
+    at async l (index-D8ezt63Y.js:503:13213)
+l @ index-D8ezt63Y.js:503
+zsceradvdzzhqynfnchh.supabase.co/auth/v1/token?grant_type=refresh_token:1  Failed to load resource: the server responded with a status of 429 ()
+index-D8ezt63Y.js:503 Error in getUserPayments: Error: User not authenticated
+    at Object.getUserPayments (index-D8ezt63Y.js:503:11657)
+    at async l (index-D8ezt63Y.js:503:13213)
+getUserPayments @ index-D8ezt63Y.js:503
+index-D8ezt63Y.js:503 Error in usePayments: Error: User not authenticated
+    at Object.getUserPayments (index-D8ezt63Y.js:503:11657)
+    at async l (index-D8ezt63Y.js:503:13213)
+l @ index-D8ezt63Y.js:503
+index-D8ezt63Y.js:503 Error in getUserPayments: Error: User not authenticated
+    at Object.getUserPayments (index-D8ezt63Y.js:503:11657)
+    at async l (index-D8ezt63Y.js:503:13213)
+getUserPayments @ index-D8ezt63Y.js:503
+index-D8ezt63Y.js:503 Error in usePayments: Error: User not authenticated
+    at Object.getUserPayments (index-D8ezt63Y.js:503:11657)
+    at async l (index-D8ezt63Y.js:503:13213)
+l @ index-D8ezt63Y.js:503
+zsceradvdzzhqynfnchh.supabase.co/rest/v1/pagamentos?select=*&email_cliente=eq.eduardoaraujo_96%40outlook.com&order=created_at.desc:1  Failed to load resource: the server responded with a status of 400 ()
+index-D8ezt63Y.js:503 Error fetching user payments: Object
+getUserPayments @ index-D8ezt63Y.js:503
+index-D8ezt63Y.js:503 Error in getUserPayments: Error: Failed to fetch user payments: column pagamentos.email_cliente does not exist
+    at Object.getUserPayments (index-D8ezt63Y.js:503:11878)
+    at async l (index-D8ezt63Y.js:503:13213)
+getUserPayments @ index-D8ezt63Y.js:503
+index-D8ezt63Y.js:503 Error in usePayments: Error: Failed to fetch user payments: column pagamentos.email_cliente does not exist
+    at Object.getUserPayments (index-D8ezt63Y.js:503:11878)
+    at async l (index-D8ezt63Y.js:503:13213)
+l @ index-D8ezt63Y.js:503
+zsceradvdzzhqynfnchh.supabase.co/rest/v1/pagamentos?select=produtos&email_cliente=eq.eduardoaraujo_96%40outlook.com&status=eq.approved:1  Failed to load resource: the server responded with a status of 400 ()
+index-D8ezt63Y.js:503 Error checking product purchase: Object
+hasUserPurchasedProduct @ index-D8ezt63Y.js:503
+zsceradvdzzhqynfnchh.supabase.co/rest/v1/pagamentos?select=*&email_cliente=eq.eduardoaraujo_96%40outlook.com&order=created_at.desc:1  Failed to load resource: the server responded with a status of 400 ()
+index-D8ezt63Y.js:503 Error fetching user payments: Object
+getUserPayments @ index-D8ezt63Y.js:503
+index-D8ezt63Y.js:503 Error in getUserPayments: Error: Failed to fetch user payments: column pagamentos.email_cliente does not exist
+    at Object.getUserPayments (index-D8ezt63Y.js:503:11878)
+    at async l (index-D8ezt63Y.js:503:13213)
+getUserPayments @ index-D8ezt63Y.js:503
+index-D8ezt63Y.js:503 Error in usePayments: Error: Failed to fetch user payments: column pagamentos.email_cliente does not exist
+    at Object.getUserPayments (index-D8ezt63Y.js:503:11878)
+    at async l (index-D8ezt63Y.js:503:13213)
+l @ index-D8ezt63Y.js:503
