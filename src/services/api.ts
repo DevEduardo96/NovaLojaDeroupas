@@ -1,8 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
 
-// 🔹 Configuração do Supabase
-const supabaseUrl = 'https://zsceradvdzzhqynfnchh.supabase.co'
-const supabaseKey = 'SUA_CHAVE_ANON_KEY_AQUI' // troque pela sua anon key
 const supabase = createClient(supabaseUrl, supabaseKey)
 
 // 🔹 Função para buscar os produtos com download_url preenchido
