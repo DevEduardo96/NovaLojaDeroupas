@@ -138,3 +138,5 @@ export class ApiClient {
 
 // Instância singleton do cliente
 export const apiClient = new ApiClient(); 
+
+//removendo key
