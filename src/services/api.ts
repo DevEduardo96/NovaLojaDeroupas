@@ -1,6 +1,7 @@
 // SUBSTITUA COMPLETAMENTE o conteúdo do arquivo src/services/api.ts por este código:
 
 import { apiClient } from "./apiClient";
+import { createClient } from '@supabase/supabase-js;
 import {
   Product,
   PaymentData,
@@ -12,6 +13,9 @@ import {
   ProductFilters,
 } from "../types";
 
+
+
+
 export const api = {
   // ===== PRODUTOS =====
   async getProducts(filters?: ProductFilters): Promise<Product[]> {
@@ -20,7 +24,7 @@ export const api = {
       if (!filters || Object.keys(filters).length === 0) {
         return await apiClient.get<Product[]>("/products");
       }
-
+      import { createClient } from '@supabase/supabase-js
       // Constrói query string com filtros
       const params = new URLSearchParams();
       if (filters.category) params.append("category", filters.category);

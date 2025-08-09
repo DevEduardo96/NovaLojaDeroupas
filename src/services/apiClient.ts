@@ -4,7 +4,7 @@ export class ApiClient {
   private timeout: number;
 
   constructor() {
-    this.baseURL = import.meta.env.VITE_API_BASE_URL || "/api";
+    this.baseURL = import.meta.env.VITE_API_BASE_URL || "https://backend-nectix.onrender.com/api";
     this.timeout = 30000; // 30 segundos
   }
 
