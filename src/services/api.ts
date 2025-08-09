@@ -1,4 +1,4 @@
-// SUBSTITUA COMPLETAMENTE o conteúdo do arquivo src/services/api.ts por este código:
+// src/services/api.ts
 
 import { apiClient } from "./apiClient";
 import {
@@ -7,21 +7,25 @@ import {
   PaymentStatus,
   DownloadResponse,
   CreatePaymentRequest,
-  ApiResponse,
-  PaginatedResponse,
   ProductFilters,
 } from "../types";
+
+import { createClient } from "@supabase/supabase-js";
+
+// Inicializa Supabase
+const supabase = createClient(
+  import.meta.env.VITE_SUPABASE_URL,
+  import.meta.env.VITE_SUPABASE_ANON_KEY
+);
 
 export const api = {
   // ===== PRODUTOS =====
   async getProducts(filters?: ProductFilters): Promise<Product[]> {
     try {
-      // Se não houver filtros, busca todos os produtos
       if (!filters || Object.keys(filters).length === 0) {
         return await apiClient.get<Product[]>("/products");
       }
 
-      // Constrói query string com filtros
       const params = new URLSearchParams();
       if (filters.category) params.append("category", filters.category);
       if (filters.search) params.append("search", filters.search);
@@ -32,7 +36,6 @@ export const api = {
       return await apiClient.get<Product[]>(`/products?${params.toString()}`);
     } catch (error) {
       console.error("Erro ao buscar produtos:", error);
-      // Fallback para dados mockados em caso de erro
       return this.getMockProducts();
     }
   },
@@ -67,34 +70,25 @@ export const api = {
   // ===== PAGAMENTOS =====
   async createPayment(data: CreatePaymentRequest): Promise<PaymentData> {
     console.log("Criando pagamento:", data);
-    
     try {
       const response = await apiClient.post<PaymentData>("api/payments/criar-pagamento", data);
       console.log("Pagamento criado com sucesso:", response);
       return response;
     } catch (error) {
       console.error("Erro ao criar pagamento:", error);
-      
-      // Fallback para modo de demonstração quando o servidor está offline
       if (error instanceof Error && error.message.includes('500')) {
         console.log("Servidor offline, usando modo de demonstração...");
         return this.createMockPayment(data);
       }
-      
       throw error;
     }
   },
 
-
-  // 🔧 CORREÇÃO CRÍTICA: Aceita string | number e converte para string
   async getPaymentStatus(paymentId: string | number): Promise<PaymentStatus> {
     console.log("Consultando status do pagamento:", paymentId);
 
-    if (!paymentId) {
-      throw new Error("ID do pagamento é obrigatório");
-    }
+    if (!paymentId) throw new Error("ID do pagamento é obrigatório");
 
-    // 🔧 CORREÇÃO: Converter para string antes de usar startsWith
     const paymentIdStr = String(paymentId);
 
     try {
@@ -103,16 +97,14 @@ export const api = {
       return response;
     } catch (error) {
       console.error("Erro ao consultar status do pagamento:", error);
-      
-      // 🔧 CORREÇÃO: Usar a versão string para startsWith
+
       if (paymentIdStr.startsWith('mock_')) {
         console.log("Consultando status de pagamento mock...");
         return this.getMockPaymentStatus(paymentIdStr);
       }
-      
-      // 🔧 CORREÇÃO: Tratamento melhor do erro 404
+
       if (error instanceof Error && (
-        error.message.includes('404') || 
+        error.message.includes('404') ||
         error.message.includes('Endpoint não encontrado') ||
         error.message.includes('Not Found')
       )) {
@@ -123,54 +115,37 @@ export const api = {
           paymentId: paymentIdStr,
         };
       }
-      
+
       throw error;
     }
   },
 
   getMockPaymentStatus(paymentId: string): PaymentStatus {
-    const paymentIdStr = String(paymentId);
-    const parts = paymentIdStr.split('_');
-    
+    const parts = String(paymentId).split('_');
     if (parts.length >= 2) {
       const timestamp = parseInt(parts[1]);
       if (!isNaN(timestamp)) {
         const elapsed = Date.now() - timestamp;
-        // Se passou mais de 30 segundos, considera como aprovado
         const status = elapsed > 30000 ? "approved" : "pending";
-        
-        return {
-          id: paymentIdStr,
-          status,
-          paymentId: paymentIdStr
-        };
+        return { id: String(paymentId), status, paymentId: String(paymentId) };
       }
     }
-    
-    // Fallback se não conseguir parsear o timestamp
-    return {
-      id: paymentIdStr,
-      status: "pending",
-      paymentId: paymentIdStr
-    };
+    return { id: String(paymentId), status: "pending", paymentId: String(paymentId) };
   },
 
-  // 🔧 CORREÇÃO: Aceita string | number
+  // ===== DOWNLOAD LINKS =====
   async getDownloadLinks(paymentId: string | number): Promise<DownloadResponse> {
     console.log("Buscando links de download:", paymentId);
 
-    if (!paymentId) {
-      throw new Error("ID do pagamento é obrigatório");
-    }
+    if (!paymentId) throw new Error("ID do pagamento é obrigatório");
 
-    // 🔧 CORREÇÃO: Converter para string
     const paymentIdStr = String(paymentId);
 
     try {
-      const response = await apiClient.get<PaymentStatus>(`api/payments/status/${paymentIdStr}`);
-      
-      // Extrair links de download da resposta de status
-      if (response && response.download_links) {
+      // Primeiro tenta pelo backend
+      const response = await apiClient.get<any>(`api/payments/status/${paymentIdStr}`);
+
+      if (response && response.download_links?.length) {
         return {
           links: response.download_links.map((link: any) => link.download_url),
           products: response.download_links.map((link: any) => ({
@@ -188,43 +163,54 @@ export const api = {
           expiresIn: "7 dias"
         };
       }
-      
-      // Se não há links de download, retornar estrutura vazia
+
+      // Caso não tenha vindo nada do backend → busca no Supabase
+      console.log("Nenhum link no backend, buscando no Supabase...");
+      const { data, error } = await supabase
+        .from("produtos")
+        .select("id, nome, image_url, download_url")
+        .not("download_url", "is", null);
+
+      if (error) {
+        console.error("Erro Supabase:", error);
+        return { links: [], products: [], customerName: "Cliente", total: 0, downloadedAt: new Date().toISOString(), expiresIn: "7 dias" };
+      }
+
       return {
-        links: [],
-        products: [],
+        links: data.map((p) => p.download_url),
+        products: data.map((p) => ({
+          id: p.id,
+          name: p.nome,
+          description: `Download: ${p.nome}`,
+          price: 0,
+          image_url: p.image_url,
+          category: "Digital",
+          download_url: p.download_url
+        })),
         customerName: "Cliente",
-        total: response.transaction_amount || 0,
+        total: 0,
         downloadedAt: new Date().toISOString(),
         expiresIn: "7 dias"
       };
-      console.log("Links de download obtidos:", response);
-      // Retornar a resposta que foi construída acima
+
     } catch (error) {
       console.error("Erro ao obter links de download:", error);
-      
-      // 🔧 CORREÇÃO: Usar versão string
+
       if (paymentIdStr.startsWith('mock_')) {
         console.log("Obtendo links de download mock...");
         return this.getMockDownloadLinks(paymentIdStr);
       }
-      
-      // 🔧 CORREÇÃO: Tratamento para endpoint não encontrado
+
       if (error instanceof Error && (
-        error.message.includes('404') || 
+        error.message.includes('404') ||
         error.message.includes('Endpoint não encontrado') ||
         error.message.includes('Not Found')
       )) {
         console.log("Endpoint de download não encontrado, retornando links mock...");
         return this.getMockDownloadLinks(paymentIdStr);
       }
-      
+
       throw error;
     }
   },
-
- 
-
-
- 
 };
