@@ -22,12 +22,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [loading, setLoading] = useState(true);
   const isRefreshing = useRef(false);
   const refreshPromise = useRef<Promise<any> | null>(null);
+  const lastSessionCheck = useRef<number>(0);
 
   useEffect(() => {
     let isMounted = true;
 
     // Get initial session
     const getInitialSession = async () => {
+      const now = Date.now();
+      // Prevent excessive session checks - minimum 5 seconds between calls
+      if (now - lastSessionCheck.current < 5000) {
+        setLoading(false);
+        return;
+      }
+      lastSessionCheck.current = now;
+
       try {
         const { data: { session }, error } = await supabase.auth.getSession();
         
@@ -61,7 +70,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (!isMounted) return;
 
-      console.log("Auth state changed:", event, session?.user?.email);
+      if (import.meta.env.DEV) {
+        console.log("Auth state changed:", event, session?.user?.email);
+      }
 
       // Evita múltiplos refresh simultâneos
       if (event === 'TOKEN_REFRESHED' && isRefreshing.current) {

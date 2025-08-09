@@ -11,6 +11,7 @@ export const usePayments = () => {
   const fetchUserPayments = async () => {
     if (!user) {
       setPayments([]);
+      setError(null);
       return;
     }
 
@@ -29,8 +30,25 @@ export const usePayments = () => {
   };
 
   useEffect(() => {
-    fetchUserPayments();
-  }, [user]);
+    // Only fetch if user exists and avoid excessive calls
+    let timeoutId: NodeJS.Timeout;
+    
+    if (user) {
+      // Debounce the API call to prevent excessive requests
+      timeoutId = setTimeout(() => {
+        fetchUserPayments();
+      }, 100);
+    } else {
+      setPayments([]);
+      setError(null);
+    }
+
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
+  }, [user?.id, user?.email]); // More specific dependencies
 
   const createPayment = async (paymentData: Omit<Payment, 'created_at' | 'updated_at'>) => {
     try {
@@ -71,7 +89,10 @@ export const usePayments = () => {
   };
 
   const hasUserPurchasedProduct = async (productId: number): Promise<boolean> => {
-    if (!user) return false;
+    if (!user || !user.email) {
+      console.warn("User not authenticated for product purchase check");
+      return false;
+    }
     
     try {
       return await paymentService.hasUserPurchasedProduct(productId);
@@ -82,7 +103,7 @@ export const usePayments = () => {
   };
 
   const getProductDownloadLinks = async (productId: number): Promise<string[]> => {
-    if (!user) {
+    if (!user || !user.email) {
       throw new Error("Usuário não autenticado");
     }
     

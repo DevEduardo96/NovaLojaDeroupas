@@ -129,7 +129,7 @@ export const PurchaseHistory: React.FC = () => {
                     Pedido #{payment.id.slice(-8)}
                   </h3>
                   <p className="text-sm text-gray-500">
-                    {payment.nome_cliente} • {payment.email_cliente}
+                    {payment.nome_cliente} • {payment.email}
                   </p>
                 </div>
               </div>
