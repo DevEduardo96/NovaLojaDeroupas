@@ -4,10 +4,7 @@ export class ApiClient {
   private timeout: number;
 
   constructor() {
-    // Corrigir para usar a URL completa do backend
-    const backendUrl = import.meta.env.VITE_API_BASE_URL || "https://backend-nectix.onrender.com/api";
-    this.baseURL = backendUrl;
-    console.log(`🔧 [ApiClient] baseURL configurada: ${this.baseURL}`);
+    this.baseURL = import.meta.env.VITE_API_BASE_URL || "/api";
     this.timeout = 30000; // 30 segundos
   }
 
@@ -127,9 +124,8 @@ export class ApiClient {
   // Método para verificar se o servidor está online
   async healthCheck(): Promise<boolean> {
     try {
-      // Usar a URL completa para o health check
-      const healthUrl = this.baseURL.replace('/api', '/health');
-      const response = await fetch(healthUrl, {
+      const baseUrl = this.baseURL.replace('/api', '');
+      const response = await fetch(`${baseUrl}/health`, {
         method: "GET",
         signal: AbortSignal.timeout(5000), // 5 segundos para health check
       });
@@ -141,4 +137,4 @@ export class ApiClient {
 }
 
 // Instância singleton do cliente
-export const apiClient = new ApiClient();
+export const apiClient = new ApiClient(); 
