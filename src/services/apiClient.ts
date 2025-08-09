@@ -5,7 +5,9 @@ export class ApiClient {
 
   constructor() {
     // Corrigir para usar a URL completa do backend
-    this.baseURL = import.meta.env.VITE_API_BASE_URL || "https://backend-nectix.onrender.com/api";
+    const backendUrl = import.meta.env.VITE_API_BASE_URL || "https://backend-nectix.onrender.com/api";
+    this.baseURL = backendUrl;
+    console.log(`🔧 [ApiClient] baseURL configurada: ${this.baseURL}`);
     this.timeout = 30000; // 30 segundos
   }
 
