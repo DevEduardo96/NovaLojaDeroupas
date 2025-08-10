@@ -90,12 +90,7 @@ export const Header: React.FC<HeaderProps> = ({
             <Link to="/" className="hover:text-indigo-600 transition-colors">
               Início
             </Link>
-            <Link
-              to="/meu-site"
-              className="hover:text-indigo-600 transition-colors"
-            >
-              Meu site
-            </Link>
+           
             <Link
               to="/suporte"
               className="hover:text-indigo-600 transition-colors"
@@ -211,13 +206,7 @@ export const Header: React.FC<HeaderProps> = ({
             >
               Início
             </Link>
-            <Link
-              to="/meu-site"
-              onClick={() => setMobileMenuOpen(false)}
-              className="py-3 hover:bg-gray-100"
-            >
-              Meu site
-            </Link>
+            
             <Link
               to="/suporte"
               onClick={() => setMobileMenuOpen(false)}
