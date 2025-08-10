@@ -88,12 +88,14 @@ function AppContent() {
           </Route>
 
           <Route path="/produtos">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-              <SupabaseProductGrid
-                onAddToCart={addToCart}
-                onProductClick={(product) => setLocation(`/produto/${product.id}`)}
-              />
-            </div>
+            <ProtectedRoute>
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <SupabaseProductGrid
+                  onAddToCart={addToCart}
+                  onProductClick={(product) => setLocation(`/produto/${product.id}`)}
+                />
+              </div>
+            </ProtectedRoute>
           </Route>
 
           <Route path="/produto/:id">

@@ -1,9 +1,20 @@
 import React from "react";
 import { ArrowRight, Play, Star } from "lucide-react";
 import { useLocation } from "wouter";
+import { useAuthCheck } from "../hooks/useAuthGuard";
 
 const Hero: React.FC = () => {
   const [location, setLocation] = useLocation();
+  const { isAuthenticated } = useAuthCheck();
+
+  const handleExplorarProdutos = () => {
+    if (isAuthenticated) {
+      setLocation("/produtos");
+    } else {
+      setLocation("/login");
+    }
+  };
+
   return (
     <section className="bg-gradient-to-br from-blue-50 to-purple-50 py-12 lg:py-20">
       <div className="container mx-auto px-4">
@@ -30,7 +41,7 @@ const Hero: React.FC = () => {
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
               <button
-                onClick={() => setLocation("/produtos")}
+                onClick={handleExplorarProdutos}
                 className="flex items-center justify-center space-x-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-lg font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 "
               >
                 <span>Explorar Produtos</span>
