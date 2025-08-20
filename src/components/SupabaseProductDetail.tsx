@@ -78,17 +78,21 @@ export const SupabaseProductDetail: React.FC<SupabaseProductDetailProps> = ({
       // Buscar variações do produto usando a nova função
       const variations = await productService.getProductVariations(id);
       
+      // Separar variações por tipo
+      const sizeVariations = variations.filter(v => v.size);
+      const colorVariations = variations.filter(v => v.color);
+      
       // Extrair tamanhos e cores únicos das variações
-      const uniqueSizes = [...new Set(variations.map(v => v.size).filter(Boolean))];
-      const uniqueColors = [...new Set(variations.map(v => v.color).filter(Boolean))];
+      const uniqueSizes = [...new Set(sizeVariations.map(v => v.size).filter(Boolean))];
+      const uniqueColors = [...new Set(colorVariations.map(v => v.color).filter(Boolean))];
       
       // Configurar tamanhos disponíveis
       setAvailableSizes(uniqueSizes);
       
-      // Configurar cores disponíveis (assumindo que cor é o nome da cor)
+      // Configurar cores disponíveis
       const colors = uniqueColors.map(color => ({
         name: color,
-        code: getColorCode(color) // Função auxiliar para converter nome em código hex
+        code: getColorCode(color)
       }));
       setAvailableColors(colors);
 
