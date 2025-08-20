@@ -16,14 +16,17 @@ export interface Product {
 export interface ProductVariation {
   id: number;
   product_id: number;
-  type: 'size' | 'color';
+  type: 'size' | 'color' | 'variation';
   name: string;
   value: string;
+  size?: string;
+  color?: string;
   stock_quantity: number;
   price_modifier: number;
+  image_url?: string;
   is_available: boolean;
-  created_at?: string;
-  updated_at?: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface User {

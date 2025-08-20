@@ -145,23 +145,48 @@ export const productService = {
     }
   },
 
-  // Get product variations
+  // Get product variations from variacoes_produto table
   async getProductVariations(productId: number): Promise<ProductVariation[]> {
     try {
       const { data, error } = await supabase
-        .from("product_variations")
-        .select("*")
-        .eq("product_id", productId)
-        .eq("is_available", true)
-        .order("type", { ascending: true })
-        .order("name", { ascending: true });
+        .from("variacoes_produto")
+        .select(`
+          id,
+          tamanho,
+          cor,
+          estoque,
+          imagem_url,
+          preco_override,
+          ativo
+        `)
+        .eq("produto_id", productId)
+        .eq("ativo", true)
+        .order("tamanho", { ascending: true })
+        .order("cor", { ascending: true });
 
       if (error) {
         console.error("Error fetching product variations:", error);
         throw new Error(`Failed to fetch product variations: ${error.message}`);
       }
 
-      return data || [];
+      // Transform data to match ProductVariation interface
+      const variations = (data || []).map(item => ({
+        id: item.id,
+        product_id: productId,
+        type: 'variation' as const,
+        name: `${item.tamanho} - ${item.cor}`,
+        value: item.cor,
+        size: item.tamanho,
+        color: item.cor,
+        stock_quantity: item.estoque || 0,
+        price_modifier: item.preco_override || 0,
+        image_url: item.imagem_url,
+        is_available: item.ativo,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      }));
+
+      return variations;
     } catch (error) {
       console.error("Error in getProductVariations:", error);
       throw error;

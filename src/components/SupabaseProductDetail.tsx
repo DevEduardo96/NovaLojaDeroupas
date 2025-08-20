@@ -75,21 +75,20 @@ export const SupabaseProductDetail: React.FC<SupabaseProductDetailProps> = ({
         return;
       }
 
-      // Buscar variações do produto
+      // Buscar variações do produto usando a nova função
       const variations = await productService.getProductVariations(id);
       
-      // Separar variações por tipo
-      const sizeVariations = variations.filter(v => v.type === 'size');
-      const colorVariations = variations.filter(v => v.type === 'color');
+      // Extrair tamanhos e cores únicos das variações
+      const uniqueSizes = [...new Set(variations.map(v => v.size).filter(Boolean))];
+      const uniqueColors = [...new Set(variations.map(v => v.color).filter(Boolean))];
       
       // Configurar tamanhos disponíveis
-      const sizes = sizeVariations.map(v => v.name);
-      setAvailableSizes(sizes);
+      setAvailableSizes(uniqueSizes);
       
-      // Configurar cores disponíveis
-      const colors = colorVariations.map(v => ({
-        name: v.name,
-        code: v.value // Assumindo que o value contém o código da cor hex
+      // Configurar cores disponíveis (assumindo que cor é o nome da cor)
+      const colors = uniqueColors.map(color => ({
+        name: color,
+        code: getColorCode(color) // Função auxiliar para converter nome em código hex
       }));
       setAvailableColors(colors);
 
@@ -100,13 +99,32 @@ export const SupabaseProductDetail: React.FC<SupabaseProductDetailProps> = ({
 
       // Definir cor e tamanho padrão
       if (colors.length > 0) setSelectedColor(colors[0].name);
-      if (sizes.length > 0) setSelectedSize(sizes[0]); // Primeiro tamanho disponível
+      if (uniqueSizes.length > 0) setSelectedSize(uniqueSizes[0]);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erro ao carregar produto");
       console.error("Error loading product:", err);
     } finally {
       setLoading(false);
     }
+  };
+
+  // Função auxiliar para converter nome da cor em código hex
+  const getColorCode = (colorName: string): string => {
+    const colorMap: { [key: string]: string } = {
+      'Branco': '#FFFFFF',
+      'Preto': '#000000',
+      'Azul': '#0066FF',
+      'Vermelho': '#FF0000',
+      'Verde': '#00FF00',
+      'Amarelo': '#FFFF00',
+      'Rosa': '#FF69B4',
+      'Roxo': '#8A2BE2',
+      'Laranja': '#FFA500',
+      'Marrom': '#8B4513',
+      'Cinza': '#808080',
+      'Bege': '#F5F5DC'
+    };
+    return colorMap[colorName] || '#CCCCCC'; // Cor padrão se não encontrar
   };
 
   const handleAddToCart = () => {

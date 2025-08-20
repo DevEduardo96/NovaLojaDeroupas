@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useEffect, useState, useRef } from "react";
 import { supabase } from "../lib/supabase";
 import type { User, Session } from "@supabase/supabase-js";
@@ -20,23 +21,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
-  const isRefreshing = useRef(false);
-  const refreshPromise = useRef<Promise<any> | null>(null);
-  const lastSessionCheck = useRef<number>(0);
+  const isInitialized = useRef(false);
+  const subscriptionRef = useRef<any>(null);
 
   useEffect(() => {
+    // Prevent multiple initializations
+    if (isInitialized.current) return;
+    isInitialized.current = true;
+
     let isMounted = true;
 
     // Get initial session
     const getInitialSession = async () => {
-      const now = Date.now();
-      // Prevent excessive session checks - minimum 5 seconds between calls
-      if (now - lastSessionCheck.current < 5000) {
-        setLoading(false);
-        return;
-      }
-      lastSessionCheck.current = now;
-
       try {
         const { data: { session }, error } = await supabase.auth.getSession();
         
@@ -44,7 +40,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         
         if (error) {
           console.error("Error getting initial session:", error);
-          // Se houver erro de sessão, limpa o estado
           setSession(null);
           setUser(null);
         } else {
@@ -53,8 +48,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         }
       } catch (error) {
         console.error("Error in getInitialSession:", error);
-        setSession(null);
-        setUser(null);
+        if (isMounted) {
+          setSession(null);
+          setUser(null);
+        }
       } finally {
         if (isMounted) {
           setLoading(false);
@@ -64,27 +61,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
     getInitialSession();
 
-    // Listen for auth state changes
+    // Single auth state listener
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (!isMounted) return;
 
-      if (import.meta.env.DEV) {
+      // Only log significant auth events, not token refreshes
+      if (event !== 'TOKEN_REFRESHED') {
         console.log("Auth state changed:", event, session?.user?.email);
-      }
-
-      // Evita múltiplos refresh simultâneos
-      if (event === 'TOKEN_REFRESHED' && isRefreshing.current) {
-        return;
-      }
-
-      // Controla o refresh token para evitar múltiplas requisições
-      if (event === 'TOKEN_REFRESHED') {
-        isRefreshing.current = true;
-        setTimeout(() => {
-          isRefreshing.current = false;
-        }, 1000);
       }
 
       setSession(session);
@@ -92,18 +77,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       setLoading(false);
     });
 
-    // Cleanup
+    subscriptionRef.current = subscription;
+
+    // Cleanup function
     return () => {
       isMounted = false;
-      subscription.unsubscribe();
-      isRefreshing.current = false;
-      refreshPromise.current = null;
+      if (subscriptionRef.current) {
+        subscriptionRef.current.unsubscribe();
+        subscriptionRef.current = null;
+      }
+      isInitialized.current = false;
     };
-  }, []);
+  }, []); // Empty dependency array ensures this runs only once
 
   const signUp = async (email: string, password: string) => {
     try {
-      // Validação de entrada
       if (!email || !password) {
         return { error: { message: "Email e senha são obrigatórios" } };
       }
@@ -126,12 +114,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const signIn = async (email: string, password: string) => {
     try {
-      // Validação de entrada
       if (!email || !password) {
         return { error: { message: "Email e senha são obrigatórios" } };
       }
 
-      // Limpa estados anteriores
       setLoading(true);
       
       const { error } = await supabase.auth.signInWithPassword({
@@ -141,7 +127,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
       if (error) {
         setLoading(false);
-        // Mensagens de erro mais amigáveis
+        // User-friendly error messages
         if (error.message.includes('Invalid login credentials')) {
           return { error: { message: "Email ou senha incorretos" } };
         } else if (error.message.includes('Email not confirmed')) {
@@ -168,7 +154,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       const { error } = await supabase.auth.signOut();
       
       if (!error) {
-        // Limpa estados locais
         setSession(null);
         setUser(null);
       }
@@ -185,18 +170,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const getUserInitial = (): string => {
     if (!user) return "";
     
-    // Tenta pegar o nome primeiro
     const fullName = user.user_metadata?.full_name || user.user_metadata?.name;
     if (fullName && typeof fullName === 'string') {
       return fullName.charAt(0).toUpperCase();
     }
     
-    // Se não tiver nome, usa a inicial do email
     if (user.email) {
       return user.email.charAt(0).toUpperCase();
     }
     
-    return "U"; // Fallback
+    return "U";
   };
 
   return (
