@@ -1,5 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
-import type { Product } from "../types";
+import type { Product, ProductVariation } from "../types";
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
@@ -144,7 +144,91 @@ export const productService = {
       throw error;
     }
   },
+
+  // Get product variations
+  async getProductVariations(productId: number): Promise<ProductVariation[]> {
+    try {
+      const { data, error } = await supabase
+        .from("product_variations")
+        .select("*")
+        .eq("product_id", productId)
+        .eq("is_available", true)
+        .order("type", { ascending: true })
+        .order("name", { ascending: true });
+
+      if (error) {
+        console.error("Error fetching product variations:", error);
+        throw new Error(`Failed to fetch product variations: ${error.message}`);
+      }
+
+      return data || [];
+    } catch (error) {
+      console.error("Error in getProductVariations:", error);
+      throw error;
+    }
+  },
+
+  // Add product variation
+  async addProductVariation(variation: Omit<ProductVariation, 'id' | 'created_at' | 'updated_at'>): Promise<ProductVariation> {
+    try {
+      const { data, error } = await supabase
+        .from("product_variations")
+        .insert(variation)
+        .select()
+        .single();
+
+      if (error) {
+        console.error("Error adding product variation:", error);
+        throw new Error(`Failed to add product variation: ${error.message}`);
+      }
+
+      return data;
+    } catch (error) {
+      console.error("Error in addProductVariation:", error);
+      throw error;
+    }
+  },
+
+  // Update product variation
+  async updateProductVariation(id: number, variation: Partial<ProductVariation>): Promise<ProductVariation> {
+    try {
+      const { data, error } = await supabase
+        .from("product_variations")
+        .update(variation)
+        .eq("id", id)
+        .select()
+        .single();
+
+      if (error) {
+        console.error("Error updating product variation:", error);
+        throw new Error(`Failed to update product variation: ${error.message}`);
+      }
+
+      return data;
+    } catch (error) {
+      console.error("Error in updateProductVariation:", error);
+      throw error;
+    }
+  },
+
+  // Delete product variation
+  async deleteProductVariation(id: number): Promise<void> {
+    try {
+      const { error } = await supabase
+        .from("product_variations")
+        .delete()
+        .eq("id", id);
+
+      if (error) {
+        console.error("Error deleting product variation:", error);
+        throw new Error(`Failed to delete product variation: ${error.message}`);
+      }
+    } catch (error) {
+      console.error("Error in deleteProductVariation:", error);
+      throw error;
+    }
+  },
 };
 
 // Re-export the Product type for convenience
-export type { Product };
+export type { Product, ProductVariation };

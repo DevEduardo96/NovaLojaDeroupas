@@ -29,7 +29,7 @@ import { Button } from "./ui/Button";
 interface SupabaseProductDetailProps {
   productId: number | null;
   onBack: () => void;
-  onAddToCart?: (product: Product) => void;
+  onAddToCart?: (cartItem: any) => void;
 }
 
 export const SupabaseProductDetail: React.FC<SupabaseProductDetailProps> = ({
@@ -48,18 +48,12 @@ export const SupabaseProductDetail: React.FC<SupabaseProductDetailProps> = ({
   const [activeTab, setActiveTab] = useState("description");
   const [imageError, setImageError] = useState(false);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [availableSizes, setAvailableSizes] = useState<string[]>([]);
+  const [availableColors, setAvailableColors] = useState<{name: string; code: string}[]>([]);
 
   usePayments();
 
-  // Dados de exemplo para tamanhos e cores (podem vir do produto)
-  const sizes = ["XS", "S", "M", "L", "XL", "XXL"];
-  const colors = [
-    { name: "Preto", code: "#000000" },
-    { name: "Branco", code: "#FFFFFF" },
-    { name: "Azul Marinho", code: "#1e3a8a" },
-    { name: "Vermelho", code: "#dc2626" },
-    { name: "Verde", code: "#059669" },
-  ];
+  
 
   // URLs de exemplo para galeria de imagens
 
@@ -81,10 +75,32 @@ export const SupabaseProductDetail: React.FC<SupabaseProductDetailProps> = ({
         return;
       }
 
-      setProduct(productData);
+      // Buscar variações do produto
+      const variations = await productService.getProductVariations(id);
+      
+      // Separar variações por tipo
+      const sizeVariations = variations.filter(v => v.type === 'size');
+      const colorVariations = variations.filter(v => v.type === 'color');
+      
+      // Configurar tamanhos disponíveis
+      const sizes = sizeVariations.map(v => v.name);
+      setAvailableSizes(sizes);
+      
+      // Configurar cores disponíveis
+      const colors = colorVariations.map(v => ({
+        name: v.name,
+        code: v.value // Assumindo que o value contém o código da cor hex
+      }));
+      setAvailableColors(colors);
+
+      setProduct({
+        ...productData,
+        variations
+      });
+
       // Definir cor e tamanho padrão
       if (colors.length > 0) setSelectedColor(colors[0].name);
-      if (sizes.length > 0) setSelectedSize(sizes[2]); // M como padrão
+      if (sizes.length > 0) setSelectedSize(sizes[0]); // Primeiro tamanho disponível
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erro ao carregar produto");
       console.error("Error loading product:", err);
@@ -95,14 +111,14 @@ export const SupabaseProductDetail: React.FC<SupabaseProductDetailProps> = ({
 
   const handleAddToCart = () => {
     if (product && onAddToCart && selectedSize && selectedColor) {
-      // Criar produto com variações selecionadas
-      const productWithVariations = {
-        ...product,
+      // Criar item do carrinho com variações selecionadas
+      const cartItem = {
+        product,
+        quantity,
         selectedSize,
-        selectedColor,
-        quantity
+        selectedColor
       };
-      onAddToCart(productWithVariations);
+      onAddToCart(cartItem);
       setAddedToCart(true);
       setTimeout(() => setAddedToCart(false), 2000);
     }
@@ -367,7 +383,7 @@ export const SupabaseProductDetail: React.FC<SupabaseProductDetailProps> = ({
                   Cor: <span className="font-normal">{selectedColor}</span>
                 </h3>
                 <div className="flex flex-wrap gap-3">
-                  {colors.map(({ name, code }) => (
+                  {availableColors.map(({ name, code }) => (
                     <button
                       key={name}
                       onClick={() => setSelectedColor(name)}
@@ -399,7 +415,7 @@ export const SupabaseProductDetail: React.FC<SupabaseProductDetailProps> = ({
                   </button>
                 </div>
                 <div className="grid grid-cols-6 gap-3">
-                  {sizes.map((size) => (
+                  {availableSizes.map((size) => (
                     <button
                       key={size}
                       onClick={() => setSelectedSize(size)}
