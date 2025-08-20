@@ -1,0 +1,56 @@
+
+-- Criar tabela para variações de produtos (tamanhos, cores, etc.)
+CREATE TABLE IF NOT EXISTS product_variations (
+  id BIGSERIAL PRIMARY KEY,
+  product_id BIGINT NOT NULL,
+  type VARCHAR(20) NOT NULL CHECK (type IN ('size', 'color')),
+  name VARCHAR(100) NOT NULL, -- Nome da variação (ex: "Grande", "Azul")
+  value VARCHAR(100) NOT NULL, -- Valor da variação (ex: "L", "#0000FF")
+  stock_quantity INTEGER DEFAULT 0,
+  price_modifier DECIMAL(10,2) DEFAULT 0.00, -- Modificador de preço (+/- valor)
+  is_available BOOLEAN DEFAULT true,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL,
+  
+  -- Foreign key constraint
+  CONSTRAINT fk_product_variations_product_id 
+    FOREIGN KEY (product_id) 
+    REFERENCES produtos (id) 
+    ON DELETE CASCADE,
+    
+  -- Unique constraint para evitar duplicatas
+  UNIQUE(product_id, type, name)
+);
+
+-- Criar índices para melhor performance
+CREATE INDEX IF NOT EXISTS idx_product_variations_product_id ON product_variations(product_id);
+CREATE INDEX IF NOT EXISTS idx_product_variations_type ON product_variations(type);
+CREATE INDEX IF NOT EXISTS idx_product_variations_available ON product_variations(is_available);
+
+-- Criar trigger para atualizar updated_at automaticamente
+CREATE OR REPLACE FUNCTION update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = TIMEZONE('utc'::text, NOW());
+    RETURN NEW;
+END;
+$$ language 'plpgsql';
+
+CREATE TRIGGER update_product_variations_updated_at 
+    BEFORE UPDATE ON product_variations 
+    FOR EACH ROW 
+    EXECUTE FUNCTION update_updated_at_column();
+
+-- Para inserir dados de exemplo, use o componente ProductVariationsManager
+-- ou execute os INSERTs manualmente com IDs de produtos existentes
+
+-- Habilitar RLS (Row Level Security) se necessário
+ALTER TABLE product_variations ENABLE ROW LEVEL SECURITY;
+
+-- Política para permitir leitura pública das variações
+CREATE POLICY "Allow public read access to product variations" ON product_variations
+    FOR SELECT USING (true);
+
+-- Política para permitir inserção/atualização apenas para usuários autenticados (opcional)
+CREATE POLICY "Allow authenticated users to manage variations" ON product_variations
+    FOR ALL USING (auth.role() = 'authenticated');
