@@ -62,12 +62,7 @@ export const SupabaseProductDetail: React.FC<SupabaseProductDetailProps> = ({
   ];
 
   // URLs de exemplo para galeria de imagens
-  const getProductImages = (baseUrl: string) => [
-    baseUrl,
-    baseUrl.replace('400', '500'),
-    baseUrl.replace('400', '600'),
-    baseUrl.replace('400', '700'),
-  ];
+
 
   useEffect(() => {
     if (productId) {
@@ -204,10 +199,13 @@ export const SupabaseProductDetail: React.FC<SupabaseProductDetailProps> = ({
     );
   }
 
-  const productImages = getProductImages(imageError 
-    ? "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=600&h=600&fit=crop"
-    : product.image_url
-  );
+   // Gerar galeria de imagens (se existir mais de uma imagem no Supabase)
+  const productImages =
+  product && product.images && product.images.length > 0
+    ? product.images
+    : [product?.image_url || "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=600&h=600&fit=crop"];
+
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">

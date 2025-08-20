@@ -21,6 +21,7 @@ export interface CreatePaymentData {
   valor: number;
   links_download: string[];
   produtos: Product[];
+  images?: string[]; // 👈 adicione isso
 }
 
 export const paymentService = {
@@ -181,7 +182,7 @@ export const paymentService = {
 
       const { data, error } = await supabase
         .from("pagamentos")
-        .select("links_download, produtos")
+        .select("links_download, produtos, images")
         .eq("email", user.email)
         .eq("status", "approved");
 
