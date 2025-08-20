@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from "react";
 import {
-  Search,
-  Filter,
   Loader2,
   ShoppingCart,
   Eye,
-  Heart,
-  Download,
   Star,
+  X,
+  SlidersHorizontal,
 } from "lucide-react";
 import { productService } from "../lib/supabase";
 import type { Product } from "../types";
@@ -15,8 +13,6 @@ import { formatPrice } from "../lib/utils";
 import { useAuth } from "../contexts/AuthContext";
 import { useFavorites } from "../contexts/FavoritesContext";
 import { Button } from "./ui/Button";
-import { Input } from "./ui/Input";
-import { Select } from "./ui/Select";
 
 interface SupabaseProductGridProps {
   showFilter?: boolean;
@@ -31,17 +27,19 @@ const SupabaseProductGrid: React.FC<SupabaseProductGridProps> = ({
   onProductClick,
   onAddToCart,
 }) => {
-  const { user } = useAuth();
-  const { toggleFavorite, isFavorite } = useFavorites();
+  useAuth();
+  useFavorites();
   const [products, setProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
   const [sortBy, setSortBy] = useState("newest");
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [priceRange, setPriceRange] = useState([0, 1000]);
 
   useEffect(() => {
     loadInitialData();
@@ -49,7 +47,7 @@ const SupabaseProductGrid: React.FC<SupabaseProductGridProps> = ({
 
   useEffect(() => {
     filterProducts();
-  }, [products, searchQuery, selectedCategory, sortBy]);
+  }, [products, searchQuery, selectedCategory, sortBy, priceRange]);
 
   const loadInitialData = async () => {
     try {
@@ -90,6 +88,12 @@ const SupabaseProductGrid: React.FC<SupabaseProductGridProps> = ({
       );
     }
 
+    // Filtrar por faixa de preço
+    filtered = filtered.filter((product) => {
+      const price = product.price || 0;
+      return price >= priceRange[0] && price <= priceRange[1];
+    });
+
     filtered.sort((a, b) => {
       const getPrice = (p: Product) => p.price || 0;
 
@@ -113,200 +117,337 @@ const SupabaseProductGrid: React.FC<SupabaseProductGridProps> = ({
     onAddToCart?.(product);
   };
 
-  const handleToggleFavorite = async (
-    productId: number,
-    e: React.MouseEvent
-  ) => {
-    e.stopPropagation();
-    if (user) await toggleFavorite(productId);
-  };
-
   const handleClickProduct = (product: Product) => {
     onProductClick?.(product);
   };
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-12">
-        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
-        <span className="ml-2 text-gray-600">Carregando produtos...</span>
+      <div className="flex items-center justify-center py-16 bg-gray-50">
+        <div className="text-center">
+          <Loader2 className="h-12 w-12 animate-spin text-blue-600 mx-auto mb-4" />
+          <span className="text-lg font-medium text-gray-700">Carregando produtos...</span>
+        </div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="text-center py-12">
-        <p className="text-red-600 text-lg font-semibold mb-2">
-          Erro ao carregar produtos
-        </p>
-        <p className="text-sm text-gray-500 mb-4">{error}</p>
-        <Button onClick={loadInitialData} variant="outline">
-          Tentar novamente
-        </Button>
+      <div className="text-center py-16 bg-gray-50">
+        <div className="max-w-md mx-auto">
+          <p className="text-red-600 text-xl font-semibold mb-3">
+            Erro ao carregar produtos
+          </p>
+          <p className="text-gray-600 mb-6">{error}</p>
+          <Button onClick={loadInitialData} variant="outline" className="px-6 py-3">
+            Tentar novamente
+          </Button>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="p-4">
-      {/* Filtros e busca - Mais compacto */}
-      {showFilter && (
-        <div className="bg-white rounded-xl shadow-sm border p-4 mb-6">
-          <div className="flex flex-col md:flex-row gap-3">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <Input
-                type="text"
-                placeholder="Buscar produtos..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 h-10"
-              />
-            </div>
+    <div className="bg-gray-50 min-h-screen">
+      <div className="container mx-auto px-4 py-6">
+        {/* Header da seção */}
+        <div className="text-center mb-8">
+          <h2 className="text-3xl font-bold text-gray-900 mb-2">Nossos Produtos</h2>
+          <p className="text-gray-600">Descubra nossa seleção de produtos digitais premium</p>
+        </div>
 
-            <div className="flex items-center gap-2">
-              <Filter className="h-4 w-4 text-gray-400" />
-              <Select
-                value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
-                className="min-w-[140px] h-10"
-              >
-                <option value="">Todas</option>
-                {categories.map((category) => (
-                  <option key={category}>{category}</option>
-                ))}
-              </Select>
-            </div>
+        {/* Barra de filtros e ordenação */}
+        {showFilter && (
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-8">
+            {/* Linha superior com filtros e ordenação */}
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-4">
+              {/* Lado esquerdo - Botão de filtro */}
+              <div className="flex items-center gap-4">
+                <button
+                  onClick={() => setIsFilterOpen(true)}
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-colors duration-200"
+                >
+                  <SlidersHorizontal className="w-4 h-4" />
+                  Filtros
+                </button>
+              </div>
 
-            <Select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              className="min-w-[130px] h-10"
-            >
-              <option value="newest">Recentes</option>
-              <option value="preco-low">Menor preço</option>
-              <option value="preco-high">Maior preço</option>
-              <option value="name">Nome A-Z</option>
-            </Select>
+              {/* Lado direito - Ordenação */}
+              <div className="flex items-center gap-3">
+                <span className="text-sm text-gray-500">Ordenar por:</span>
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className="px-3 py-2 bg-white border border-gray-300 rounded-md text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                >
+                  <option value="newest">Mais recentes</option>
+                  <option value="name">Nome (A-Z)</option>
+                  <option value="preco-low">Menor preço</option>
+                  <option value="preco-high">Maior preço</option>
+                </select>
+              </div>
+            </div>
+            
+            {/* Linha inferior com contador de resultados e filtros ativos */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-gray-100">
+              <span className="text-sm text-gray-500">
+                Mostrando {filteredProducts.length} de {products.length} produtos
+              </span>
+              
+              {/* Filtros ativos */}
+              {(selectedCategory || (priceRange[0] > 0 || priceRange[1] < 1000)) && (
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-sm text-gray-500">Filtros ativos:</span>
+                  {selectedCategory && (
+                    <span className="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
+                      {selectedCategory}
+                      <button
+                        onClick={() => setSelectedCategory("")}
+                        className="hover:text-blue-900"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </span>
+                  )}
+                  {(priceRange[0] > 0 || priceRange[1] < 1000) && (
+                    <span className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
+                      {formatPrice(priceRange[0])} - {formatPrice(priceRange[1])}
+                      <button
+                        onClick={() => setPriceRange([0, 1000])}
+                        className="hover:text-green-900"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </span>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
-          <p className="mt-3 text-xs text-gray-500">
-            {filteredProducts.length} produto(s) encontrado(s)
-          </p>
-        </div>
-      )}
+        )}
 
-      {/* Lista de produtos - Grid mais denso */}
-      {filteredProducts.length === 0 ? (
-        <div className="text-center py-12">
-          <p className="text-gray-500 text-lg">Nenhum produto encontrado</p>
-          <p className="text-gray-400 text-sm mt-2">
-            Tente ajustar os filtros ou termo de busca
-          </p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-          {filteredProducts.map((product) => (
-            <div
-              key={product.id}
-              onClick={() => handleClickProduct(product)}
-              className="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 cursor-pointer overflow-hidden group border border-gray-100 hover:border-blue-200"
-            >
-              {/* Imagem compacta */}
-              <div className="relative">
-                <img
-                  src={product.image_url}
-                  alt={product.name}
-                  className="w-full h-32 sm:h-40 object-cover group-hover:scale-105 transition-transform duration-300"
-                  onError={(e) =>
-                    ((e.target as HTMLImageElement).src =
-                      "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&h=400&fit=crop")
-                  }
-                />
-                
-                {/* Badge categoria */}
-                <div className="absolute top-2 left-2">
-                  <span className="px-2 py-1 bg-black bg-opacity-70 text-white text-xs font-medium rounded-md backdrop-blur-sm">
-                    {product.category}
-                  </span>
-                </div>
-                
-                {/* Rating */}
-                <div className="absolute top-2 right-2">
-                  <div className="flex items-center bg-white bg-opacity-90 rounded-lg px-2 py-1 backdrop-blur-sm">
-                    <Star className="w-3 h-3 text-yellow-400 mr-1" />
-                    <span className="text-xs font-semibold text-gray-800">
-                      4.8
-                    </span>
-                  </div>
-                </div>
-                
-                {/* Botão favorito */}
-                {user && (
+        {/* Menu lateral de filtros */}
+        {isFilterOpen && (
+          <>
+            {/* Overlay escuro */}
+            <div 
+              className="fixed inset-0 bg-black bg-opacity-50 z-40"
+              onClick={() => setIsFilterOpen(false)}
+            ></div>
+            
+            {/* Menu lateral */}
+            <div className="fixed top-0 left-0 h-full w-80 bg-white z-50 shadow-2xl transform transition-transform duration-300">
+              <div className="p-6">
+                {/* Cabeçalho do menu */}
+                <div className="flex items-center justify-between mb-8">
+                  <h3 className="text-xl font-bold text-gray-800">Filtros</h3>
                   <button
-                    onClick={(e) => handleToggleFavorite(product.id, e)}
-                    className="absolute bottom-2 right-2 p-1.5 bg-white bg-opacity-90 rounded-full hover:bg-opacity-100 transition-all shadow-sm"
+                    onClick={() => setIsFilterOpen(false)}
+                    className="p-2 hover:bg-gray-100 rounded-full transition-colors"
                   >
-                    <Heart
-                      className={`h-3 w-3 ${
-                        isFavorite(product.id)
-                          ? "text-red-500 fill-current"
-                          : "text-gray-400"
-                      }`}
-                    />
+                    <X className="h-5 w-5 text-gray-500" />
                   </button>
-                )}
-              </div>
+                </div>
 
-              {/* Conteúdo compacto */}
-              <div className="p-3">
-                <h3 className="text-sm font-semibold text-gray-900 mb-1 line-clamp-2 leading-tight">
-                  {product.name}
-                </h3>
-                
-                {/* Preço em destaque */}
-                <div className="mb-3">
-                  <div className="flex items-center gap-2">
-                    <span className="text-lg font-bold text-blue-600">
-                      {formatPrice(product.price)}
-                    </span>
-                    {product.original_price && (
-                      <span className="text-xs text-gray-400 line-through">
-                        {formatPrice(product.original_price)}
-                      </span>
-                    )}
-                  </div>
-                  <div className="flex items-center text-gray-500 text-xs mt-1">
-                    <Download className="w-3 h-3 mr-1" />
-                    <span>Digital</span>
+                {/* Categorias */}
+                <div className="mb-8">
+                  <h4 className="text-lg font-semibold text-gray-800 mb-4">Categorias</h4>
+                  <div className="space-y-3">
+                    <button
+                      onClick={() => setSelectedCategory("")}
+                      className={`block text-left w-full py-2 text-sm transition-colors ${
+                        selectedCategory === "" 
+                          ? "text-blue-600 font-semibold" 
+                          : "text-gray-600 hover:text-blue-600"
+                      }`}
+                    >
+                      Todas as categorias
+                    </button>
+                    {categories.map((category) => (
+                      <button
+                        key={category}
+                        onClick={() => setSelectedCategory(category)}
+                        className={`block text-left w-full py-2 text-sm transition-colors ${
+                          selectedCategory === category 
+                            ? "text-blue-600 font-semibold" 
+                            : "text-gray-600 hover:text-blue-600"
+                        }`}
+                      >
+                        {category}
+                      </button>
+                    ))}
                   </div>
                 </div>
 
-                {/* Botões compactos */}
-                {showActions && (
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => handleClickProduct(product)}
-                      className="flex-1 flex items-center justify-center bg-gray-50 text-gray-700 py-2 px-2 rounded-lg text-xs font-medium hover:bg-gray-100 transition-colors"
-                    >
-                      <Eye className="w-3 h-3 mr-1" />
-                      <span className="hidden sm:inline">Ver</span>
-                    </button>
-
-                    <button
-                      onClick={(e) => handleAddToCart(product, e)}
-                      className="flex-1 flex items-center justify-center bg-gradient-to-r from-blue-600 to-blue-700 text-white py-2 px-2 rounded-lg text-xs font-medium hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-sm"
-                    >
-                      <ShoppingCart className="w-3 h-3 mr-1" />
-                      <span className="hidden sm:inline">Add</span>
-                    </button>
+                {/* Filtro por preço */}
+                <div className="mb-8">
+                  <h4 className="text-lg font-semibold text-gray-800 mb-4">Faixa de preço</h4>
+                  
+                  {/* Range slider simulado */}
+                  <div className="mb-4">
+                    <div className="relative h-2 bg-gray-200 rounded-full">
+                      <div 
+                        className="absolute h-2 bg-blue-500 rounded-full"
+                        style={{
+                          left: `${(priceRange[0] / 1000) * 100}%`,
+                          width: `${((priceRange[1] - priceRange[0]) / 1000) * 100}%`
+                        }}
+                      ></div>
+                      <div 
+                        className="absolute w-4 h-4 bg-blue-500 rounded-full top-1/2 transform -translate-y-1/2 cursor-pointer border-2 border-white shadow-lg"
+                        style={{ left: `${(priceRange[0] / 1000) * 100}%` }}
+                      ></div>
+                      <div 
+                        className="absolute w-4 h-4 bg-blue-500 rounded-full top-1/2 transform -translate-y-1/2 cursor-pointer border-2 border-white shadow-lg"
+                        style={{ left: `${(priceRange[1] / 1000) * 100}%` }}
+                      ></div>
+                    </div>
                   </div>
-                )}
+
+                  {/* Inputs de preço */}
+                  <div className="flex items-center gap-2 mb-4">
+                    <input
+                      type="number"
+                      value={priceRange[0]}
+                      onChange={(e) => setPriceRange([parseInt(e.target.value) || 0, priceRange[1]])}
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      min="0"
+                      max="1000"
+                    />
+                    <span className="text-gray-500">-</span>
+                    <input
+                      type="number"
+                      value={priceRange[1]}
+                      onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value) || 1000])}
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      min="0"
+                      max="1000"
+                    />
+                  </div>
+
+                  <div className="text-sm text-gray-600 mb-4">
+                    Preço: {formatPrice(priceRange[0])} — {formatPrice(priceRange[1])}
+                  </div>
+
+                  <button 
+                    onClick={() => setIsFilterOpen(false)}
+                    className="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors font-medium"
+                  >
+                    Aplicar filtros
+                  </button>
+                </div>
+
+                {/* Botão limpar filtros */}
+                <div className="pt-4 border-t border-gray-200">
+                  <button
+                    onClick={() => {
+                      setSelectedCategory("");
+                      setPriceRange([0, 1000]);
+                      setSortBy("newest");
+                    }}
+                    className="w-full px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors font-medium"
+                  >
+                    Limpar todos os filtros
+                  </button>
+                </div>
               </div>
             </div>
-          ))}
-        </div>
-      )}
+          </>
+        )}
+
+        {/* Grade de produtos */}
+        {filteredProducts.length === 0 ? (
+          <div className="text-center py-20">
+            <div className="max-w-md mx-auto">
+              <p className="text-gray-500 text-xl font-medium mb-2">Nenhum produto encontrado</p>
+              <p className="text-gray-400">Tente ajustar os filtros ou termo de busca</p>
+            </div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredProducts.map((product) => (
+              <div
+                key={product.id}
+                className="group bg-white shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden cursor-pointer rounded-lg"
+                onClick={() => handleClickProduct(product)}
+              >
+                {/* Container da imagem */}
+                <div className="relative overflow-hidden bg-gray-100 aspect-square">
+                  <img
+                    src={product.image_url}
+                    alt={product.name}
+                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                    onError={(e) =>
+                      ((e.target as HTMLImageElement).src =
+                        "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&h=400&fit=crop")
+                    }
+                  />
+                  
+                  {/* Overlay escuro no hover */}
+                  <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300"></div>
+                  
+                  {/* Botões "Detalhes" e "Adicionar ao Carrinho" que aparecem no hover */}
+                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
+                    <div className="flex gap-3">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleClickProduct(product);
+                        }}
+                        className="bg-white text-gray-800 font-medium py-2 px-4 rounded-md transition-all duration-200 hover:bg-gray-50 shadow-lg flex items-center gap-2"
+                      >
+                        <Eye className="w-4 h-4" />
+                        Detalhes
+                      </button>
+                      
+                      {showActions && (
+                        <button
+                          onClick={(e) => handleAddToCart(product, e)}
+                          className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition-all duration-200 shadow-lg flex items-center gap-2"
+                        >
+                          <ShoppingCart className="w-4 h-4" />
+                          Carrinho
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Conteúdo do card */}
+                <div className="p-4 text-center">
+                  {/* Categoria */}
+                  <div className="text-xs text-gray-400 uppercase tracking-wider mb-2 font-medium">
+                    {product.category}
+                  </div>
+                  
+                  {/* Nome do produto */}
+                  <h3 className="text-base font-semibold text-gray-800 mb-3 line-clamp-2 leading-tight">
+                    {product.name}
+                  </h3>
+                  
+                  {/* Rating com estrelas */}
+                  <div className="flex items-center justify-center mb-3">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <Star 
+                        key={star} 
+                        className="w-4 h-4 text-gray-300" 
+                        fill="none" 
+                        stroke="currentColor"
+                      />
+                    ))}
+                  </div>
+                  
+                  {/* Preço */}
+                  <div className="text-lg font-bold text-gray-800">
+                    {formatPrice(product.price)}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 };
