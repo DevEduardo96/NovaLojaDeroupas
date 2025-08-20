@@ -1,0 +1,160 @@
+chunk-GKJBSOWT.js?v=79cd73e9:21551 Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools
+AuthContext.tsx:99 Auth state: User signed in eduardoaraujo_96@outlook.com
+@supabase_supabase-js.js?v=79cd73e9:4370  POST https://zsceradvdzzhqynfnchh.supabase.co/auth/v1/token?grant_type=refresh_token 429 (Too Many Requests)
+(anonymous) @ @supabase_supabase-js.js?v=79cd73e9:4370
+_handleRequest2 @ @supabase_supabase-js.js?v=79cd73e9:4651
+_request @ @supabase_supabase-js.js?v=79cd73e9:4641
+(anonymous) @ @supabase_supabase-js.js?v=79cd73e9:6540
+(anonymous) @ @supabase_supabase-js.js?v=79cd73e9:4436
+(anonymous) @ @supabase_supabase-js.js?v=79cd73e9:4448
+retryable @ @supabase_supabase-js.js?v=79cd73e9:4431
+_refreshAccessToken @ @supabase_supabase-js.js?v=79cd73e9:6535
+_callRefreshToken @ @supabase_supabase-js.js?v=79cd73e9:6663
+__loadSession @ @supabase_supabase-js.js?v=79cd73e9:6034
+await in __loadSession
+_useSession @ @supabase_supabase-js.js?v=79cd73e9:5976
+(anonymous) @ @supabase_supabase-js.js?v=79cd73e9:5914
+(anonymous) @ @supabase_supabase-js.js?v=79cd73e9:5930
+await in (anonymous)
+_acquireLock @ @supabase_supabase-js.js?v=79cd73e9:5931
+getSession @ @supabase_supabase-js.js?v=79cd73e9:5913
+await in getSession
+(anonymous) @ @supabase_supabase-js.js?v=79cd73e9:7422
+(anonymous) @ @supabase_supabase-js.js?v=79cd73e9:7266
+__awaiter8 @ @supabase_supabase-js.js?v=79cd73e9:7248
+_getAccessToken @ @supabase_supabase-js.js?v=79cd73e9:7418
+(anonymous) @ @supabase_supabase-js.js?v=79cd73e9:3943
+(anonymous) @ @supabase_supabase-js.js?v=79cd73e9:3918
+__awaiter6 @ @supabase_supabase-js.js?v=79cd73e9:3900
+(anonymous) @ @supabase_supabase-js.js?v=79cd73e9:3941
+then @ @supabase_supabase-js.js?v=79cd73e9:89
+AuthContext.tsx:106 Auth state: User signed out
+@supabase_supabase-js.js?v=79cd73e9:3930  GET https://zsceradvdzzhqynfnchh.supabase.co/rest/v1/variacoes_produto?select=id%2Ctamanho%2Ccor%2Cestoque%2Cimagem_url%2Cpreco_override%2Cativo&produto_id=eq.10&ativo=eq.true&order=tamanho.asc%2Ccor.asc 404 (Not Found)
+(anonymous) @ @supabase_supabase-js.js?v=79cd73e9:3930
+(anonymous) @ @supabase_supabase-js.js?v=79cd73e9:3951
+fulfilled @ @supabase_supabase-js.js?v=79cd73e9:3903
+Promise.then
+step @ @supabase_supabase-js.js?v=79cd73e9:3916
+(anonymous) @ @supabase_supabase-js.js?v=79cd73e9:3918
+__awaiter6 @ @supabase_supabase-js.js?v=79cd73e9:3900
+(anonymous) @ @supabase_supabase-js.js?v=79cd73e9:3941
+then @ @supabase_supabase-js.js?v=79cd73e9:89
+supabase.ts:172 Error fetching product variations: {code: '42P01', details: null, hint: null, message: 'relation "public.variacoes_produto" does not exist'}
+getProductVariations @ supabase.ts:172
+await in getProductVariations
+loadProduct @ SupabaseProductDetail.tsx:79
+await in loadProduct
+(anonymous) @ SupabaseProductDetail.tsx:63
+commitHookEffectListMount @ chunk-GKJBSOWT.js?v=79cd73e9:16915
+commitPassiveMountOnFiber @ chunk-GKJBSOWT.js?v=79cd73e9:18156
+commitPassiveMountEffects_complete @ chunk-GKJBSOWT.js?v=79cd73e9:18129
+commitPassiveMountEffects_begin @ chunk-GKJBSOWT.js?v=79cd73e9:18119
+commitPassiveMountEffects @ chunk-GKJBSOWT.js?v=79cd73e9:18109
+flushPassiveEffectsImpl @ chunk-GKJBSOWT.js?v=79cd73e9:19490
+flushPassiveEffects @ chunk-GKJBSOWT.js?v=79cd73e9:19447
+commitRootImpl @ chunk-GKJBSOWT.js?v=79cd73e9:19416
+commitRoot @ chunk-GKJBSOWT.js?v=79cd73e9:19277
+performSyncWorkOnRoot @ chunk-GKJBSOWT.js?v=79cd73e9:18895
+flushSyncCallbacks @ chunk-GKJBSOWT.js?v=79cd73e9:9119
+(anonymous) @ chunk-GKJBSOWT.js?v=79cd73e9:18627
+supabase.ts:195 Error in getProductVariations: Error: Failed to fetch product variations: relation "public.variacoes_produto" does not exist
+    at Object.getProductVariations (supabase.ts:173:15)
+    at async loadProduct (SupabaseProductDetail.tsx:79:26)
+getProductVariations @ supabase.ts:195
+await in getProductVariations
+loadProduct @ SupabaseProductDetail.tsx:79
+await in loadProduct
+(anonymous) @ SupabaseProductDetail.tsx:63
+commitHookEffectListMount @ chunk-GKJBSOWT.js?v=79cd73e9:16915
+commitPassiveMountOnFiber @ chunk-GKJBSOWT.js?v=79cd73e9:18156
+commitPassiveMountEffects_complete @ chunk-GKJBSOWT.js?v=79cd73e9:18129
+commitPassiveMountEffects_begin @ chunk-GKJBSOWT.js?v=79cd73e9:18119
+commitPassiveMountEffects @ chunk-GKJBSOWT.js?v=79cd73e9:18109
+flushPassiveEffectsImpl @ chunk-GKJBSOWT.js?v=79cd73e9:19490
+flushPassiveEffects @ chunk-GKJBSOWT.js?v=79cd73e9:19447
+commitRootImpl @ chunk-GKJBSOWT.js?v=79cd73e9:19416
+commitRoot @ chunk-GKJBSOWT.js?v=79cd73e9:19277
+performSyncWorkOnRoot @ chunk-GKJBSOWT.js?v=79cd73e9:18895
+flushSyncCallbacks @ chunk-GKJBSOWT.js?v=79cd73e9:9119
+(anonymous) @ chunk-GKJBSOWT.js?v=79cd73e9:18627
+SupabaseProductDetail.tsx:105 Error loading product: Error: Failed to fetch product variations: relation "public.variacoes_produto" does not exist
+    at Object.getProductVariations (supabase.ts:173:15)
+    at async loadProduct (SupabaseProductDetail.tsx:79:26)
+loadProduct @ SupabaseProductDetail.tsx:105
+await in loadProduct
+(anonymous) @ SupabaseProductDetail.tsx:63
+commitHookEffectListMount @ chunk-GKJBSOWT.js?v=79cd73e9:16915
+commitPassiveMountOnFiber @ chunk-GKJBSOWT.js?v=79cd73e9:18156
+commitPassiveMountEffects_complete @ chunk-GKJBSOWT.js?v=79cd73e9:18129
+commitPassiveMountEffects_begin @ chunk-GKJBSOWT.js?v=79cd73e9:18119
+commitPassiveMountEffects @ chunk-GKJBSOWT.js?v=79cd73e9:18109
+flushPassiveEffectsImpl @ chunk-GKJBSOWT.js?v=79cd73e9:19490
+flushPassiveEffects @ chunk-GKJBSOWT.js?v=79cd73e9:19447
+commitRootImpl @ chunk-GKJBSOWT.js?v=79cd73e9:19416
+commitRoot @ chunk-GKJBSOWT.js?v=79cd73e9:19277
+performSyncWorkOnRoot @ chunk-GKJBSOWT.js?v=79cd73e9:18895
+flushSyncCallbacks @ chunk-GKJBSOWT.js?v=79cd73e9:9119
+(anonymous) @ chunk-GKJBSOWT.js?v=79cd73e9:18627
+@supabase_supabase-js.js?v=79cd73e9:3930  GET https://zsceradvdzzhqynfnchh.supabase.co/rest/v1/variacoes_produto?select=id%2Ctamanho%2Ccor%2Cestoque%2Cimagem_url%2Cpreco_override%2Cativo&produto_id=eq.10&ativo=eq.true&order=tamanho.asc%2Ccor.asc 404 (Not Found)
+(anonymous) @ @supabase_supabase-js.js?v=79cd73e9:3930
+(anonymous) @ @supabase_supabase-js.js?v=79cd73e9:3951
+fulfilled @ @supabase_supabase-js.js?v=79cd73e9:3903
+Promise.then
+step @ @supabase_supabase-js.js?v=79cd73e9:3916
+(anonymous) @ @supabase_supabase-js.js?v=79cd73e9:3918
+__awaiter6 @ @supabase_supabase-js.js?v=79cd73e9:3900
+(anonymous) @ @supabase_supabase-js.js?v=79cd73e9:3941
+then @ @supabase_supabase-js.js?v=79cd73e9:89
+supabase.ts:172 Error fetching product variations: {code: '42P01', details: null, hint: null, message: 'relation "public.variacoes_produto" does not exist'}
+getProductVariations @ supabase.ts:172
+await in getProductVariations
+loadProduct @ SupabaseProductDetail.tsx:79
+await in loadProduct
+(anonymous) @ SupabaseProductDetail.tsx:63
+commitHookEffectListMount @ chunk-GKJBSOWT.js?v=79cd73e9:16915
+invokePassiveEffectMountInDEV @ chunk-GKJBSOWT.js?v=79cd73e9:18324
+invokeEffectsInDev @ chunk-GKJBSOWT.js?v=79cd73e9:19701
+commitDoubleInvokeEffectsInDEV @ chunk-GKJBSOWT.js?v=79cd73e9:19686
+flushPassiveEffectsImpl @ chunk-GKJBSOWT.js?v=79cd73e9:19503
+flushPassiveEffects @ chunk-GKJBSOWT.js?v=79cd73e9:19447
+commitRootImpl @ chunk-GKJBSOWT.js?v=79cd73e9:19416
+commitRoot @ chunk-GKJBSOWT.js?v=79cd73e9:19277
+performSyncWorkOnRoot @ chunk-GKJBSOWT.js?v=79cd73e9:18895
+flushSyncCallbacks @ chunk-GKJBSOWT.js?v=79cd73e9:9119
+(anonymous) @ chunk-GKJBSOWT.js?v=79cd73e9:18627
+supabase.ts:195 Error in getProductVariations: Error: Failed to fetch product variations: relation "public.variacoes_produto" does not exist
+    at Object.getProductVariations (supabase.ts:173:15)
+    at async loadProduct (SupabaseProductDetail.tsx:79:26)
+getProductVariations @ supabase.ts:195
+await in getProductVariations
+loadProduct @ SupabaseProductDetail.tsx:79
+await in loadProduct
+(anonymous) @ SupabaseProductDetail.tsx:63
+commitHookEffectListMount @ chunk-GKJBSOWT.js?v=79cd73e9:16915
+invokePassiveEffectMountInDEV @ chunk-GKJBSOWT.js?v=79cd73e9:18324
+invokeEffectsInDev @ chunk-GKJBSOWT.js?v=79cd73e9:19701
+commitDoubleInvokeEffectsInDEV @ chunk-GKJBSOWT.js?v=79cd73e9:19686
+flushPassiveEffectsImpl @ chunk-GKJBSOWT.js?v=79cd73e9:19503
+flushPassiveEffects @ chunk-GKJBSOWT.js?v=79cd73e9:19447
+commitRootImpl @ chunk-GKJBSOWT.js?v=79cd73e9:19416
+commitRoot @ chunk-GKJBSOWT.js?v=79cd73e9:19277
+performSyncWorkOnRoot @ chunk-GKJBSOWT.js?v=79cd73e9:18895
+flushSyncCallbacks @ chunk-GKJBSOWT.js?v=79cd73e9:9119
+(anonymous) @ chunk-GKJBSOWT.js?v=79cd73e9:18627
+SupabaseProductDetail.tsx:105 Error loading product: Error: Failed to fetch product variations: relation "public.variacoes_produto" does not exist
+    at Object.getProductVariations (supabase.ts:173:15)
+    at async loadProduct (SupabaseProductDetail.tsx:79:26)
+loadProduct @ SupabaseProductDetail.tsx:105
+await in loadProduct
+(anonymous) @ SupabaseProductDetail.tsx:63
+commitHookEffectListMount @ chunk-GKJBSOWT.js?v=79cd73e9:16915
+invokePassiveEffectMountInDEV @ chunk-GKJBSOWT.js?v=79cd73e9:18324
+invokeEffectsInDev @ chunk-GKJBSOWT.js?v=79cd73e9:19701
+commitDoubleInvokeEffectsInDEV @ chunk-GKJBSOWT.js?v=79cd73e9:19686
+flushPassiveEffectsImpl @ chunk-GKJBSOWT.js?v=79cd73e9:19503
+flushPassiveEffects @ chunk-GKJBSOWT.js?v=79cd73e9:19447
+commitRootImpl @ chunk-GKJBSOWT.js?v=79cd73e9:19416
+commitRoot @ chunk-GKJBSOWT.js?v=79cd73e9:19277
+performSyncWorkOnRoot @ chunk-GKJBSOWT.js?v=79cd73e9:18895
+flushSyncCallbacks @ chunk-GKJBSOWT.js?v=79cd73e9:9119
+(anonymous) @ chunk-GKJBSOWT.js?v=79cd73e9:18627
