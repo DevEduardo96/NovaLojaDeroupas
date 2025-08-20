@@ -101,9 +101,9 @@ export const SupabaseProductDetail: React.FC<SupabaseProductDetailProps> = ({
         variations
       });
 
-      // Definir cor e tamanho padrão
-      if (colors.length > 0) setSelectedColor(colors[0].name);
-      if (uniqueSizes.length > 0) setSelectedSize(uniqueSizes[0]);
+      // Resetar seleções para forçar escolha consciente do usuário
+      setSelectedColor("");
+      setSelectedSize("");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erro ao carregar produto");
       console.error("Error loading product:", err);
@@ -399,57 +399,62 @@ export const SupabaseProductDetail: React.FC<SupabaseProductDetailProps> = ({
 
             {/* Color Selection Section */}
             {availableColors.length > 0 && (
-              <div className="bg-white rounded-2xl p-6 shadow-xl">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-xl font-semibold text-gray-900">
+              <div className="bg-white rounded-2xl p-6 shadow-xl border-2 border-gray-100">
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="text-xl font-bold text-gray-900 flex items-center">
+                    <span className="w-3 h-3 bg-purple-500 rounded-full mr-3"></span>
                     Escolha a Cor
                   </h3>
-                  <span className="text-sm text-gray-600 bg-gray-100 px-3 py-1 rounded-full">
-                    {selectedColor || 'Nenhuma selecionada'}
+                  <span className={`text-sm px-4 py-2 rounded-full font-medium ${
+                    selectedColor 
+                      ? 'bg-green-100 text-green-800' 
+                      : 'bg-red-100 text-red-800'
+                  }`}>
+                    {selectedColor ? `Selecionada: ${selectedColor}` : 'Selecione uma cor'}
                   </span>
                 </div>
                 
                 <div className="space-y-4">
-                  <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-4">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                     {availableColors.map(({ name, code }) => (
                       <button
                         key={name}
                         onClick={() => setSelectedColor(name)}
-                        className={`group relative flex flex-col items-center p-3 rounded-xl border-2 transition-all hover:scale-105 ${
+                        className={`group relative flex flex-col items-center p-4 rounded-xl border-2 transition-all duration-200 hover:scale-105 ${
                           selectedColor === name
-                            ? 'border-purple-500 bg-purple-50 shadow-lg'
-                            : 'border-gray-200 hover:border-gray-300 hover:shadow-md'
+                            ? 'border-purple-500 bg-gradient-to-b from-purple-50 to-purple-100 shadow-lg transform scale-105'
+                            : 'border-gray-200 hover:border-purple-300 hover:shadow-md bg-gradient-to-b from-white to-gray-50'
                         }`}
                       >
                         <div 
-                          className={`w-12 h-12 rounded-full border-2 mb-2 ${
-                            selectedColor === name ? 'border-white shadow-md' : 'border-gray-200'
+                          className={`w-16 h-16 rounded-full border-3 mb-3 shadow-md ${
+                            selectedColor === name ? 'border-white ring-2 ring-purple-400' : 'border-gray-300'
                           }`}
                           style={{ backgroundColor: code }}
                         >
                           {code === '#FFFFFF' && (
-                            <div className="w-full h-full rounded-full border border-gray-300"></div>
+                            <div className="w-full h-full rounded-full border-2 border-gray-400"></div>
                           )}
                         </div>
-                        <span className={`text-xs font-medium text-center ${
-                          selectedColor === name ? 'text-purple-700' : 'text-gray-600'
+                        <span className={`text-sm font-semibold text-center ${
+                          selectedColor === name ? 'text-purple-700' : 'text-gray-700'
                         }`}>
                           {name}
                         </span>
                         {selectedColor === name && (
-                          <div className="absolute -top-1 -right-1 w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center">
-                            <CheckCircle className="w-4 h-4 text-white" />
+                          <div className="absolute -top-2 -right-2 w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center shadow-lg">
+                            <CheckCircle className="w-5 h-5 text-white" />
                           </div>
                         )}
                       </button>
                     ))}
                   </div>
                   
-                  {!selectedColor && availableColors.length > 0 && (
-                    <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
-                      <p className="text-orange-700 text-sm flex items-center">
-                        <span className="w-2 h-2 bg-orange-500 rounded-full mr-2"></span>
-                        Selecione uma cor para continuar
+                  {!selectedColor && (
+                    <div className="bg-gradient-to-r from-orange-50 to-red-50 border-l-4 border-orange-400 rounded-lg p-4">
+                      <p className="text-orange-800 font-medium flex items-center">
+                        <span className="w-3 h-3 bg-orange-500 rounded-full mr-3 animate-pulse"></span>
+                        Por favor, selecione uma cor antes de continuar
                       </p>
                     </div>
                   )}
@@ -459,16 +464,21 @@ export const SupabaseProductDetail: React.FC<SupabaseProductDetailProps> = ({
 
             {/* Size Selection Section */}
             {availableSizes.length > 0 && (
-              <div className="bg-white rounded-2xl p-6 shadow-xl">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-xl font-semibold text-gray-900">
+              <div className="bg-white rounded-2xl p-6 shadow-xl border-2 border-gray-100">
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="text-xl font-bold text-gray-900 flex items-center">
+                    <span className="w-3 h-3 bg-blue-500 rounded-full mr-3"></span>
                     Escolha o Tamanho
                   </h3>
                   <div className="flex items-center space-x-3">
-                    <span className="text-sm text-gray-600 bg-gray-100 px-3 py-1 rounded-full">
-                      {selectedSize || 'Nenhum selecionado'}
+                    <span className={`text-sm px-4 py-2 rounded-full font-medium ${
+                      selectedSize 
+                        ? 'bg-green-100 text-green-800' 
+                        : 'bg-red-100 text-red-800'
+                    }`}>
+                      {selectedSize ? `Selecionado: ${selectedSize}` : 'Selecione um tamanho'}
                     </span>
-                    <button className="text-sm text-purple-600 hover:text-purple-700 flex items-center bg-purple-50 px-3 py-1 rounded-full transition-colors">
+                    <button className="text-sm text-purple-600 hover:text-purple-700 flex items-center bg-purple-50 px-3 py-2 rounded-full transition-colors hover:bg-purple-100">
                       <Ruler className="w-4 h-4 mr-1" />
                       Guia de tamanhos
                     </button>
@@ -476,32 +486,32 @@ export const SupabaseProductDetail: React.FC<SupabaseProductDetailProps> = ({
                 </div>
                 
                 <div className="space-y-4">
-                  <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
+                  <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-4">
                     {availableSizes.map((size) => (
                       <button
                         key={size}
                         onClick={() => setSelectedSize(size)}
-                        className={`relative py-4 px-3 rounded-xl border-2 text-sm font-semibold transition-all hover:scale-105 ${
+                        className={`relative py-6 px-4 rounded-xl border-2 text-lg font-bold transition-all duration-200 hover:scale-105 min-h-[80px] flex items-center justify-center ${
                           selectedSize === size
-                            ? 'border-purple-500 bg-purple-50 text-purple-700 shadow-lg'
-                            : 'border-gray-200 text-gray-700 hover:border-gray-300 hover:shadow-md'
+                            ? 'border-blue-500 bg-gradient-to-b from-blue-50 to-blue-100 text-blue-700 shadow-lg transform scale-105'
+                            : 'border-gray-200 text-gray-700 hover:border-blue-300 hover:shadow-md bg-gradient-to-b from-white to-gray-50'
                         }`}
                       >
                         {size}
                         {selectedSize === size && (
-                          <div className="absolute -top-1 -right-1 w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center">
-                            <CheckCircle className="w-4 h-4 text-white" />
+                          <div className="absolute -top-2 -right-2 w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center shadow-lg">
+                            <CheckCircle className="w-5 h-5 text-white" />
                           </div>
                         )}
                       </button>
                     ))}
                   </div>
                   
-                  {!selectedSize && availableSizes.length > 0 && (
-                    <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
-                      <p className="text-orange-700 text-sm flex items-center">
-                        <span className="w-2 h-2 bg-orange-500 rounded-full mr-2"></span>
-                        Selecione um tamanho para continuar
+                  {!selectedSize && (
+                    <div className="bg-gradient-to-r from-orange-50 to-red-50 border-l-4 border-orange-400 rounded-lg p-4">
+                      <p className="text-orange-800 font-medium flex items-center">
+                        <span className="w-3 h-3 bg-orange-500 rounded-full mr-3 animate-pulse"></span>
+                        Por favor, selecione um tamanho antes de continuar
                       </p>
                     </div>
                   )}
@@ -544,32 +554,90 @@ export const SupabaseProductDetail: React.FC<SupabaseProductDetailProps> = ({
             </div>
 
             {/* Actions */}
-            <div className="bg-white rounded-2xl p-6 shadow-xl">
+            <div className="bg-white rounded-2xl p-6 shadow-xl border-2 border-gray-100">
+              {/* Status das seleções */}
+              {(availableColors.length > 0 || availableSizes.length > 0) && (
+                <div className="mb-6 p-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl">
+                  <h4 className="font-semibold text-gray-900 mb-3 text-center">Status das Seleções</h4>
+                  <div className="grid grid-cols-2 gap-4">
+                    {availableColors.length > 0 && (
+                      <div className="flex items-center justify-between p-3 bg-white rounded-lg">
+                        <span className="text-sm font-medium text-gray-700">Cor:</span>
+                        <span className={`text-sm font-bold px-3 py-1 rounded-full ${
+                          selectedColor ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                        }`}>
+                          {selectedColor || 'Não selecionada'}
+                        </span>
+                      </div>
+                    )}
+                    {availableSizes.length > 0 && (
+                      <div className="flex items-center justify-between p-3 bg-white rounded-lg">
+                        <span className="text-sm font-medium text-gray-700">Tamanho:</span>
+                        <span className={`text-sm font-bold px-3 py-1 rounded-full ${
+                          selectedSize ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                        }`}>
+                          {selectedSize || 'Não selecionado'}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Botão de adicionar ao carrinho */}
               <Button
                 onClick={handleAddToCart}
-                disabled={addedToCart || !selectedSize || !selectedColor}
-                className="w-full h-14 text-lg font-semibold bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 transform hover:scale-105 transition-all duration-200"
+                disabled={
+                  addedToCart || 
+                  (availableColors.length > 0 && !selectedColor) || 
+                  (availableSizes.length > 0 && !selectedSize)
+                }
+                className={`w-full h-16 text-xl font-bold transition-all duration-300 transform ${
+                  addedToCart 
+                    ? 'bg-green-500 hover:bg-green-600 scale-105' 
+                    : (availableColors.length > 0 && !selectedColor) || (availableSizes.length > 0 && !selectedSize)
+                      ? 'bg-gray-400 cursor-not-allowed'
+                      : 'bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 hover:scale-105 shadow-lg'
+                }`}
               >
                 {addedToCart ? (
                   <>
-                    <CheckCircle className="w-5 h-5 mr-2" />
-                    Adicionado ao Carrinho!
+                    <CheckCircle className="w-6 h-6 mr-3" />
+                    Produto Adicionado com Sucesso!
                   </>
                 ) : (
                   <>
-                    <ShoppingCart className="w-5 h-5 mr-2" />
-                    Adicionar ao Carrinho
+                    <ShoppingCart className="w-6 h-6 mr-3" />
+                    {((availableColors.length > 0 && !selectedColor) || (availableSizes.length > 0 && !selectedSize))
+                      ? 'Selecione Cor e Tamanho'
+                      : 'Adicionar ao Carrinho'
+                    }
                   </>
                 )}
               </Button>
               
-              {(!selectedSize || !selectedColor) && (
-                <p className="mt-2 text-sm text-red-600 text-center">
-                  Selecione cor e tamanho antes de adicionar ao carrinho
-                </p>
+              {/* Mensagem de validação mais clara */}
+              {((availableColors.length > 0 && !selectedColor) || (availableSizes.length > 0 && !selectedSize)) && (
+                <div className="mt-4 p-4 bg-gradient-to-r from-red-50 to-orange-50 border-l-4 border-red-400 rounded-lg">
+                  <p className="text-red-800 font-medium text-center">
+                    ⚠️ Por favor, selecione todas as opções obrigatórias:
+                  </p>
+                  <ul className="mt-2 text-sm text-red-700">
+                    {availableColors.length > 0 && !selectedColor && (
+                      <li className="flex items-center justify-center">
+                        • Cor (obrigatória)
+                      </li>
+                    )}
+                    {availableSizes.length > 0 && !selectedSize && (
+                      <li className="flex items-center justify-center">
+                        • Tamanho (obrigatório)
+                      </li>
+                    )}
+                  </ul>
+                </div>
               )}
               
-              <div className="mt-4 text-center">
+              <div className="mt-6 text-center">
                 <p className="text-sm text-gray-500 flex items-center justify-center space-x-4">
                   <span className="flex items-center">
                     <Shield className="w-4 h-4 mr-1 text-green-500" />
