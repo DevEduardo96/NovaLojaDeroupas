@@ -16,6 +16,10 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     storageKey: "supabase.auth.token",
     flowType: "pkce",
     debug: false,
+    // Add throttling to prevent too many refresh requests
+    refreshTokenGrace: 30, // seconds before token expires to refresh
+    retryDelayMin: 2, // minimum delay between retries (seconds)
+    retryDelayMax: 10, // maximum delay between retries (seconds)
   },
   global: {
     headers: {
@@ -27,7 +31,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   },
   realtime: {
     params: {
-      eventsPerSecond: 10,
+      eventsPerSecond: 5, // Reduced to prevent rate limiting
     },
   },
 });
