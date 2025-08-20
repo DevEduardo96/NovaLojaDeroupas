@@ -5,7 +5,6 @@ import {
   Eye,
   Star,
   X,
-  SlidersHorizontal,
 } from "lucide-react";
 import { productService } from "../lib/supabase";
 import type { Product } from "../types";
