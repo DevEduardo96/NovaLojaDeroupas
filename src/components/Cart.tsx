@@ -77,6 +77,20 @@ export const Cart: React.FC<CartProps> = ({
                       <h3 className="font-semibold text-gray-900 text-sm">
                         {item.product.name}
                       </h3>
+                      {(item.product.selectedColor || item.product.selectedSize) && (
+                        <div className="flex flex-wrap gap-2 mt-1">
+                          {item.product.selectedColor && (
+                            <span className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded">
+                              {item.product.selectedColor}
+                            </span>
+                          )}
+                          {item.product.selectedSize && (
+                            <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">
+                              {item.product.selectedSize}
+                            </span>
+                          )}
+                        </div>
+                      )}
                       <p className="text-indigo-600 font-bold">
                         {formatPrice(item.product.price)}
                       </p>
