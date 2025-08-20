@@ -60,6 +60,27 @@ export const productService = {
     }
   },
 
+  // Fetch single product by ID
+  async getProduct(id: number): Promise<Product | null> {
+    try {
+      const { data, error } = await supabase
+        .from("produtos")
+        .select("*")
+        .eq("id", id)
+        .single();
+
+      if (error) {
+        console.error("Error fetching product:", error);
+        return null;
+      }
+
+      return data;
+    } catch (error) {
+      console.error("Error in getProduct:", error);
+      return null;
+    }
+  },
+
   // Fetch products by category
   async getProductsByCategory(category: string): Promise<Product[]> {
     try {
