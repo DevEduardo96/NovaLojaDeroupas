@@ -397,86 +397,149 @@ export const SupabaseProductDetail: React.FC<SupabaseProductDetailProps> = ({
               </div>
             </div>
 
-            {/* Product Options */}
-            <div className="bg-white rounded-2xl p-6 shadow-xl space-y-6">
-              {/* Color Selection */}
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-3">
-                  Cor: <span className="font-normal">{selectedColor}</span>
-                </h3>
-                <div className="flex flex-wrap gap-3">
-                  {availableColors.map(({ name, code }) => (
-                    <button
-                      key={name}
-                      onClick={() => setSelectedColor(name)}
-                      className={`w-10 h-10 rounded-full border-2 transition-all ${
-                        selectedColor === name
-                          ? 'border-purple-500 ring-2 ring-purple-200'
-                          : 'border-gray-300 hover:border-gray-400'
-                      }`}
-                      style={{ backgroundColor: code }}
-                      title={name}
-                    >
-                      {code === '#FFFFFF' && (
-                        <div className="w-full h-full rounded-full border border-gray-200"></div>
-                      )}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Size Selection */}
-              <div>
-                <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-lg font-semibold text-gray-900">
-                    Tamanho: <span className="font-normal">{selectedSize}</span>
+            {/* Color Selection Section */}
+            {availableColors.length > 0 && (
+              <div className="bg-white rounded-2xl p-6 shadow-xl">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-xl font-semibold text-gray-900">
+                    Escolha a Cor
                   </h3>
-                  <button className="text-sm text-purple-600 hover:text-purple-700 flex items-center">
-                    <Ruler className="w-4 h-4 mr-1" />
-                    Guia de tamanhos
-                  </button>
-                </div>
-                <div className="grid grid-cols-6 gap-3">
-                  {availableSizes.map((size) => (
-                    <button
-                      key={size}
-                      onClick={() => setSelectedSize(size)}
-                      className={`py-2 px-3 rounded-lg border text-sm font-medium transition-colors ${
-                        selectedSize === size
-                          ? 'border-purple-500 bg-purple-50 text-purple-700'
-                          : 'border-gray-300 hover:border-gray-400'
-                      }`}
-                    >
-                      {size}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Quantity */}
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-3">Quantidade</h3>
-                <div className="flex items-center space-x-3">
-                  <div className="flex items-center border border-gray-300 rounded-lg">
-                    <button
-                      onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                      className="p-2 hover:bg-gray-100 rounded-l-lg"
-                      disabled={quantity <= 1}
-                    >
-                      <Minus className="w-4 h-4" />
-                    </button>
-                    <span className="px-4 py-2 font-medium">{quantity}</span>
-                    <button
-                      onClick={() => setQuantity(quantity + 1)}
-                      className="p-2 hover:bg-gray-100 rounded-r-lg"
-                    >
-                      <Plus className="w-4 h-4" />
-                    </button>
-                  </div>
-                  <span className="text-gray-600 text-sm">
-                    {quantity > 1 && `Total: ${formatPrice(product.price * quantity)}`}
+                  <span className="text-sm text-gray-600 bg-gray-100 px-3 py-1 rounded-full">
+                    {selectedColor || 'Nenhuma selecionada'}
                   </span>
                 </div>
+                
+                <div className="space-y-4">
+                  <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-4">
+                    {availableColors.map(({ name, code }) => (
+                      <button
+                        key={name}
+                        onClick={() => setSelectedColor(name)}
+                        className={`group relative flex flex-col items-center p-3 rounded-xl border-2 transition-all hover:scale-105 ${
+                          selectedColor === name
+                            ? 'border-purple-500 bg-purple-50 shadow-lg'
+                            : 'border-gray-200 hover:border-gray-300 hover:shadow-md'
+                        }`}
+                      >
+                        <div 
+                          className={`w-12 h-12 rounded-full border-2 mb-2 ${
+                            selectedColor === name ? 'border-white shadow-md' : 'border-gray-200'
+                          }`}
+                          style={{ backgroundColor: code }}
+                        >
+                          {code === '#FFFFFF' && (
+                            <div className="w-full h-full rounded-full border border-gray-300"></div>
+                          )}
+                        </div>
+                        <span className={`text-xs font-medium text-center ${
+                          selectedColor === name ? 'text-purple-700' : 'text-gray-600'
+                        }`}>
+                          {name}
+                        </span>
+                        {selectedColor === name && (
+                          <div className="absolute -top-1 -right-1 w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center">
+                            <CheckCircle className="w-4 h-4 text-white" />
+                          </div>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                  
+                  {!selectedColor && availableColors.length > 0 && (
+                    <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
+                      <p className="text-orange-700 text-sm flex items-center">
+                        <span className="w-2 h-2 bg-orange-500 rounded-full mr-2"></span>
+                        Selecione uma cor para continuar
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Size Selection Section */}
+            {availableSizes.length > 0 && (
+              <div className="bg-white rounded-2xl p-6 shadow-xl">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-xl font-semibold text-gray-900">
+                    Escolha o Tamanho
+                  </h3>
+                  <div className="flex items-center space-x-3">
+                    <span className="text-sm text-gray-600 bg-gray-100 px-3 py-1 rounded-full">
+                      {selectedSize || 'Nenhum selecionado'}
+                    </span>
+                    <button className="text-sm text-purple-600 hover:text-purple-700 flex items-center bg-purple-50 px-3 py-1 rounded-full transition-colors">
+                      <Ruler className="w-4 h-4 mr-1" />
+                      Guia de tamanhos
+                    </button>
+                  </div>
+                </div>
+                
+                <div className="space-y-4">
+                  <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
+                    {availableSizes.map((size) => (
+                      <button
+                        key={size}
+                        onClick={() => setSelectedSize(size)}
+                        className={`relative py-4 px-3 rounded-xl border-2 text-sm font-semibold transition-all hover:scale-105 ${
+                          selectedSize === size
+                            ? 'border-purple-500 bg-purple-50 text-purple-700 shadow-lg'
+                            : 'border-gray-200 text-gray-700 hover:border-gray-300 hover:shadow-md'
+                        }`}
+                      >
+                        {size}
+                        {selectedSize === size && (
+                          <div className="absolute -top-1 -right-1 w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center">
+                            <CheckCircle className="w-4 h-4 text-white" />
+                          </div>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                  
+                  {!selectedSize && availableSizes.length > 0 && (
+                    <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
+                      <p className="text-orange-700 text-sm flex items-center">
+                        <span className="w-2 h-2 bg-orange-500 rounded-full mr-2"></span>
+                        Selecione um tamanho para continuar
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Quantity Section */}
+            <div className="bg-white rounded-2xl p-6 shadow-xl">
+              <h3 className="text-xl font-semibold text-gray-900 mb-4">Quantidade</h3>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center border-2 border-gray-200 rounded-xl overflow-hidden">
+                  <button
+                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                    className="p-3 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    disabled={quantity <= 1}
+                  >
+                    <Minus className="w-5 h-5" />
+                  </button>
+                  <span className="px-6 py-3 font-bold text-lg bg-gray-50 min-w-[80px] text-center">
+                    {quantity}
+                  </span>
+                  <button
+                    onClick={() => setQuantity(quantity + 1)}
+                    className="p-3 hover:bg-gray-100 transition-colors"
+                  >
+                    <Plus className="w-5 h-5" />
+                  </button>
+                </div>
+                
+                {quantity > 1 && (
+                  <div className="text-right">
+                    <p className="text-sm text-gray-600">Total</p>
+                    <p className="text-2xl font-bold text-purple-600">
+                      {formatPrice(product.price * quantity)}
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
 
