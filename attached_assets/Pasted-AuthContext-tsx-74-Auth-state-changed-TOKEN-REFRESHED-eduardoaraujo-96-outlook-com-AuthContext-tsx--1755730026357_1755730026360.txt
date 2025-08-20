@@ -1,0 +1,42 @@
+AuthContext.tsx:74 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:74 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:74 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:74 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:74 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:74 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:74 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:74 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+SupabaseProductDetail.tsx:104 Error loading product: TypeError: getProductVariations is not a function
+    at loadProduct (SupabaseProductDetail.tsx:84:32)
+loadProduct @ SupabaseProductDetail.tsx:104
+await in loadProduct
+(anonymous) @ SupabaseProductDetail.tsx:68
+commitHookEffectListMount @ chunk-GKJBSOWT.js?v=79cd73e9:16915
+commitPassiveMountOnFiber @ chunk-GKJBSOWT.js?v=79cd73e9:18156
+commitPassiveMountEffects_complete @ chunk-GKJBSOWT.js?v=79cd73e9:18129
+commitPassiveMountEffects_begin @ chunk-GKJBSOWT.js?v=79cd73e9:18119
+commitPassiveMountEffects @ chunk-GKJBSOWT.js?v=79cd73e9:18109
+flushPassiveEffectsImpl @ chunk-GKJBSOWT.js?v=79cd73e9:19490
+flushPassiveEffects @ chunk-GKJBSOWT.js?v=79cd73e9:19447
+commitRootImpl @ chunk-GKJBSOWT.js?v=79cd73e9:19416
+commitRoot @ chunk-GKJBSOWT.js?v=79cd73e9:19277
+performSyncWorkOnRoot @ chunk-GKJBSOWT.js?v=79cd73e9:18895
+flushSyncCallbacks @ chunk-GKJBSOWT.js?v=79cd73e9:9119
+(anonymous) @ chunk-GKJBSOWT.js?v=79cd73e9:18627
+SupabaseProductDetail.tsx:104 Error loading product: TypeError: getProductVariations is not a function
+    at loadProduct (SupabaseProductDetail.tsx:84:32)
+loadProduct @ SupabaseProductDetail.tsx:104
+await in loadProduct
+(anonymous) @ SupabaseProductDetail.tsx:68
+commitHookEffectListMount @ chunk-GKJBSOWT.js?v=79cd73e9:16915
+invokePassiveEffectMountInDEV @ chunk-GKJBSOWT.js?v=79cd73e9:18324
+invokeEffectsInDev @ chunk-GKJBSOWT.js?v=79cd73e9:19701
+commitDoubleInvokeEffectsInDEV @ chunk-GKJBSOWT.js?v=79cd73e9:19686
+flushPassiveEffectsImpl @ chunk-GKJBSOWT.js?v=79cd73e9:19503
+flushPassiveEffects @ chunk-GKJBSOWT.js?v=79cd73e9:19447
+commitRootImpl @ chunk-GKJBSOWT.js?v=79cd73e9:19416
+commitRoot @ chunk-GKJBSOWT.js?v=79cd73e9:19277
+performSyncWorkOnRoot @ chunk-GKJBSOWT.js?v=79cd73e9:18895
+flushSyncCallbacks @ chunk-GKJBSOWT.js?v=79cd73e9:9119
+(anonymous) @ chunk-GKJBSOWT.js?v=79cd73e9:18627
+AuthContext.tsx:74 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
