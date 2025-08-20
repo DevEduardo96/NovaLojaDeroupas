@@ -49,7 +49,7 @@ export const SupabaseProductDetail: React.FC<SupabaseProductDetailProps> = ({
   const [imageError, setImageError] = useState(false);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
 
-  const { hasUserPurchasedProduct } = usePayments();
+  usePayments();
 
   // Dados de exemplo para tamanhos e cores (podem vir do produto)
   const sizes = ["XS", "S", "M", "L", "XL", "XXL"];
