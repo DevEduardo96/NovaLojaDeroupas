@@ -18,39 +18,17 @@ export const useCart = () => {
     localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items));
   }, [items]);
 
-  const addToCart = useCallback((product: Product | any, customQuantity?: number) => {
+  const addToCart = useCallback((product: Product) => {
     setItems((prev) => {
-      // Para produtos com variações, criar um ID único baseado no produto + variações
-      const productKey = product.selectedColor || product.selectedSize 
-        ? `${product.id}-${product.selectedColor || ''}-${product.selectedSize || ''}`
-        : product.id;
-      
-      const existingItem = prev.find((item) => {
-        const itemKey = item.product.selectedColor || item.product.selectedSize
-          ? `${item.product.id}-${item.product.selectedColor || ''}-${item.product.selectedSize || ''}`
-          : item.product.id;
-        return itemKey === productKey;
-      });
-      
+      const existingItem = prev.find((item) => item.product.id === product.id);
       if (existingItem) {
-        return prev.map((item) => {
-          const itemKey = item.product.selectedColor || item.product.selectedSize
-            ? `${item.product.id}-${item.product.selectedColor || ''}-${item.product.selectedSize || ''}`
-            : item.product.id;
-          return itemKey === productKey
-            ? { ...item, quantity: item.quantity + (customQuantity || product.quantity || 1) }
-            : item;
-        });
+        return prev.map((item) =>
+          item.product.id === product.id
+            ? { ...item, quantity: item.quantity + 1 }
+            : item
+        );
       }
-      
-      return [...prev, { 
-        product: {
-          ...product,
-          // Garantir que o ID seja único para variações
-          id: productKey
-        }, 
-        quantity: customQuantity || product.quantity || 1 
-      }];
+      return [...prev, { product, quantity: 1 }];
     });
   }, []);
 

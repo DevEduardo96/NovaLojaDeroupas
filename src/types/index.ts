@@ -10,23 +10,6 @@ export interface Product {
   created_at?: string;
   updated_at?: string;
   download_url?: string; // <-- novo campo
-  variations?: ProductVariation[]; // Variações do produto
-}
-
-export interface ProductVariation {
-  id: number;
-  product_id: number;
-  type: 'size' | 'color' | 'variation';
-  name: string;
-  value: string;
-  size?: string;
-  color?: string;
-  stock_quantity: number;
-  price_modifier: number;
-  image_url?: string;
-  is_available: boolean;
-  created_at: string;
-  updated_at: string;
 }
 
 export interface User {
@@ -39,8 +22,6 @@ export interface User {
 export interface CartItem {
   product: Product;
   quantity: number;
-  selectedSize?: string;
-  selectedColor?: string;
 }
 
 export interface Favorite {

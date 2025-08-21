@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useEffect, useState, useRef } from "react";
 import { supabase } from "../lib/supabase";
 import type { User, Session } from "@supabase/supabase-js";
@@ -21,50 +20,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
-  const isInitialized = useRef(false);
-  const subscriptionRef = useRef<any>(null);
-  const refreshingRef = useRef(false);
-  const mountedRef = useRef(true);
+  const isRefreshing = useRef(false);
+  const refreshPromise = useRef<Promise<any> | null>(null);
+  const lastSessionCheck = useRef<number>(0);
 
   useEffect(() => {
-    // Prevent multiple initializations
-    if (isInitialized.current) return;
-    isInitialized.current = true;
-    mountedRef.current = true;
-
     let isMounted = true;
 
-    // Get initial session with retry logic
-    const getInitialSession = async (retryCount = 0) => {
-      try {
-        // Avoid multiple simultaneous session requests
-        if (refreshingRef.current) {
-          return;
-        }
+    // Get initial session
+    const getInitialSession = async () => {
+      const now = Date.now();
+      // Prevent excessive session checks - minimum 5 seconds between calls
+      if (now - lastSessionCheck.current < 5000) {
+        setLoading(false);
+        return;
+      }
+      lastSessionCheck.current = now;
 
-        refreshingRef.current = true;
+      try {
         const { data: { session }, error } = await supabase.auth.getSession();
         
-        if (!isMounted || !mountedRef.current) return;
+        if (!isMounted) return;
         
         if (error) {
           console.error("Error getting initial session:", error);
-          
-          // Handle rate limiting with exponential backoff
-          if (error.message?.includes('429') || error.message?.includes('Too Many Requests')) {
-            if (retryCount < 3) {
-              const delay = Math.pow(2, retryCount) * 1000; // 1s, 2s, 4s
-              console.log(`Rate limited, retrying in ${delay}ms...`);
-              setTimeout(() => {
-                if (isMounted && mountedRef.current) {
-                  refreshingRef.current = false;
-                  getInitialSession(retryCount + 1);
-                }
-              }, delay);
-              return;
-            }
-          }
-          
+          // Se houver erro de sessão, limpa o estado
           setSession(null);
           setUser(null);
         } else {
@@ -73,13 +53,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         }
       } catch (error) {
         console.error("Error in getInitialSession:", error);
-        if (isMounted && mountedRef.current) {
-          setSession(null);
-          setUser(null);
-        }
+        setSession(null);
+        setUser(null);
       } finally {
-        refreshingRef.current = false;
-        if (isMounted && mountedRef.current) {
+        if (isMounted) {
           setLoading(false);
         }
       }
@@ -87,71 +64,46 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
     getInitialSession();
 
-    // Single auth state listener with improved error handling
+    // Listen for auth state changes
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (!isMounted || !mountedRef.current) return;
+      if (!isMounted) return;
 
-      // Handle different auth events appropriately
-      switch (event) {
-        case 'SIGNED_IN':
-          console.log("Auth state: User signed in", session?.user?.email);
-          setSession(session);
-          setUser(session?.user ?? null);
-          setLoading(false);
-          break;
-          
-        case 'SIGNED_OUT':
-          console.log("Auth state: User signed out");
-          setSession(null);
-          setUser(null);
-          setLoading(false);
-          refreshingRef.current = false; // Reset refresh state
-          break;
-          
-        case 'TOKEN_REFRESHED':
-          // Silently handle token refresh without logging
-          if (session) {
-            setSession(session);
-            setUser(session.user);
-          }
-          break;
-          
-        case 'USER_UPDATED':
-          console.log("Auth state: User updated");
-          if (session) {
-            setSession(session);
-            setUser(session.user);
-          }
-          break;
-          
-        default:
-          // Handle other events silently
-          setSession(session);
-          setUser(session?.user ?? null);
-          setLoading(false);
+      if (import.meta.env.DEV) {
+        console.log("Auth state changed:", event, session?.user?.email);
       }
+
+      // Evita múltiplos refresh simultâneos
+      if (event === 'TOKEN_REFRESHED' && isRefreshing.current) {
+        return;
+      }
+
+      // Controla o refresh token para evitar múltiplas requisições
+      if (event === 'TOKEN_REFRESHED') {
+        isRefreshing.current = true;
+        setTimeout(() => {
+          isRefreshing.current = false;
+        }, 1000);
+      }
+
+      setSession(session);
+      setUser(session?.user ?? null);
+      setLoading(false);
     });
 
-    subscriptionRef.current = subscription;
-
-    // Cleanup function
+    // Cleanup
     return () => {
       isMounted = false;
-      mountedRef.current = false;
-      refreshingRef.current = false;
-      
-      if (subscriptionRef.current) {
-        subscriptionRef.current.unsubscribe();
-        subscriptionRef.current = null;
-      }
-      isInitialized.current = false;
+      subscription.unsubscribe();
+      isRefreshing.current = false;
+      refreshPromise.current = null;
     };
-  }, []); // Empty dependency array ensures this runs only once
+  }, []);
 
   const signUp = async (email: string, password: string) => {
     try {
+      // Validação de entrada
       if (!email || !password) {
         return { error: { message: "Email e senha são obrigatórios" } };
       }
@@ -174,17 +126,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const signIn = async (email: string, password: string) => {
     try {
+      // Validação de entrada
       if (!email || !password) {
         return { error: { message: "Email e senha são obrigatórios" } };
       }
 
-      // Prevent concurrent login attempts
-      if (refreshingRef.current) {
-        return { error: { message: "Aguarde, processando requisição anterior..." } };
-      }
-
+      // Limpa estados anteriores
       setLoading(true);
-      refreshingRef.current = true;
       
       const { error } = await supabase.auth.signInWithPassword({
         email: email.trim().toLowerCase(),
@@ -192,28 +140,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       });
 
       if (error) {
-        refreshingRef.current = false;
         setLoading(false);
-        
-        // User-friendly error messages with rate limiting handling
+        // Mensagens de erro mais amigáveis
         if (error.message.includes('Invalid login credentials')) {
           return { error: { message: "Email ou senha incorretos" } };
         } else if (error.message.includes('Email not confirmed')) {
           return { error: { message: "Por favor, confirme seu email antes de fazer login" } };
-        } else if (error.message.includes('Too many requests') || error.message.includes('429')) {
-          return { error: { message: "Muitas tentativas de login. Aguarde alguns minutos antes de tentar novamente" } };
+        } else if (error.message.includes('Too many requests')) {
+          return { error: { message: "Muitas tentativas de login. Tente novamente em alguns minutos" } };
         } else if (error.message.includes('Invalid email')) {
           return { error: { message: "Formato de email inválido" } };
         }
         return { error: { message: error.message } };
       }
 
-      // Success - the auth state change listener will handle state updates
-      refreshingRef.current = false;
       return { error: null };
     } catch (error) {
       console.error("Error in signIn:", error);
-      refreshingRef.current = false;
       setLoading(false);
       return { error: { message: "Erro de conexão. Verifique sua internet e tente novamente" } };
     }
@@ -221,27 +164,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const signOut = async () => {
     try {
-      // Prevent concurrent logout attempts
-      if (refreshingRef.current) {
-        return { error: { message: "Aguarde, processando requisição anterior..." } };
-      }
-
       setLoading(true);
-      refreshingRef.current = true;
-      
       const { error } = await supabase.auth.signOut();
       
       if (!error) {
+        // Limpa estados locais
         setSession(null);
         setUser(null);
       }
       
-      refreshingRef.current = false;
       setLoading(false);
       return { error };
     } catch (error) {
       console.error("Error in signOut:", error);
-      refreshingRef.current = false;
       setLoading(false);
       return { error: { message: "Erro interno ao fazer logout" } };
     }
@@ -250,16 +185,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const getUserInitial = (): string => {
     if (!user) return "";
     
+    // Tenta pegar o nome primeiro
     const fullName = user.user_metadata?.full_name || user.user_metadata?.name;
     if (fullName && typeof fullName === 'string') {
       return fullName.charAt(0).toUpperCase();
     }
     
+    // Se não tiver nome, usa a inicial do email
     if (user.email) {
       return user.email.charAt(0).toUpperCase();
     }
     
-    return "U";
+    return "U"; // Fallback
   };
 
   return (
