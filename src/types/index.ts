@@ -141,3 +141,19 @@ export interface AppConfig {
   supabaseUrl: string;
   environment: 'development' | 'production' | 'staging';
 }
+
+export interface ProductVariation {
+  id: number;
+  product_id: number;
+  type: "size" | "color";
+  name: string;
+  value: string;
+  stock_quantity: number;
+  price_modifier: number;
+  is_available: boolean;
+}
+
+export interface ProductWithVariations extends Product {
+  colors: ProductVariation[];
+  sizes: ProductVariation[];
+}

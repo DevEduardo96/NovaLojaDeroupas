@@ -19,8 +19,9 @@ import {
   Zap,
   Plus,
   Minus,
+  AlertCircle,
 } from "lucide-react";
-import { productService } from "../lib/supabase";
+import { productService, type ProductWithVariations, type ProductVariation } from "../lib/supabase";
 import type { Product } from "../types";
 import { formatPrice, shareContent } from "../lib/utils";
 import { usePayments } from "../hooks/usePayments";
@@ -37,7 +38,7 @@ export const SupabaseProductDetail: React.FC<SupabaseProductDetailProps> = ({
   onBack,
   onAddToCart,
 }) => {
-  const [product, setProduct] = useState<Product | null>(null);
+  const [product, setProduct] = useState<ProductWithVariations | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isWishlisted, setIsWishlisted] = useState(false);
@@ -46,23 +47,12 @@ export const SupabaseProductDetail: React.FC<SupabaseProductDetailProps> = ({
   const [selectedColor, setSelectedColor] = useState("");
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState("description");
-  const [imageError, setImageError] = useState(false);
+  const [, setImageError] = useState(false);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [stockCheck, setStockCheck] = useState<boolean>(true);
+  const [checkingStock, setCheckingStock] = useState(false);
 
   usePayments();
-
-  // Dados de exemplo para tamanhos e cores (podem vir do produto)
-  const sizes = ["XS", "S", "M", "L", "XL", "XXL"];
-  const colors = [
-    { name: "Preto", code: "#000000" },
-    { name: "Branco", code: "#FFFFFF" },
-    { name: "Azul Marinho", code: "#1e3a8a" },
-    { name: "Vermelho", code: "#dc2626" },
-    { name: "Verde", code: "#059669" },
-  ];
-
-  // URLs de exemplo para galeria de imagens
-
 
   useEffect(() => {
     if (productId) {
@@ -70,11 +60,21 @@ export const SupabaseProductDetail: React.FC<SupabaseProductDetailProps> = ({
     }
   }, [productId]);
 
+  useEffect(() => {
+    // Check stock when size or color changes
+    if (product && (selectedSize || selectedColor)) {
+      checkStock();
+    }
+  }, [selectedSize, selectedColor, product]);
+
   const loadProduct = async (id: number) => {
     try {
       setLoading(true);
       setError(null);
+      console.log("Loading product with ID:", id); // Debug log
+      
       const productData = await productService.getProductById(id);
+      console.log("Loaded product data:", productData); // Debug log
 
       if (!productData) {
         setError("Produto não encontrado");
@@ -82,25 +82,108 @@ export const SupabaseProductDetail: React.FC<SupabaseProductDetailProps> = ({
       }
 
       setProduct(productData);
-      // Definir cor e tamanho padrão
-      if (colors.length > 0) setSelectedColor(colors[0].name);
-      if (sizes.length > 0) setSelectedSize(sizes[2]); // M como padrão
+      
+      // Debug logs para verificar as variações
+      console.log("Product colors:", productData.colors);
+      console.log("Product sizes:", productData.sizes);
+      
+      // Set default selections - com verificação mais robusta
+      if (productData.colors && Array.isArray(productData.colors) && productData.colors.length > 0) {
+        console.log("Setting default color:", productData.colors[0].name);
+        setSelectedColor(productData.colors[0].name);
+      } else {
+        console.log("No colors available");
+      }
+      
+      if (productData.sizes && Array.isArray(productData.sizes) && productData.sizes.length > 0) {
+        // Try to select "M" as default, or first available
+        const mediumSize = productData.sizes.find(s => s.name === "M");
+        const defaultSize = mediumSize ? mediumSize.name : productData.sizes[0].name;
+        console.log("Setting default size:", defaultSize);
+        setSelectedSize(defaultSize);
+      } else {
+        console.log("No sizes available");
+      }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erro ao carregar produto");
       console.error("Error loading product:", err);
+      setError(err instanceof Error ? err.message : "Erro ao carregar produto");
     } finally {
       setLoading(false);
     }
   };
 
+  const checkStock = async () => {
+    if (!product) return;
+    
+    setCheckingStock(true);
+    try {
+      const hasStock = await productService.checkVariationStock(
+        product.id,
+        selectedSize,
+        selectedColor
+      );
+      setStockCheck(hasStock);
+    } catch (error) {
+      console.error("Error checking stock:", error);
+      setStockCheck(false);
+    } finally {
+      setCheckingStock(false);
+    }
+  };
+
+  const getSelectedVariationStock = (): number => {
+    if (!product) return 0;
+    
+    let stock = 0;
+    
+    if (selectedSize && product.sizes && Array.isArray(product.sizes)) {
+      const sizeVariation = product.sizes.find(s => s.name === selectedSize);
+      if (sizeVariation) {
+        stock = Math.min(stock || sizeVariation.stock_quantity, sizeVariation.stock_quantity);
+      }
+    }
+    
+    if (selectedColor && product.colors && Array.isArray(product.colors)) {
+      const colorVariation = product.colors.find(c => c.name === selectedColor);
+      if (colorVariation) {
+        stock = stock ? Math.min(stock, colorVariation.stock_quantity) : colorVariation.stock_quantity;
+      }
+    }
+    
+    return stock;
+  };
+
+  const calculatePrice = (): number => {
+    if (!product) return 0;
+    
+    let finalPrice = product.price;
+    
+    // Add price modifiers from selected variations
+    if (selectedSize && product.sizes && Array.isArray(product.sizes)) {
+      const sizeVariation = product.sizes.find(s => s.name === selectedSize);
+      if (sizeVariation && sizeVariation.price_modifier) {
+        finalPrice += sizeVariation.price_modifier;
+      }
+    }
+    
+    if (selectedColor && product.colors && Array.isArray(product.colors)) {
+      const colorVariation = product.colors.find(c => c.name === selectedColor);
+      if (colorVariation && colorVariation.price_modifier) {
+        finalPrice += colorVariation.price_modifier;
+      }
+    }
+    
+    return Math.max(0, finalPrice); // Ensure price is never negative
+  };
+
   const handleAddToCart = () => {
-    if (product && onAddToCart && selectedSize && selectedColor) {
-      // Criar produto com variações selecionadas
+    if (product && onAddToCart && selectedSize && selectedColor && stockCheck) {
       const productWithVariations = {
         ...product,
         selectedSize,
         selectedColor,
-        quantity
+        quantity,
+        finalPrice: calculatePrice()
       };
       onAddToCart(productWithVariations);
       setAddedToCart(true);
@@ -155,6 +238,75 @@ export const SupabaseProductDetail: React.FC<SupabaseProductDetailProps> = ({
     );
   };
 
+  const renderColorOption = (color: ProductVariation) => {
+    const isSelected = selectedColor === color.name;
+    const isOutOfStock = color.stock_quantity <= 0;
+    
+    return (
+      <button
+        key={color.id}
+        onClick={() => {
+          if (!isOutOfStock) {
+            console.log("Color selected:", color.name); // Debug log
+            setSelectedColor(color.name);
+          }
+        }}
+        disabled={isOutOfStock}
+        className={`relative w-10 h-10 rounded-full border-2 transition-all ${
+          isSelected
+            ? 'border-purple-500 ring-2 ring-purple-200'
+            : isOutOfStock
+            ? 'border-gray-300 opacity-50 cursor-not-allowed'
+            : 'border-gray-300 hover:border-gray-400'
+        }`}
+        style={{ backgroundColor: color.value || '#cccccc' }}
+        title={`${color.name} - ${isOutOfStock ? 'Indisponível' : `${color.stock_quantity} disponível`}`}
+      >
+        {(color.value === '#FFFFFF' || color.value === 'white') && (
+          <div className="w-full h-full rounded-full border border-gray-200"></div>
+        )}
+        {isOutOfStock && (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="w-6 h-0.5 bg-red-500 rotate-45"></div>
+          </div>
+        )}
+      </button>
+    );
+  };
+
+  const renderSizeOption = (size: ProductVariation) => {
+    const isSelected = selectedSize === size.name;
+    const isOutOfStock = size.stock_quantity <= 0;
+    
+    return (
+      <button
+        key={size.id}
+        onClick={() => {
+          if (!isOutOfStock) {
+            console.log("Size selected:", size.name); // Debug log
+            setSelectedSize(size.name);
+          }
+        }}
+        disabled={isOutOfStock}
+        className={`py-2 px-3 rounded-lg border text-sm font-medium transition-colors relative ${
+          isSelected
+            ? 'border-purple-500 bg-purple-50 text-purple-700'
+            : isOutOfStock
+            ? 'border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed'
+            : 'border-gray-300 hover:border-gray-400'
+        }`}
+        title={`Tamanho ${size.name} - ${isOutOfStock ? 'Indisponível' : `${size.stock_quantity} disponível`}`}
+      >
+        {size.name}
+        {isOutOfStock && (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="w-4 h-0.5 bg-red-500 rotate-45"></div>
+          </div>
+        )}
+      </button>
+    );
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
@@ -199,13 +351,19 @@ export const SupabaseProductDetail: React.FC<SupabaseProductDetailProps> = ({
     );
   }
 
-   // Gerar galeria de imagens (se existir mais de uma imagem no Supabase)
+  // Generate image gallery
   const productImages =
-  product && product.images && product.images.length > 0
-    ? product.images
-    : [product?.image_url || "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=600&h=600&fit=crop"];
+    product && product.images && product.images.length > 0
+      ? product.images
+      : [product?.image_url || "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=600&h=600&fit=crop"];
 
+  const finalPrice = calculatePrice();
+  const selectedStock = getSelectedVariationStock();
+  const maxQuantity = Math.min(selectedStock, 10); // Limit to 10 or available stock
 
+  // Debug logs para verificar se as variações existem antes de renderizar
+  console.log("Before render - Colors:", product.colors);
+  console.log("Before render - Sizes:", product.sizes);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
@@ -252,7 +410,12 @@ export const SupabaseProductDetail: React.FC<SupabaseProductDetailProps> = ({
                 )}
                 {product.original_price && (
                   <span className="bg-red-500 text-white text-sm px-3 py-1 rounded-full font-medium">
-                    -{Math.round((1 - product.price / product.original_price) * 100)}% OFF
+                    -{Math.round((1 - finalPrice / product.original_price) * 100)}% OFF
+                  </span>
+                )}
+                {!stockCheck && (
+                  <span className="bg-red-500 text-white text-sm px-3 py-1 rounded-full font-medium">
+                    Indisponível
                   </span>
                 )}
               </div>
@@ -344,8 +507,13 @@ export const SupabaseProductDetail: React.FC<SupabaseProductDetailProps> = ({
               <div className="border-t border-gray-200 pt-6">
                 <div className="flex items-baseline space-x-3 mb-2">
                   <span className="text-3xl sm:text-4xl font-bold text-purple-600">
-                    {formatPrice(product.price)}
+                    {formatPrice(finalPrice)}
                   </span>
+                  {product.original_price && finalPrice !== product.price && (
+                    <span className="text-lg text-gray-400 line-through">
+                      {formatPrice(product.price)}
+                    </span>
+                  )}
                   {product.original_price && (
                     <span className="text-lg text-gray-400 line-through">
                       {formatPrice(product.original_price)}
@@ -356,103 +524,123 @@ export const SupabaseProductDetail: React.FC<SupabaseProductDetailProps> = ({
                   <Zap className="w-4 h-4 mr-1 text-yellow-500" />
                   Frete grátis para compras acima de R$ 200
                 </p>
+                {selectedStock > 0 && (
+                  <p className="text-gray-600 text-sm flex items-center mt-1">
+                    <Package className="w-4 h-4 mr-1 text-blue-500" />
+                    {selectedStock} disponível{selectedStock > 1 ? 's' : ''} em estoque
+                  </p>
+                )}
               </div>
             </div>
 
             {/* Product Options */}
             <div className="bg-white rounded-2xl p-6 shadow-xl space-y-6">
+              {/* Debug info - remover em produção */}
+           
+
               {/* Color Selection */}
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-3">
-                  Cor: <span className="font-normal">{selectedColor}</span>
-                </h3>
-                <div className="flex flex-wrap gap-3">
-                  {colors.map(({ name, code }) => (
-                    <button
-                      key={name}
-                      onClick={() => setSelectedColor(name)}
-                      className={`w-10 h-10 rounded-full border-2 transition-all ${
-                        selectedColor === name
-                          ? 'border-purple-500 ring-2 ring-purple-200'
-                          : 'border-gray-300 hover:border-gray-400'
-                      }`}
-                      style={{ backgroundColor: code }}
-                      title={name}
-                    >
-                      {code === '#FFFFFF' && (
-                        <div className="w-full h-full rounded-full border border-gray-200"></div>
-                      )}
-                    </button>
-                  ))}
+              {product.colors && Array.isArray(product.colors) && product.colors.length > 0 && (
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-3">
+                    Cor: <span className="font-normal">{selectedColor || 'Selecione uma cor'}</span>
+                  </h3>
+                  <div className="flex flex-wrap gap-3">
+                    {product.colors.map(renderColorOption)}
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* Size Selection */}
-              <div>
-                <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-lg font-semibold text-gray-900">
-                    Tamanho: <span className="font-normal">{selectedSize}</span>
-                  </h3>
-                  <button className="text-sm text-purple-600 hover:text-purple-700 flex items-center">
-                    <Ruler className="w-4 h-4 mr-1" />
-                    Guia de tamanhos
-                  </button>
-                </div>
-                <div className="grid grid-cols-6 gap-3">
-                  {sizes.map((size) => (
-                    <button
-                      key={size}
-                      onClick={() => setSelectedSize(size)}
-                      className={`py-2 px-3 rounded-lg border text-sm font-medium transition-colors ${
-                        selectedSize === size
-                          ? 'border-purple-500 bg-purple-50 text-purple-700'
-                          : 'border-gray-300 hover:border-gray-400'
-                      }`}
-                    >
-                      {size}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Quantity */}
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-3">Quantidade</h3>
-                <div className="flex items-center space-x-3">
-                  <div className="flex items-center border border-gray-300 rounded-lg">
-                    <button
-                      onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                      className="p-2 hover:bg-gray-100 rounded-l-lg"
-                      disabled={quantity <= 1}
-                    >
-                      <Minus className="w-4 h-4" />
-                    </button>
-                    <span className="px-4 py-2 font-medium">{quantity}</span>
-                    <button
-                      onClick={() => setQuantity(quantity + 1)}
-                      className="p-2 hover:bg-gray-100 rounded-r-lg"
-                    >
-                      <Plus className="w-4 h-4" />
+              {product.sizes && Array.isArray(product.sizes) && product.sizes.length > 0 && (
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="text-lg font-semibold text-gray-900">
+                      Tamanho: <span className="font-normal">{selectedSize || 'Selecione um tamanho'}</span>
+                    </h3>
+                    <button className="text-sm text-purple-600 hover:text-purple-700 flex items-center">
+                      <Ruler className="w-4 h-4 mr-1" />
+                      Guia de tamanhos
                     </button>
                   </div>
-                  <span className="text-gray-600 text-sm">
-                    {quantity > 1 && `Total: ${formatPrice(product.price * quantity)}`}
+                  <div className="grid grid-cols-6 gap-3">
+                    {product.sizes.map(renderSizeOption)}
+                  </div>
+                </div>
+              )}
+
+              {/* Fallback message se não houver variações */}
+              {(!product.colors || product.colors.length === 0) && (!product.sizes || product.sizes.length === 0) && (
+                <div className="text-center py-4 text-gray-500">
+                  <p>Este produto não possui variações de cor ou tamanho disponíveis.</p>
+                </div>
+              )}
+
+              {/* Stock Status */}
+              {checkingStock ? (
+                <div className="flex items-center space-x-2 text-gray-600">
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span className="text-sm">Verificando disponibilidade...</span>
+                </div>
+              ) : !stockCheck && (selectedSize || selectedColor) ? (
+                <div className="flex items-center space-x-2 text-red-600 bg-red-50 p-3 rounded-lg">
+                  <AlertCircle className="w-4 h-4" />
+                  <span className="text-sm">
+                    Combinação indisponível. Tente outras opções.
                   </span>
                 </div>
-              </div>
+              ) : null}
+
+              {/* Quantity */}
+              {stockCheck && selectedSize && selectedColor && (
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-3">Quantidade</h3>
+                  <div className="flex items-center space-x-3">
+                    <div className="flex items-center border border-gray-300 rounded-lg">
+                      <button
+                        onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                        className="p-2 hover:bg-gray-100 rounded-l-lg"
+                        disabled={quantity <= 1}
+                      >
+                        <Minus className="w-4 h-4" />
+                      </button>
+                      <span className="px-4 py-2 font-medium">{quantity}</span>
+                      <button
+                        onClick={() => setQuantity(Math.min(maxQuantity, quantity + 1))}
+                        className="p-2 hover:bg-gray-100 rounded-r-lg"
+                        disabled={quantity >= maxQuantity}
+                      >
+                        <Plus className="w-4 h-4" />
+                      </button>
+                    </div>
+                    <span className="text-gray-600 text-sm">
+                      {quantity > 1 && `Total: ${formatPrice(finalPrice * quantity)}`}
+                      {maxQuantity < 10 && (
+                        <span className="block text-orange-600">
+                          Máx: {maxQuantity} unidades
+                        </span>
+                      )}
+                    </span>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Actions */}
             <div className="bg-white rounded-2xl p-6 shadow-xl">
               <Button
                 onClick={handleAddToCart}
-                disabled={addedToCart || !selectedSize || !selectedColor}
-                className="w-full h-14 text-lg font-semibold bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 transform hover:scale-105 transition-all duration-200"
+                disabled={addedToCart || !selectedSize || !selectedColor || !stockCheck || selectedStock <= 0}
+                className="w-full h-14 text-lg font-semibold bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
               >
                 {addedToCart ? (
                   <>
                     <CheckCircle className="w-5 h-5 mr-2" />
                     Adicionado ao Carrinho!
+                  </>
+                ) : !stockCheck || selectedStock <= 0 ? (
+                  <>
+                    <AlertCircle className="w-5 h-5 mr-2" />
+                    Indisponível
                   </>
                 ) : (
                   <>
@@ -502,13 +690,13 @@ export const SupabaseProductDetail: React.FC<SupabaseProductDetailProps> = ({
                       key={id}
                       onClick={() => setActiveTab(id)}
                       className={`flex items-center space-x-2 py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap transition-colors ${
-                        activeTab === id
-                          ? "border-purple-500 text-purple-600"
+                                               activeTab === id
+                          ? "border-purple-600 text-purple-600"
                           : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
                       }`}
                     >
-                      <Icon className="w-4 h-4" />
-                      <span>{label}</span>
+                      <Icon className="w-4 h-4 mr-1" />
+                      {label}
                     </button>
                   ))}
                 </nav>
@@ -519,146 +707,70 @@ export const SupabaseProductDetail: React.FC<SupabaseProductDetailProps> = ({
             <div className="p-6">
               {activeTab === "description" && (
                 <div className="prose max-w-none">
-                  <div className="text-gray-700 leading-relaxed space-y-4">
-                    <p className="text-lg">
-                      {product.description || 
-                        "Peça versátil e elegante, perfeita para diversas ocasiões. Confeccionada com materiais de alta qualidade, oferece conforto e estilo únicos. Design moderno que se adapta ao seu guarda-roupa."
-                      }
-                    </p>
-                    <div className="bg-gray-50 rounded-lg p-4">
-                      <h4 className="font-semibold text-gray-900 mb-2">Características principais:</h4>
-                      <ul className="text-gray-700 space-y-1">
-                        <li>• Material premium e durável</li>
-                        <li>• Design contemporâneo e versátil</li>
-                        <li>• Conforto excepcional</li>
-                        <li>• Fácil manutenção e cuidado</li>
-                      </ul>
-                    </div>
-                  </div>
+                  <p>{product.description || "Sem descrição disponível para este produto."}</p>
                 </div>
               )}
 
               {activeTab === "details" && (
-                <div className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-4">
-                      <h3 className="text-xl font-semibold text-gray-900">Especificações</h3>
-                      <div className="space-y-3">
-                        <div className="flex justify-between py-2 border-b border-gray-100">
-                          <span className="text-gray-600">Material:</span>
-                          <span className="font-medium">100% Algodão</span>
-                        </div>
-                        <div className="flex justify-between py-2 border-b border-gray-100">
-                          <span className="text-gray-600">Origem:</span>
-                          <span className="font-medium">Nacional</span>
-                        </div>
-                        <div className="flex justify-between py-2 border-b border-gray-100">
-                          <span className="text-gray-600">Cuidados:</span>
-                          <span className="font-medium">Máquina 30°C</span>
-                        </div>
-                        <div className="flex justify-between py-2 border-b border-gray-100">
-                          <span className="text-gray-600">Modelo:</span>
-                          <span className="font-medium">Regular Fit</span>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="space-y-4">
-                      <h3 className="text-xl font-semibold text-gray-900">Informações de Entrega</h3>
-                      <div className="space-y-3">
-                        <div className="flex items-center space-x-3">
-                          <Truck className="w-5 h-5 text-blue-500" />
-                          <span>Frete grátis para compras acima de R$ 200</span>
-                        </div>
-                        <div className="flex items-center space-x-3">
-                          <Clock className="w-5 h-5 text-green-500" />
-                          <span>Entrega em 5-7 dias úteis</span>
-                        </div>
-                        <div className="flex items-center space-x-3">
-                          <RotateCcw className="w-5 h-5 text-purple-500" />
-                          <span>7 dias para trocas e devoluções</span>
-                        </div>
-                      </div>
-                    </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm text-gray-700">
+                  <div>
+                    <p><strong>Categoria:</strong> {product.category || "N/A"}</p>
+                    <p><strong>Marca:</strong> {product.brand || "N/A"}</p>
+                  </div>
+                  <div>
+                    <p><strong>Código do produto:</strong> #{product.id}</p>
+                    <p><strong>Disponibilidade:</strong> {selectedStock > 0 ? "Em estoque" : "Indisponível"}</p>
                   </div>
                 </div>
               )}
 
               {activeTab === "sizing" && (
-                <div className="space-y-6">
-                  <h3 className="text-xl font-semibold text-gray-900">Guia de Tamanhos</h3>
-                  
-                  <div className="overflow-x-auto">
-                    <table className="w-full border-collapse border border-gray-300">
-                      <thead>
-                        <tr className="bg-gray-50">
-                          <th className="border border-gray-300 px-4 py-2 text-left">Tamanho</th>
-                          <th className="border border-gray-300 px-4 py-2 text-left">Busto (cm)</th>
-                          <th className="border border-gray-300 px-4 py-2 text-left">Cintura (cm)</th>
-                          <th className="border border-gray-300 px-4 py-2 text-left">Quadril (cm)</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {[
-                          { size: "XS", bust: "80-84", waist: "60-64", hip: "86-90" },
-                          { size: "S", bust: "84-88", waist: "64-68", hip: "90-94" },
-                          { size: "M", bust: "88-92", waist: "68-72", hip: "94-98" },
-                          { size: "L", bust: "92-96", waist: "72-76", hip: "98-102" },
-                          { size: "XL", bust: "96-100", waist: "76-80", hip: "102-106" },
-                          { size: "XXL", bust: "100-104", waist: "80-84", hip: "106-110" },
-                        ].map((row) => (
-                          <tr key={row.size} className="hover:bg-gray-50">
-                            <td className="border border-gray-300 px-4 py-2 font-medium">{row.size}</td>
-                            <td className="border border-gray-300 px-4 py-2">{row.bust}</td>
-                            <td className="border border-gray-300 px-4 py-2">{row.waist}</td>
-                            <td className="border border-gray-300 px-4 py-2">{row.hip}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                  
-                  <div className="bg-blue-50 rounded-lg p-4">
-                    <h4 className="font-semibold text-blue-900 mb-2 flex items-center">
-                      <Ruler className="w-5 h-5 mr-2" />
-                      Como medir
-                    </h4>
-                    <ul className="text-blue-800 text-sm space-y-1">
-                      <li><strong>Busto:</strong> Meça na parte mais larga do busto</li>
-                      <li><strong>Cintura:</strong> Meça na parte mais fina da cintura</li>
-                      <li><strong>Quadril:</strong> Meça na parte mais larga do quadril</li>
-                    </ul>
-                  </div>
+                <div className="text-sm text-gray-700">
+                  <p className="mb-2">Confira abaixo as medidas aproximadas:</p>
+                  <ul className="list-disc pl-5 space-y-1">
+                    <li>P: 90-96 cm de busto</li>
+                    <li>M: 96-102 cm de busto</li>
+                    <li>G: 102-110 cm de busto</li>
+                    <li>GG: 110-118 cm de busto</li>
+                  </ul>
+                  <p className="mt-3 text-gray-500 text-xs">* As medidas podem variar dependendo do modelo.</p>
                 </div>
               )}
 
               {activeTab === "reviews" && (
-                <div className="space-y-6">
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-xl font-semibold text-gray-900">
-                      Avaliações dos Clientes
-                    </h3>
-                    <div className="flex items-center space-x-2">
-                      {renderStars(4.8)}
-                      <span className="text-lg font-semibold">4.8</span>
-                      <span className="text-gray-600">(89 avaliações)</span>
+                <div className="space-y-4">
+                  {/* Exemplo de review fixa, pode ser substituída por dados do Supabase */}
+                  <div className="border-b pb-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center space-x-1">
+                        {renderStars(5)}
+                        <span className="text-sm text-gray-500">(5/5)</span>
+                      </div>
+                      <span className="text-xs text-gray-400">há 2 dias</span>
                     </div>
+                    <p className="text-gray-700 text-sm">Ótima qualidade, chegou super rápido e bem embalado. Recomendo!</p>
+                    <p className="mt-1 text-xs text-gray-500">– Ana Paula</p>
                   </div>
-                  
-                  <div className="text-center py-8">
-                    <Star className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-                    <p className="text-gray-500">
-                      As avaliações dos clientes serão exibidas aqui em breve.
-                    </p>
+                  <div className="border-b pb-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center space-x-1">
+                        {renderStars(4)}
+                        <span className="text-sm text-gray-500">(4/5)</span>
+                      </div>
+                      <span className="text-xs text-gray-400">há 1 semana</span>
+                    </div>
+                    <p className="text-gray-700 text-sm">Produto bom, mas a cor é um pouco diferente da foto.</p>
+                    <p className="mt-1 text-xs text-gray-500">– João Silva</p>
                   </div>
+                  <Button variant="outline" className="mt-4">
+                    Ver mais avaliações
+                  </Button>
                 </div>
               )}
             </div>
           </div>
         </div>
       </div>
-   </div>
+    </div>
   );
 };
-
-export default SupabaseProductDetail;

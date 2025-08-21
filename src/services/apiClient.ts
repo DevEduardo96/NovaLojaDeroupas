@@ -4,14 +4,12 @@ export class ApiClient {
   private timeout: number;
 
   constructor() {
+    // IMPORTANTE: backend no Render usa /api
     this.baseURL = import.meta.env.VITE_API_BASE_URL || "https://backend-nectix.onrender.com/api";
     this.timeout = 30000; // 30 segundos
   }
 
-  private async request<T>(
-    endpoint: string,
-    options: RequestInit = {}
-  ): Promise<T> {
+  private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
     const url = `${this.baseURL}${endpoint}`;
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), this.timeout);
@@ -27,74 +25,41 @@ export class ApiClient {
       });
 
       clearTimeout(timeoutId);
-
-      // Log da resposta bruta para debug
       console.log(`[API] ${response.status} ${response.statusText} - ${url}`);
-      
+
       if (!response.ok) {
         let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
-        
-        // Verificar content-type antes de tentar parsear JSON
-        const contentType = response.headers.get("content-type");
-        console.log(`[API] Error Content-Type: ${contentType}`);
-        
         try {
-          if (contentType && contentType.includes("application/json")) {
+          const contentType = response.headers.get("content-type");
+          if (contentType?.includes("application/json")) {
             const errorData = await response.json();
-            console.log(`[API] Error JSON:`, errorData);
             errorMessage = errorData.error || errorData.message || errorMessage;
+            console.error("[API] Error JSON:", errorData);
           } else {
             const errorText = await response.text();
-            console.log(`[API] Error Text:`, errorText);
             errorMessage = errorText || errorMessage;
+            console.error("[API] Error Text:", errorText);
           }
-        } catch (parseError) {
-          console.log(`[API] Error parsing response:`, parseError);
-          // Se não conseguir parsear, usa a mensagem padrão
+        } catch {
+          // ignora erro de parse
         }
         throw new Error(errorMessage);
       }
 
-      // Verificar content-type da resposta de sucesso
-      const contentType = response.headers.get("content-type");
-      console.log(`[API] Success Content-Type: ${contentType}`);
-      
-      // Se a resposta for vazia, retorna null
       const text = await response.text();
-      console.log(`[API] Response body (raw):`, text);
-      
-      if (!text) {
-        console.log(`[API] Empty response, returning null`);
-        return null as T;
-      }
+      if (!text) return null as T;
 
-      // Verificar se é JSON válido antes de parsear
-      try {
-        if (contentType && contentType.includes("application/json")) {
-          const parsed = JSON.parse(text);
-          console.log(`[API] Parsed JSON:`, parsed);
-          return parsed;
-        } else {
-          console.warn(`[API] Response is not JSON, content-type: ${contentType}`);
-          // Se não for JSON, tentar parsear mesmo assim
-          const parsed = JSON.parse(text);
-          console.log(`[API] Force parsed JSON:`, parsed);
-          return parsed;
-        }
-      } catch (parseError) {
-        console.error(`[API] JSON parse error:`, parseError);
-        console.error(`[API] Raw text that failed to parse:`, text);
-        throw new Error(`Resposta inválida do servidor: não é JSON válido`);
+      const contentType = response.headers.get("content-type");
+      if (contentType?.includes("application/json")) {
+        return JSON.parse(text);
       }
+      return text as unknown as T;
     } catch (error) {
       clearTimeout(timeoutId);
-      if (error instanceof Error) {
-        if (error.name === "AbortError") {
-          throw new Error("Timeout: A requisição demorou muito para responder");
-        }
-        throw error;
+      if (error instanceof Error && error.name === "AbortError") {
+        throw new Error("Timeout: a requisição demorou muito para responder");
       }
-      throw new Error("Erro desconhecido na requisição");
+      throw error instanceof Error ? error : new Error("Erro desconhecido na requisição");
     }
   }
 
@@ -121,14 +86,10 @@ export class ApiClient {
     return this.request<T>(endpoint, { method: "DELETE" });
   }
 
-  // Método para verificar se o servidor está online
+  // Health check
   async healthCheck(): Promise<boolean> {
     try {
-      const baseUrl = this.baseURL.replace('/api', '');
-      const response = await fetch(`${baseUrl}/health`, {
-        method: "GET",
-        signal: AbortSignal.timeout(5000), // 5 segundos para health check
-      });
+      const response = await fetch(`${this.baseURL.replace("/api", "")}/health`, { method: "GET" });
       return response.ok;
     } catch {
       return false;
@@ -136,7 +97,5 @@ export class ApiClient {
   }
 }
 
-// Instância singleton do cliente
-export const apiClient = new ApiClient(); 
-
-//removendo key
+// Singleton
+export const apiClient = new ApiClient();
