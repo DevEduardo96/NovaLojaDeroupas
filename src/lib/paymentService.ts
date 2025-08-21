@@ -2,15 +2,17 @@ import { supabase } from "./supabase";
 import type { Product } from "../types";
 
 export interface Payment {
-  id: string;
-  status: string;
-  email: string;
+  id?: string;
+  email_cliente: string;
   nome_cliente: string;
-  valor: number;
-  links_download: string[];
-  produtos: Product[];
-  created_at: string;
-  updated_at: string;
+  valor_total: number;
+  status: string;
+  metodo_pagamento: string;
+  pedido_id?: number; // Novo campo para vincular ao pedido
+  items?: any[];
+  dados_cliente?: any;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface CreatePaymentData {
@@ -118,7 +120,7 @@ export const paymentService = {
   async getUserPayments(): Promise<Payment[]> {
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      
+
       if (!user) {
         throw new Error("User not authenticated");
       }
@@ -145,7 +147,7 @@ export const paymentService = {
   async hasUserPurchasedProduct(productId: number): Promise<boolean> {
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      
+
       if (!user) {
         return false;
       }
@@ -175,7 +177,7 @@ export const paymentService = {
   async getProductDownloadLinks(productId: number): Promise<string[]> {
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      
+
       if (!user) {
         throw new Error("User not authenticated");
       }
@@ -202,4 +204,4 @@ export const paymentService = {
       throw error;
     }
   }
-}; 
+};

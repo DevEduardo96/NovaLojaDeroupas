@@ -4,11 +4,17 @@ import { PaymentStatus } from '../components/PaymentStatus';
 import { PaymentData } from '../types';
 import { api } from '../services/api';
 import { useCart } from '../hooks/useCart';
+import { useAuth } from '../contexts/AuthContext';
+import { useApi } from '../hooks/useApi';
+import { orderService, type OrderData } from '../lib/orderService';
+import { toast } from 'react-hot-toast';
 
 export const CheckoutPage: React.FC = () => {
-  const { items: cartItems, getTotal } = useCart();
+  const { items: cartItems, getTotal, clearCart } = useCart();
   const [isLoading, setIsLoading] = useState(false);
   const [paymentData, setPaymentData] = useState<PaymentData | null>(null);
+  const { user } = useAuth();
+  const { createPayment } = api; // Assumindo que createPayment está disponível em api
 
   const totalAmount = getTotal();
 
@@ -50,12 +56,54 @@ export const CheckoutPage: React.FC = () => {
 
       await api.wakeUpServer();
 
-      const response = await api.createPayment({
-        carrinho: carrinhoFormatado,
+      // Adaptação para o novo fluxo onde o pedido é criado primeiro
+      const orderDataForService: OrderData = {
         nomeCliente: formData.nomeCliente,
         email: formData.email,
-        total: totalAmount
-      });
+        telefone: formData.telefone, // Certifique-se que esses campos existem no formData
+        cpf: formData.cpf,
+        cep: formData.cep,
+        rua: formData.rua,
+        numero: formData.numero,
+        complemento: formData.complemento,
+        bairro: formData.bairro,
+        cidade: formData.cidade,
+        estado: formData.estado
+      };
+
+      const order = await orderService.createOrder(orderDataForService, validItems, user?.id);
+
+      const paymentDataPayload = {
+        email_cliente: formData.email,
+        nome_cliente: formData.nomeCliente,
+        valor_total: totalAmount,
+        status: 'pending',
+        metodo_pagamento: 'pix',
+        pedido_id: order.id,
+        items: validItems.map(item => ({
+          product_id: item.product.id,
+          name: item.product.name,
+          price: item.product.price,
+          quantity: item.quantity,
+          selectedSize: item.selectedSize,
+          selectedColor: item.selectedColor,
+        })),
+        dados_cliente: {
+          telefone: formData.telefone,
+          cpf: formData.cpf,
+          endereco: {
+            cep: formData.cep,
+            rua: formData.rua,
+            numero: formData.numero,
+            complemento: formData.complemento,
+            bairro: formData.bairro,
+            cidade: formData.cidade,
+            estado: formData.estado
+          }
+        }
+      };
+
+      const response = await createPayment(paymentDataPayload);
 
       console.log('Resposta recebida:', response);
 
@@ -65,6 +113,7 @@ export const CheckoutPage: React.FC = () => {
       }
 
       setPaymentData(response);
+      clearCart(); // Limpa o carrinho após o sucesso
 
     } catch (err) {
       console.error('Erro ao criar pagamento:', err);
@@ -78,6 +127,25 @@ export const CheckoutPage: React.FC = () => {
           errorMessage = 'Erro no servidor de pagamentos. Por favor, tente novamente em alguns minutos.';
         } else if (err.message.includes('500')) {
           errorMessage = 'Servidor temporariamente indisponível. Tente novamente em alguns minutos.';
+        } else {
+          errorMessage = err.message; // Captura outras mensagens de erro genéricas
+        }
+      }
+
+      // Tenta cancelar o pedido se houve um erro após a criação do pedido
+      if (err instanceof Error && err.message !== 'Carrinho vazio.' && typeof err.message === 'string' && err.message.includes('Falha ao criar pagamento')) {
+        try {
+          // Assumindo que 'order' está acessível ou que o ID do pedido foi salvo temporariamente
+          const currentOrderJson = localStorage.getItem('currentOrder');
+          if (currentOrderJson) {
+            const currentOrder = JSON.parse(currentOrderJson);
+            if (currentOrder && currentOrder.id) {
+              await orderService.cancelOrder(currentOrder.id);
+              localStorage.removeItem('currentOrder');
+            }
+          }
+        } catch (cancelError) {
+          console.error('Erro ao cancelar pedido após falha no pagamento:', cancelError);
         }
       }
 
