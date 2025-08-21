@@ -80,41 +80,9 @@ export const CheckoutPage: React.FC = () => {
 
       console.log('📋 Dados formatados para orderService:', orderDataForService);
 
-      // 🎯 Criar pedido no Supabase primeiro (PRIORIDADE)
-      console.log('📝 Criando pedido na tabela pedidos...');
-      const order = await supabaseRetry.executeWithRetry(
-        () => orderService.createOrder(
-          orderDataForService,
-          validItems,
-          'pix', // método de pagamento
-          0, // desconto
-          0  // taxa de entrega
-        ),
-        'Criação de pedido'
-      );
-
-      console.log('✅ Pedido criado na tabela pedidos com ID:', order.id);
-      console.log('📊 Detalhes do pedido:', {
-        id: order.id,
-        email_cliente: order.email_cliente,
-        nome_cliente: order.nome_cliente,
-        telefone: order.telefone,
-        endereco: {
-          cep: order.cep,
-          rua: order.rua,
-          numero: order.numero,
-          complemento: order.complemento,
-          bairro: order.bairro,
-          cidade: order.cidade,
-          estado: order.estado
-        },
-        total: order.total,
-        status: order.status,
-        itens: order.itens?.length || 0
-      });
 
       // Salvar ID do pedido para referência
-      localStorage.setItem('currentOrderId', order.id.toString());
+      // localStorage.setItem('currentOrderId', order.id.toString()); // Comentado para evitar duplicação
 
       // 💳 Preparar dados para pagamento (formato antigo para compatibilidade)
       const carrinhoFormatado = validItems.map(item => ({
@@ -128,7 +96,7 @@ export const CheckoutPage: React.FC = () => {
         nome_cliente: formData.nomeCliente,
         valor_total: totalAmount,
         carrinho: carrinhoFormatado,
-        pedido_id: order.id // Vincular com o pedido criado
+        pedido_id: null // Will be set after order creation
       };
 
       console.log('💳 Payload para pagamento:', paymentDataPayload);
@@ -149,6 +117,41 @@ export const CheckoutPage: React.FC = () => {
       if (!paymentResponse?.qr_code_base64) {
         throw new Error('QR Code não foi gerado. Tente novamente.');
       }
+
+      // 🎯 Criar pedido no Supabase após sucesso do pagamento (PRIORIDADE)
+      console.log('📝 Criando pedido na tabela pedidos...');
+      const order = await supabaseRetry.executeWithRetry(
+        () => orderService.createOrder(
+          orderDataForService,
+          validItems,
+          'pix', // método de pagamento
+          0, // desconto
+          0  // taxa de entrega
+        ),
+        'Criação de pedido'
+      );
+      
+      localStorage.setItem('currentOrderId', order.id.toString());
+
+      console.log('✅ Pedido criado na tabela pedidos com ID:', order.id);
+      console.log('📊 Detalhes do pedido:', {
+        id: order.id,
+        email_cliente: order.email_cliente,
+        nome_cliente: order.nome_cliente,
+        telefone: order.telefone,
+        endereco: {
+          cep: order.cep,
+          rua: order.rua,
+          numero: order.numero,
+          complemento: order.complemento,
+          bairro: order.bairro,
+          cidade: order.cidade,
+          estado: order.estado
+        },
+        total: order.total,
+        status: order.status,
+        itens: order.itens?.length || 0
+      });
 
       toast.success('Pedido criado com sucesso! Redirecionando para pagamento...');
 

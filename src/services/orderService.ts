@@ -64,7 +64,7 @@ export const orderService = {
     try {
       console.log('🧪 Testando conexão com Supabase...');
       
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('pedidos')
         .select('id')
         .limit(1);
@@ -74,7 +74,7 @@ export const orderService = {
         return false;
       }
 
-      console.log('✅ Conexão OK');
+      console.log('✅ Conexão OK - Dados da tabela:', data);
       return true;
     } catch (error) {
       console.error('💥 Erro crítico na conexão:', error);
@@ -233,7 +233,7 @@ export const orderService = {
 
       console.log('📋 Dados formatados para tabela pedidos:', {
         ...orderInsert,
-        user_id: orderInsert.user_id ? 'PRESENTE' : 'NULL',
+        user_id: orderInsert.user_id ? `USER_ID: ${orderInsert.user_id}` : 'NULL (checkout sem login)',
         totais: {
           subtotal: orderInsert.subtotal,
           desconto: orderInsert.desconto,
@@ -241,6 +241,18 @@ export const orderService = {
           total: orderInsert.total
         }
       });
+
+      // 🔧 VERIFICAR ESTRUTURA DA TABELA
+      console.log('🔍 Verificando estrutura da tabela pedidos...');
+      const { data: tableInfo, error: tableInfoError } = await supabase
+        .rpc('get_table_info', { table_name: 'pedidos' })
+        .limit(1);
+      
+      if (tableInfoError) {
+        console.warn('⚠️ Não foi possível obter info da tabela:', tableInfoError);
+      } else {
+        console.log('📋 Info da tabela pedidos:', tableInfo);
+      }
 
       console.log('📝 Inserindo pedido:', orderInsert);
 
