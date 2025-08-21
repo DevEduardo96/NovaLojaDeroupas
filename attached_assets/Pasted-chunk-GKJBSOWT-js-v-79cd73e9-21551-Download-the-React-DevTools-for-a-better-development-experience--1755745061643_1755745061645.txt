@@ -1,0 +1,69 @@
+chunk-GKJBSOWT.js?v=79cd73e9:21551 Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools
+AuthContext.tsx:74 Auth state changed: INITIAL_SESSION undefined
+AuthContext.tsx:74 Auth state changed: SIGNED_IN eduardoaraujo_96@outlook.com
+AuthContext.tsx:74 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:74 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:74 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:74 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:74 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:74 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:74 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:74 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+SupabaseProductDetail.tsx:79 Loading product with ID: 10
+SupabaseProductDetail.tsx:79 Loading product with ID: 10
+AuthContext.tsx:74 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:74 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:74 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:74 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:74 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:74 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+SupabaseProductDetail.tsx:82 Loaded product data: Object
+AuthContext.tsx:74 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:74 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+zsceradvdzzhqynfnchh.supabase.co/auth/v1/token?grant_type=refresh_token:1  Failed to load resource: the server responded with a status of 429 ()
+AuthContext.tsx:74 Auth state changed: SIGNED_OUT undefined
+SupabaseProductDetail.tsx:82 Loaded product data: Object
+useCart.ts:82 Uncaught TypeError: Cannot read properties of undefined (reading 'price')
+    at useCart.ts:82:45
+    at Array.reduce (<anonymous>)
+    at useCart.ts:81:18
+    at AppContent (App.tsx:128:22)
+    at renderWithHooks (chunk-GKJBSOWT.js?v=79cd73e9:11548:26)
+    at updateFunctionComponent (chunk-GKJBSOWT.js?v=79cd73e9:14582:28)
+    at beginWork (chunk-GKJBSOWT.js?v=79cd73e9:15924:22)
+    at HTMLUnknownElement.callCallback2 (chunk-GKJBSOWT.js?v=79cd73e9:3674:22)
+    at Object.invokeGuardedCallbackDev (chunk-GKJBSOWT.js?v=79cd73e9:3699:24)
+    at invokeGuardedCallback (chunk-GKJBSOWT.js?v=79cd73e9:3733:39)
+useCart.ts:82 Uncaught TypeError: Cannot read properties of undefined (reading 'price')
+    at useCart.ts:82:45
+    at Array.reduce (<anonymous>)
+    at useCart.ts:81:18
+    at AppContent (App.tsx:128:22)
+    at renderWithHooks (chunk-GKJBSOWT.js?v=79cd73e9:11548:26)
+    at updateFunctionComponent (chunk-GKJBSOWT.js?v=79cd73e9:14582:28)
+    at beginWork (chunk-GKJBSOWT.js?v=79cd73e9:15924:22)
+    at HTMLUnknownElement.callCallback2 (chunk-GKJBSOWT.js?v=79cd73e9:3674:22)
+    at Object.invokeGuardedCallbackDev (chunk-GKJBSOWT.js?v=79cd73e9:3699:24)
+    at invokeGuardedCallback (chunk-GKJBSOWT.js?v=79cd73e9:3733:39)
+chunk-GKJBSOWT.js?v=79cd73e9:14032 The above error occurred in the <AppContent> component:
+
+    at AppContent (http://localhost:5173/src/App.tsx:50:35)
+    at FavoritesProvider (http://localhost:5173/src/contexts/FavoritesContext.tsx:23:37)
+    at AuthProvider (http://localhost:5173/src/contexts/AuthContext.tsx:22:3)
+    at Router (http://localhost:5173/node_modules/.vite/deps/wouter.js?v=79cd73e9:235:17)
+    at App (http://localhost:5173/src/App.tsx:356:41)
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+logCapturedError @ chunk-GKJBSOWT.js?v=79cd73e9:14032
+chunk-GKJBSOWT.js?v=79cd73e9:9129 Uncaught TypeError: Cannot read properties of undefined (reading 'price')
+    at useCart.ts:82:45
+    at Array.reduce (<anonymous>)
+    at useCart.ts:81:18
+    at AppContent (App.tsx:128:22)
+    at renderWithHooks (chunk-GKJBSOWT.js?v=79cd73e9:11548:26)
+    at updateFunctionComponent (chunk-GKJBSOWT.js?v=79cd73e9:14582:28)
+    at beginWork (chunk-GKJBSOWT.js?v=79cd73e9:15924:22)
+    at beginWork$1 (chunk-GKJBSOWT.js?v=79cd73e9:19753:22)
+    at performUnitOfWork (chunk-GKJBSOWT.js?v=79cd73e9:19198:20)
+    at workLoopSync (chunk-GKJBSOWT.js?v=79cd73e9:19137:13)
