@@ -101,7 +101,37 @@ export const CheckoutPage: React.FC = () => {
 
       console.log('💳 Payload para pagamento:', paymentDataPayload);
 
-      // 💳 Criar pagamento PIX
+      // 🎯 PRIMEIRO: Criar pedido no Supabase (PRIORIDADE MÁXIMA)
+      console.log('📝 INICIANDO criação do pedido na tabela pedidos...');
+      console.log('📋 Dados que serão enviados:', orderDataForService);
+      console.log('🛒 Itens que serão enviados:', validItems);
+
+      let order;
+      try {
+        order = await supabaseRetry.executeWithRetry(
+          () => orderService.createOrder(
+            orderDataForService,
+            validItems,
+            'pix', // método de pagamento
+            0, // desconto
+            0  // taxa de entrega
+          ),
+          'Criação de pedido'
+        );
+        
+        console.log('✅ SUCESSO! Pedido criado na tabela pedidos com ID:', order.id);
+        console.log('📊 Detalhes completos do pedido criado:', order);
+        
+        localStorage.setItem('currentOrderId', order.id.toString());
+
+      } catch (orderError) {
+        console.error('❌ ERRO CRÍTICO ao criar pedido:', orderError);
+        console.error('Stack trace:', orderError.stack);
+        throw new Error(`Falha ao criar pedido: ${orderError.message}`);
+      }
+
+      // 💳 SEGUNDO: Criar pagamento PIX (após pedido salvo)
+      console.log('💳 Iniciando criação do pagamento PIX...');
       const paymentResponse = await apiRetry.executeWithRetry(
         () => api.createPayment({
           carrinho: carrinhoFormatado,
@@ -115,25 +145,11 @@ export const CheckoutPage: React.FC = () => {
       console.log('💳 Resposta do pagamento:', paymentResponse);
 
       if (!paymentResponse?.qr_code_base64) {
+        // Se pagamento falhou mas pedido foi criado, cancelar pedido
+        console.log('🔄 Pagamento falhou, cancelando pedido...');
+        await orderService.cancelOrder(order.id);
         throw new Error('QR Code não foi gerado. Tente novamente.');
       }
-
-      // 🎯 Criar pedido no Supabase após sucesso do pagamento (PRIORIDADE)
-      console.log('📝 Criando pedido na tabela pedidos...');
-      const order = await supabaseRetry.executeWithRetry(
-        () => orderService.createOrder(
-          orderDataForService,
-          validItems,
-          'pix', // método de pagamento
-          0, // desconto
-          0  // taxa de entrega
-        ),
-        'Criação de pedido'
-      );
-      
-      localStorage.setItem('currentOrderId', order.id.toString());
-
-      console.log('✅ Pedido criado na tabela pedidos com ID:', order.id);
       console.log('📊 Detalhes do pedido:', {
         id: order.id,
         email_cliente: order.email_cliente,
