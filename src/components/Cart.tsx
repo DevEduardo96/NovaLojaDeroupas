@@ -73,14 +73,29 @@ export const Cart: React.FC<CartProps> = ({
                       className="w-16 h-16 object-cover rounded-lg"
                     />
 
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-gray-900 text-sm">
-                        {item.product.name}
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-lg font-medium text-gray-900 truncate">
+                        {item.name}
                       </h3>
-                      <p className="text-indigo-600 font-bold">
-                        {formatPrice(item.product.price)}
+                      <p className="text-sm text-gray-500 mt-1 line-clamp-2">
+                        {item.description}
                       </p>
+                      {(item.selectedSize || item.selectedColor) && (
+                        <div className="flex space-x-4 mt-2 text-xs text-gray-600">
+                          {item.selectedSize && (
+                            <span className="bg-gray-100 px-2 py-1 rounded">
+                              Tamanho: {item.selectedSize}
+                            </span>
+                          )}
+                          {item.selectedColor && (
+                            <span className="bg-gray-100 px-2 py-1 rounded">
+                              Cor: {item.selectedColor}
+                            </span>
+                          )}
+                        </div>
+                      )}
                     </div>
+
 
                     <div className="flex items-center space-x-2">
                       <button

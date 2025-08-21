@@ -10,6 +10,7 @@ export interface Product {
   created_at?: string;
   updated_at?: string;
   download_url?: string; // <-- novo campo
+  file_format?: string;
 }
 
 export interface User {
@@ -151,9 +152,12 @@ export interface ProductVariation {
   stock_quantity: number;
   price_modifier: number;
   is_available: boolean;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface ProductWithVariations extends Product {
-  colors: ProductVariation[];
+  variations: ProductVariation[];
   sizes: ProductVariation[];
+  colors: ProductVariation[];
 }

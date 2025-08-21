@@ -18,35 +18,56 @@ export const useCart = () => {
     localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items));
   }, [items]);
 
-  const addToCart = useCallback((product: Product) => {
-    setItems((prev) => {
-      const existingItem = prev.find((item) => item.product.id === product.id);
+  const addToCart = useCallback((product: Product & { selectedSize?: string; selectedColor?: string; variationInfo?: any }) => {
+    setItems(prevItems => {
+      // Create a unique key for products with variations
+      const variationKey = `${product.id}-${product.selectedSize || ''}-${product.selectedColor || ''}`;
+
+      const existingItem = prevItems.find(item => {
+        const itemVariationKey = `${item.id}-${item.selectedSize || ''}-${item.selectedColor || ''}`;
+        return itemVariationKey === variationKey;
+      });
+
       if (existingItem) {
-        return prev.map((item) =>
-          item.product.id === product.id
+        return prevItems.map(item => {
+          const itemVariationKey = `${item.id}-${item.selectedSize || ''}-${item.selectedColor || ''}`;
+          return itemVariationKey === variationKey
             ? { ...item, quantity: item.quantity + 1 }
-            : item
-        );
+            : item;
+        });
       }
-      return [...prev, { product, quantity: 1 }];
+
+      return [...prevItems, { 
+        ...product, 
+        quantity: 1,
+        selectedSize: product.selectedSize,
+        selectedColor: product.selectedColor,
+        variationInfo: product.variationInfo
+      }];
     });
   }, []);
 
-  const removeFromCart = useCallback((productId: number) => {
-    setItems((prev) => prev.filter((item) => item.product.id !== productId));
+  const removeFromCart = useCallback((productId: number, selectedSize?: string, selectedColor?: string) => {
+    const variationKeyToRemove = `${productId}-${selectedSize || ''}-${selectedColor || ''}`;
+    setItems((prev) => prev.filter((item) => {
+      const itemVariationKey = `${item.id}-${item.selectedSize || ''}-${item.selectedColor || ''}`;
+      return itemVariationKey !== variationKeyToRemove;
+    }));
   }, []);
 
   const updateQuantity = useCallback(
-    (productId: number, quantity: number) => {
+    (productId: number, quantity: number, selectedSize?: string, selectedColor?: string) => {
       if (quantity <= 0) {
-        removeFromCart(productId);
+        removeFromCart(productId, selectedSize, selectedColor);
         return;
       }
 
+      const variationKeyToUpdate = `${productId}-${selectedSize || ''}-${selectedColor || ''}`;
       setItems((prev) =>
-        prev.map((item) =>
-          item.product.id === productId ? { ...item, quantity } : item
-        )
+        prev.map((item) => {
+          const itemVariationKey = `${item.id}-${item.selectedSize || ''}-${item.selectedColor || ''}`;
+          return itemVariationKey === variationKeyToUpdate ? { ...item, quantity } : item;
+        })
       );
     },
     [removeFromCart]

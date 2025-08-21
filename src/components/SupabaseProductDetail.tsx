@@ -21,11 +21,12 @@ import {
   Minus,
   AlertCircle,
 } from "lucide-react";
-import { productService, type ProductWithVariations, type ProductVariation } from "../lib/supabase";
-import type { Product } from "../types";
+import { productService, type ProductWithVariations, type ProductVariation as SupabaseProductVariation } from "../lib/supabase";
+import type { Product, ProductVariation } from "../types"; // Ensure ProductVariation from types is imported
 import { formatPrice, shareContent } from "../lib/utils";
 import { usePayments } from "../hooks/usePayments";
 import { Button } from "./ui/Button";
+import ProductVariationSelector from "./ProductVariationSelector"; // Import the new selector component
 
 interface SupabaseProductDetailProps {
   productId: number | null;
@@ -38,19 +39,27 @@ export const SupabaseProductDetail: React.FC<SupabaseProductDetailProps> = ({
   onBack,
   onAddToCart,
 }) => {
-  const [product, setProduct] = useState<ProductWithVariations | null>(null);
+  const [product, setProduct] = useState<ProductWithVariations | null>(null); // Use the more specific type
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [addedToCart, setAddedToCart] = useState(false);
-  const [selectedSize, setSelectedSize] = useState("");
-  const [selectedColor, setSelectedColor] = useState("");
-  const [quantity, setQuantity] = useState(1);
+  // Removed old selectedSize and selectedColor states, as they will be managed by ProductVariationSelector
   const [activeTab, setActiveTab] = useState("description");
   const [, setImageError] = useState(false);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
-  const [stockCheck, setStockCheck] = useState<boolean>(true);
-  const [checkingStock, setCheckingStock] = useState(false);
+  // Removed stockCheck and checkingStock states, as they will be managed by ProductVariationSelector
+  const [selectedVariations, setSelectedVariations] = useState<{
+    size?: SupabaseProductVariation; // Use the type from supabase service
+    color?: SupabaseProductVariation; // Use the type from supabase service
+    totalPrice: number;
+    inStock: boolean;
+    quantity: number;
+  }>({
+    totalPrice: 0,
+    inStock: true,
+    quantity: 1, // Initialize quantity
+  });
 
   usePayments();
 
@@ -60,19 +69,15 @@ export const SupabaseProductDetail: React.FC<SupabaseProductDetailProps> = ({
     }
   }, [productId]);
 
-  useEffect(() => {
-    // Check stock when size or color changes
-    if (product && (selectedSize || selectedColor)) {
-      checkStock();
-    }
-  }, [selectedSize, selectedColor, product]);
+  // The logic for checking stock and updating UI based on selections is now handled within ProductVariationSelector.
+  // We only need to update `selectedVariations` when the selector reports changes.
 
   const loadProduct = async (id: number) => {
     try {
       setLoading(true);
       setError(null);
       console.log("Loading product with ID:", id); // Debug log
-      
+
       const productData = await productService.getProductById(id);
       console.log("Loaded product data:", productData); // Debug log
 
@@ -82,28 +87,47 @@ export const SupabaseProductDetail: React.FC<SupabaseProductDetailProps> = ({
       }
 
       setProduct(productData);
-      
-      // Debug logs para verificar as variações
-      console.log("Product colors:", productData.colors);
-      console.log("Product sizes:", productData.sizes);
-      
-      // Set default selections - com verificação mais robusta
+
+      // Initialize selectedVariations with default values or the first available variation
+      let initialVariations = {
+        totalPrice: productData.price,
+        inStock: true,
+        quantity: 1,
+      };
+
       if (productData.colors && Array.isArray(productData.colors) && productData.colors.length > 0) {
-        console.log("Setting default color:", productData.colors[0].name);
-        setSelectedColor(productData.colors[0].name);
-      } else {
-        console.log("No colors available");
+        const defaultColor = productData.colors[0];
+        initialVariations.color = defaultColor;
+        // If price_modifier exists for color, apply it
+        if (defaultColor.price_modifier) {
+          initialVariations.totalPrice += defaultColor.price_modifier;
+        }
       }
-      
+
       if (productData.sizes && Array.isArray(productData.sizes) && productData.sizes.length > 0) {
-        // Try to select "M" as default, or first available
-        const mediumSize = productData.sizes.find(s => s.name === "M");
-        const defaultSize = mediumSize ? mediumSize.name : productData.sizes[0].name;
-        console.log("Setting default size:", defaultSize);
-        setSelectedSize(defaultSize);
-      } else {
-        console.log("No sizes available");
+        const defaultSize = productData.sizes[0]; // Default to the first size
+        initialVariations.size = defaultSize;
+        // If price_modifier exists for size, apply it
+        if (defaultSize.price_modifier) {
+          initialVariations.totalPrice += defaultSize.price_modifier;
+        }
       }
+
+      // Check initial stock
+      if (initialVariations.size && initialVariations.color) {
+        const hasStock = await productService.checkVariationStock(
+          productData.id,
+          initialVariations.size.name,
+          initialVariations.color.name
+        );
+        initialVariations.inStock = hasStock;
+      } else {
+        // If no variations are selected yet, assume it's in stock if the base product is available
+        initialVariations.inStock = true; // Or check a general stock field if available
+      }
+
+      setSelectedVariations(initialVariations);
+
     } catch (err) {
       console.error("Error loading product:", err);
       setError(err instanceof Error ? err.message : "Erro ao carregar produto");
@@ -112,98 +136,50 @@ export const SupabaseProductDetail: React.FC<SupabaseProductDetailProps> = ({
     }
   };
 
-  const checkStock = async () => {
-    if (!product) return;
-    
-    setCheckingStock(true);
-    try {
-      const hasStock = await productService.checkVariationStock(
-        product.id,
-        selectedSize,
-        selectedColor
-      );
-      setStockCheck(hasStock);
-    } catch (error) {
-      console.error("Error checking stock:", error);
-      setStockCheck(false);
-    } finally {
-      setCheckingStock(false);
-    }
-  };
-
-  const getSelectedVariationStock = (): number => {
-    if (!product) return 0;
-    
-    let stock = 0;
-    
-    if (selectedSize && product.sizes && Array.isArray(product.sizes)) {
-      const sizeVariation = product.sizes.find(s => s.name === selectedSize);
-      if (sizeVariation) {
-        stock = Math.min(stock || sizeVariation.stock_quantity, sizeVariation.stock_quantity);
-      }
-    }
-    
-    if (selectedColor && product.colors && Array.isArray(product.colors)) {
-      const colorVariation = product.colors.find(c => c.name === selectedColor);
-      if (colorVariation) {
-        stock = stock ? Math.min(stock, colorVariation.stock_quantity) : colorVariation.stock_quantity;
-      }
-    }
-    
-    return stock;
-  };
-
-  const calculatePrice = (): number => {
-    if (!product) return 0;
-    
-    let finalPrice = product.price;
-    
-    // Add price modifiers from selected variations
-    if (selectedSize && product.sizes && Array.isArray(product.sizes)) {
-      const sizeVariation = product.sizes.find(s => s.name === selectedSize);
-      if (sizeVariation && sizeVariation.price_modifier) {
-        finalPrice += sizeVariation.price_modifier;
-      }
-    }
-    
-    if (selectedColor && product.colors && Array.isArray(product.colors)) {
-      const colorVariation = product.colors.find(c => c.name === selectedColor);
-      if (colorVariation && colorVariation.price_modifier) {
-        finalPrice += colorVariation.price_modifier;
-      }
-    }
-    
-    return Math.max(0, finalPrice); // Ensure price is never negative
-  };
+  // The logic for checking stock and updating UI based on selections is now handled within ProductVariationSelector.
+  // We only need to update `selectedVariations` when the selector reports changes.
 
   const handleAddToCart = () => {
-    if (product && onAddToCart && selectedSize && selectedColor && stockCheck) {
+    if (product && selectedVariations.inStock && selectedVariations.size && selectedVariations.color) {
       const productWithVariations = {
         ...product,
-        selectedSize,
-        selectedColor,
-        quantity,
-        finalPrice: calculatePrice()
+        price: selectedVariations.totalPrice, // Use the calculated price
+        selectedSize: selectedVariations.size?.name,
+        selectedColor: selectedVariations.color?.name,
+        quantity: selectedVariations.quantity, // Use the selected quantity
+        variationInfo: {
+          size: selectedVariations.size,
+          color: selectedVariations.color,
+        }
       };
-      onAddToCart(productWithVariations);
+      onAddToCart?.(productWithVariations); // Call the prop with the enriched product
       setAddedToCart(true);
       setTimeout(() => setAddedToCart(false), 2000);
+    } else if (!selectedVariations.inStock) {
+      // This case might be handled by the button being disabled, but a toast can be a fallback.
+      console.log("Attempted to add out-of-stock item.");
+    } else if (!selectedVariations.size || !selectedVariations.color) {
+      console.log("Attempted to add with incomplete variations.");
+      // Optionally show a message to select variations
     }
   };
 
   const handleShare = async () => {
     if (product) {
+      const shareUrl = `${window.location.origin}/products/${product.id}`; // Construct a shareable URL
       const success = await shareContent({
         title: product.name,
-        text: product.description,
-        url: window.location.href,
+        text: `Confira este produto: ${product.name}!`,
+        url: shareUrl,
       });
-      
+
       if (!success) {
         try {
-          await navigator.clipboard.writeText(window.location.href);
+          await navigator.clipboard.writeText(shareUrl);
+          toast.success("Link copiado para a área de transferência!");
         } catch (err) {
           console.error("Error copying to clipboard:", err);
+          toast.error("Falha ao copiar link.");
         }
       }
     }
@@ -238,74 +214,7 @@ export const SupabaseProductDetail: React.FC<SupabaseProductDetailProps> = ({
     );
   };
 
-  const renderColorOption = (color: ProductVariation) => {
-    const isSelected = selectedColor === color.name;
-    const isOutOfStock = color.stock_quantity <= 0;
-    
-    return (
-      <button
-        key={color.id}
-        onClick={() => {
-          if (!isOutOfStock) {
-            console.log("Color selected:", color.name); // Debug log
-            setSelectedColor(color.name);
-          }
-        }}
-        disabled={isOutOfStock}
-        className={`relative w-10 h-10 rounded-full border-2 transition-all ${
-          isSelected
-            ? 'border-purple-500 ring-2 ring-purple-200'
-            : isOutOfStock
-            ? 'border-gray-300 opacity-50 cursor-not-allowed'
-            : 'border-gray-300 hover:border-gray-400'
-        }`}
-        style={{ backgroundColor: color.value || '#cccccc' }}
-        title={`${color.name} - ${isOutOfStock ? 'Indisponível' : `${color.stock_quantity} disponível`}`}
-      >
-        {(color.value === '#FFFFFF' || color.value === 'white') && (
-          <div className="w-full h-full rounded-full border border-gray-200"></div>
-        )}
-        {isOutOfStock && (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="w-6 h-0.5 bg-red-500 rotate-45"></div>
-          </div>
-        )}
-      </button>
-    );
-  };
-
-  const renderSizeOption = (size: ProductVariation) => {
-    const isSelected = selectedSize === size.name;
-    const isOutOfStock = size.stock_quantity <= 0;
-    
-    return (
-      <button
-        key={size.id}
-        onClick={() => {
-          if (!isOutOfStock) {
-            console.log("Size selected:", size.name); // Debug log
-            setSelectedSize(size.name);
-          }
-        }}
-        disabled={isOutOfStock}
-        className={`py-2 px-3 rounded-lg border text-sm font-medium transition-colors relative ${
-          isSelected
-            ? 'border-purple-500 bg-purple-50 text-purple-700'
-            : isOutOfStock
-            ? 'border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed'
-            : 'border-gray-300 hover:border-gray-400'
-        }`}
-        title={`Tamanho ${size.name} - ${isOutOfStock ? 'Indisponível' : `${size.stock_quantity} disponível`}`}
-      >
-        {size.name}
-        {isOutOfStock && (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="w-4 h-0.5 bg-red-500 rotate-45"></div>
-          </div>
-        )}
-      </button>
-    );
-  };
+  // Removed renderColorOption and renderSizeOption as they are now part of ProductVariationSelector
 
   if (loading) {
     return (
@@ -357,13 +266,16 @@ export const SupabaseProductDetail: React.FC<SupabaseProductDetailProps> = ({
       ? product.images
       : [product?.image_url || "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=600&h=600&fit=crop"];
 
-  const finalPrice = calculatePrice();
-  const selectedStock = getSelectedVariationStock();
+  const finalPrice = selectedVariations.totalPrice || product.price; // Use calculated price, fallback to base price
+  const selectedStock = selectedVariations.size && selectedVariations.color
+    ? (selectedVariations.size.stock_quantity && selectedVariations.color.stock_quantity
+        ? Math.min(selectedVariations.size.stock_quantity, selectedVariations.color.stock_quantity)
+        : selectedVariations.size.stock_quantity || selectedVariations.color.stock_quantity || 0) // Handle cases where one might be undefined
+    : 0; // If variations aren't selected, stock is effectively 0 for selection purposes
+
   const maxQuantity = Math.min(selectedStock, 10); // Limit to 10 or available stock
 
-  // Debug logs para verificar se as variações existem antes de renderizar
-  console.log("Before render - Colors:", product.colors);
-  console.log("Before render - Sizes:", product.sizes);
+  // Removed debug logs related to old selection states
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
@@ -400,7 +312,7 @@ export const SupabaseProductDetail: React.FC<SupabaseProductDetailProps> = ({
                 className="w-full h-96 sm:h-[500px] object-cover"
                 onError={handleImageError}
               />
-              
+
               {/* Badges */}
               <div className="absolute top-4 left-4 flex flex-wrap gap-2">
                 {product.category && (
@@ -408,12 +320,12 @@ export const SupabaseProductDetail: React.FC<SupabaseProductDetailProps> = ({
                     {product.category}
                   </span>
                 )}
-                {product.original_price && (
+                {product.original_price && finalPrice !== product.price && ( // Show discount if price changed
                   <span className="bg-red-500 text-white text-sm px-3 py-1 rounded-full font-medium">
-                    -{Math.round((1 - finalPrice / product.original_price) * 100)}% OFF
+                    -{Math.round((1 - finalPrice / product.price) * 100)}% OFF
                   </span>
                 )}
-                {!stockCheck && (
+                {!selectedVariations.inStock && ( // Show out of stock based on selected variations
                   <span className="bg-red-500 text-white text-sm px-3 py-1 rounded-full font-medium">
                     Indisponível
                   </span>
@@ -452,8 +364,8 @@ export const SupabaseProductDetail: React.FC<SupabaseProductDetailProps> = ({
                   key={index}
                   onClick={() => setActiveImageIndex(index)}
                   className={`relative rounded-lg overflow-hidden aspect-square ${
-                    activeImageIndex === index 
-                      ? 'ring-2 ring-purple-500' 
+                    activeImageIndex === index
+                      ? 'ring-2 ring-purple-500'
                       : 'ring-1 ring-gray-200 hover:ring-gray-300'
                   }`}
                 >
@@ -535,86 +447,47 @@ export const SupabaseProductDetail: React.FC<SupabaseProductDetailProps> = ({
 
             {/* Product Options */}
             <div className="bg-white rounded-2xl p-6 shadow-xl space-y-6">
-              {/* Debug info - remover em produção */}
-           
+              {/* Variation Selector Component */}
+              <div className="mb-6">
+                <ProductVariationSelector
+                  productId={product.id}
+                  basePrice={product.price}
+                  initialVariations={{
+                    size: product.sizes?.[0], // Pass initial size if available
+                    color: product.colors?.[0], // Pass initial color if available
+                  }}
+                  onVariationChange={setSelectedVariations}
+                  // Pass available variations to the selector
+                  availableSizes={product.sizes}
+                  availableColors={product.colors}
+                />
+              </div>
 
-              {/* Color Selection */}
-              {product.colors && Array.isArray(product.colors) && product.colors.length > 0 && (
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-3">
-                    Cor: <span className="font-normal">{selectedColor || 'Selecione uma cor'}</span>
-                  </h3>
-                  <div className="flex flex-wrap gap-3">
-                    {product.colors.map(renderColorOption)}
-                  </div>
-                </div>
-              )}
-
-              {/* Size Selection */}
-              {product.sizes && Array.isArray(product.sizes) && product.sizes.length > 0 && (
-                <div>
-                  <div className="flex items-center justify-between mb-3">
-                    <h3 className="text-lg font-semibold text-gray-900">
-                      Tamanho: <span className="font-normal">{selectedSize || 'Selecione um tamanho'}</span>
-                    </h3>
-                    <button className="text-sm text-purple-600 hover:text-purple-700 flex items-center">
-                      <Ruler className="w-4 h-4 mr-1" />
-                      Guia de tamanhos
-                    </button>
-                  </div>
-                  <div className="grid grid-cols-6 gap-3">
-                    {product.sizes.map(renderSizeOption)}
-                  </div>
-                </div>
-              )}
-
-              {/* Fallback message se não houver variações */}
-              {(!product.colors || product.colors.length === 0) && (!product.sizes || product.sizes.length === 0) && (
-                <div className="text-center py-4 text-gray-500">
-                  <p>Este produto não possui variações de cor ou tamanho disponíveis.</p>
-                </div>
-              )}
-
-              {/* Stock Status */}
-              {checkingStock ? (
-                <div className="flex items-center space-x-2 text-gray-600">
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  <span className="text-sm">Verificando disponibilidade...</span>
-                </div>
-              ) : !stockCheck && (selectedSize || selectedColor) ? (
-                <div className="flex items-center space-x-2 text-red-600 bg-red-50 p-3 rounded-lg">
-                  <AlertCircle className="w-4 h-4" />
-                  <span className="text-sm">
-                    Combinação indisponível. Tente outras opções.
-                  </span>
-                </div>
-              ) : null}
-
-              {/* Quantity */}
-              {stockCheck && selectedSize && selectedColor && (
+              {/* Quantity Selector (conditionally rendered) */}
+              {selectedVariations.size && selectedVariations.color && selectedVariations.inStock && (
                 <div>
                   <h3 className="text-lg font-semibold text-gray-900 mb-3">Quantidade</h3>
                   <div className="flex items-center space-x-3">
                     <div className="flex items-center border border-gray-300 rounded-lg">
                       <button
-                        onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                        onClick={() => setSelectedVariations(prev => ({ ...prev, quantity: Math.max(1, prev.quantity - 1) }))}
                         className="p-2 hover:bg-gray-100 rounded-l-lg"
-                        disabled={quantity <= 1}
+                        disabled={selectedVariations.quantity <= 1}
                       >
                         <Minus className="w-4 h-4" />
                       </button>
-                      <span className="px-4 py-2 font-medium">{quantity}</span>
+                      <span className="px-4 py-2 font-medium">{selectedVariations.quantity}</span>
                       <button
-                        onClick={() => setQuantity(Math.min(maxQuantity, quantity + 1))}
+                        onClick={() => setSelectedVariations(prev => ({ ...prev, quantity: Math.min(maxQuantity, prev.quantity + 1) }))}
                         className="p-2 hover:bg-gray-100 rounded-r-lg"
-                        disabled={quantity >= maxQuantity}
+                        disabled={selectedVariations.quantity >= maxQuantity}
                       >
                         <Plus className="w-4 h-4" />
                       </button>
                     </div>
                     <span className="text-gray-600 text-sm">
-                      {quantity > 1 && `Total: ${formatPrice(finalPrice * quantity)}`}
-                      {maxQuantity < 10 && (
+                      {selectedVariations.quantity > 1 && `Total: ${formatPrice(finalPrice * selectedVariations.quantity)}`}
+                      {maxQuantity < 10 && selectedStock < 10 && ( // Show max only if actual stock is limited and less than 10
                         <span className="block text-orange-600">
                           Máx: {maxQuantity} unidades
                         </span>
@@ -629,15 +502,26 @@ export const SupabaseProductDetail: React.FC<SupabaseProductDetailProps> = ({
             <div className="bg-white rounded-2xl p-6 shadow-xl">
               <Button
                 onClick={handleAddToCart}
-                disabled={addedToCart || !selectedSize || !selectedColor || !stockCheck || selectedStock <= 0}
-                className="w-full h-14 text-lg font-semibold bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                disabled={addedToCart || !selectedVariations.size || !selectedVariations.color || !selectedVariations.inStock}
+                className={`w-full h-14 text-lg font-semibold ${
+                  addedToCart
+                    ? 'bg-green-500 hover:bg-green-600 text-white'
+                    : selectedVariations.inStock && selectedVariations.size && selectedVariations.color
+                      ? 'bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none'
+                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                }`}
               >
                 {addedToCart ? (
                   <>
                     <CheckCircle className="w-5 h-5 mr-2" />
                     Adicionado ao Carrinho!
                   </>
-                ) : !stockCheck || selectedStock <= 0 ? (
+                ) : !selectedVariations.size || !selectedVariations.color ? (
+                  <>
+                    <AlertCircle className="w-5 h-5 mr-2" />
+                    Selecione as opções
+                  </>
+                ) : !selectedVariations.inStock ? (
                   <>
                     <AlertCircle className="w-5 h-5 mr-2" />
                     Indisponível
@@ -649,13 +533,13 @@ export const SupabaseProductDetail: React.FC<SupabaseProductDetailProps> = ({
                   </>
                 )}
               </Button>
-              
-              {(!selectedSize || !selectedColor) && (
+
+              {!selectedVariations.size || !selectedVariations.color && (
                 <p className="mt-2 text-sm text-red-600 text-center">
                   Selecione cor e tamanho antes de adicionar ao carrinho
                 </p>
               )}
-              
+
               <div className="mt-4 text-center">
                 <p className="text-sm text-gray-500 flex items-center justify-center space-x-4">
                   <span className="flex items-center">
@@ -690,7 +574,7 @@ export const SupabaseProductDetail: React.FC<SupabaseProductDetailProps> = ({
                       key={id}
                       onClick={() => setActiveTab(id)}
                       className={`flex items-center space-x-2 py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap transition-colors ${
-                                               activeTab === id
+                        activeTab === id
                           ? "border-purple-600 text-purple-600"
                           : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
                       }`}
@@ -719,7 +603,7 @@ export const SupabaseProductDetail: React.FC<SupabaseProductDetailProps> = ({
                   </div>
                   <div>
                     <p><strong>Código do produto:</strong> #{product.id}</p>
-                    <p><strong>Disponibilidade:</strong> {selectedStock > 0 ? "Em estoque" : "Indisponível"}</p>
+                    <p><strong>Disponibilidade:</strong> {selectedVariations.inStock ? "Em estoque" : "Indisponível"}</p>
                   </div>
                 </div>
               )}

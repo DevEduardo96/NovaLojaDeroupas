@@ -1,7 +1,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { productService } from '../lib/supabase';
-import type { ProductVariation } from '../types';
+import type { ProductVariation } from '../lib/supabase';
 
 export const useProductVariations = (productId?: number) => {
   const [variations, setVariations] = useState<ProductVariation[]>([]);
@@ -19,8 +19,8 @@ export const useProductVariations = (productId?: number) => {
       setVariations(data);
       
       // Separar por tipo
-      const sizeVariations = data.filter(v => v.type === 'size');
-      const colorVariations = data.filter(v => v.type === 'color');
+      const sizeVariations = data.filter(v => v.type === 'size' && v.is_available);
+      const colorVariations = data.filter(v => v.type === 'color' && v.is_available);
       
       setSizes(sizeVariations);
       setColors(colorVariations);
@@ -36,8 +36,8 @@ export const useProductVariations = (productId?: number) => {
 
   const getSizesByProduct = useCallback(async (id: number) => {
     try {
-      const data = await productService.getVariationsByType(id, 'size');
-      return data;
+      const data = await productService.getProductVariations(id);
+      return data.filter(v => v.type === 'size' && v.is_available);
     } catch (err) {
       console.error('Error fetching sizes:', err);
       return [];
@@ -46,8 +46,8 @@ export const useProductVariations = (productId?: number) => {
 
   const getColorsByProduct = useCallback(async (id: number) => {
     try {
-      const data = await productService.getVariationsByType(id, 'color');
-      return data;
+      const data = await productService.getProductVariations(id);
+      return data.filter(v => v.type === 'color' && v.is_available);
     } catch (err) {
       console.error('Error fetching colors:', err);
       return [];
@@ -56,13 +56,13 @@ export const useProductVariations = (productId?: number) => {
 
   const createVariation = useCallback(async (variation: Omit<ProductVariation, 'id' | 'created_at' | 'updated_at'>) => {
     try {
-      const newVariation = await productService.createProductVariation(variation);
+      const newVariation = await productService.addProductVariation(variation);
       setVariations(prev => [...prev, newVariation]);
       
       // Atualizar listas específicas
-      if (newVariation.type === 'size') {
+      if (newVariation.type === 'size' && newVariation.is_available) {
         setSizes(prev => [...prev, newVariation]);
-      } else if (newVariation.type === 'color') {
+      } else if (newVariation.type === 'color' && newVariation.is_available) {
         setColors(prev => [...prev, newVariation]);
       }
       
@@ -81,9 +81,9 @@ export const useProductVariations = (productId?: number) => {
       
       // Atualizar listas específicas
       if (updatedVariation.type === 'size') {
-        setSizes(prev => prev.map(v => v.id === id ? updatedVariation : v));
+        setSizes(prev => prev.map(v => v.id === id ? updatedVariation : v).filter(v => v.is_available));
       } else if (updatedVariation.type === 'color') {
-        setColors(prev => prev.map(v => v.id === id ? updatedVariation : v));
+        setColors(prev => prev.map(v => v.id === id ? updatedVariation : v).filter(v => v.is_available));
       }
       
       return updatedVariation;
@@ -113,6 +113,15 @@ export const useProductVariations = (productId?: number) => {
     return basePrice + variation.price_modifier;
   }, []);
 
+  const checkStock = useCallback(async (productId: number, size?: string, color?: string) => {
+    try {
+      return await productService.checkVariationStock(productId, size, color);
+    } catch (err) {
+      console.error('Error checking stock:', err);
+      return false;
+    }
+  }, []);
+
   useEffect(() => {
     if (productId) {
       fetchVariations(productId);
@@ -132,6 +141,7 @@ export const useProductVariations = (productId?: number) => {
     updateVariation,
     deleteVariation,
     calculateVariationPrice,
+    checkStock,
     refetch: () => productId ? fetchVariations(productId) : Promise.resolve(),
   };
 };
