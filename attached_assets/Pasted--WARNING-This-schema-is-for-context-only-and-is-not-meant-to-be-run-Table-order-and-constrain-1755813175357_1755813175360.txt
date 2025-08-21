@@ -1,0 +1,183 @@
+-- WARNING: This schema is for context only and is not meant to be run.
+-- Table order and constraints may not be valid for execution.
+
+CREATE TABLE public.avaliacoes (
+  id integer NOT NULL DEFAULT nextval('avaliacoes_id_seq'::regclass),
+  user_id uuid,
+  product_id integer,
+  rating integer NOT NULL CHECK (rating >= 1 AND rating <= 5),
+  comment text,
+  is_approved boolean DEFAULT false,
+  created_at timestamp with time zone DEFAULT timezone('UTC'::text, now()),
+  updated_at timestamp with time zone DEFAULT timezone('UTC'::text, now()),
+  CONSTRAINT avaliacoes_pkey PRIMARY KEY (id),
+  CONSTRAINT avaliacoes_product_id_fkey FOREIGN KEY (product_id) REFERENCES public.produtos(id),
+  CONSTRAINT avaliacoes_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id)
+);
+CREATE TABLE public.cart_items (
+  id integer NOT NULL DEFAULT nextval('cart_items_id_seq'::regclass),
+  user_id uuid,
+  product_id integer,
+  quantity integer NOT NULL DEFAULT 1 CHECK (quantity > 0),
+  created_at timestamp with time zone DEFAULT timezone('UTC'::text, now()),
+  updated_at timestamp with time zone DEFAULT timezone('UTC'::text, now()),
+  CONSTRAINT cart_items_pkey PRIMARY KEY (id),
+  CONSTRAINT cart_items_product_id_fkey FOREIGN KEY (product_id) REFERENCES public.produtos(id),
+  CONSTRAINT cart_items_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id)
+);
+CREATE TABLE public.categorias (
+  id integer NOT NULL DEFAULT nextval('categorias_id_seq'::regclass),
+  name character varying NOT NULL UNIQUE,
+  description text,
+  image_url text,
+  is_active boolean DEFAULT true,
+  sort_order integer DEFAULT 0,
+  created_at timestamp with time zone DEFAULT timezone('UTC'::text, now()),
+  updated_at timestamp with time zone DEFAULT timezone('UTC'::text, now()),
+  CONSTRAINT categorias_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.configuracoes (
+  id integer NOT NULL DEFAULT nextval('configuracoes_id_seq'::regclass),
+  chave character varying NOT NULL UNIQUE,
+  valor text NOT NULL,
+  descricao text,
+  tipo character varying DEFAULT 'string'::character varying CHECK (tipo::text = ANY (ARRAY['string'::character varying, 'number'::character varying, 'boolean'::character varying, 'json'::character varying]::text[])),
+  is_public boolean DEFAULT false,
+  created_at timestamp with time zone DEFAULT timezone('UTC'::text, now()),
+  updated_at timestamp with time zone DEFAULT timezone('UTC'::text, now()),
+  CONSTRAINT configuracoes_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.downloads (
+  id integer NOT NULL DEFAULT nextval('downloads_id_seq'::regclass),
+  user_id uuid,
+  product_id integer,
+  payment_id text,
+  download_url text NOT NULL,
+  download_count integer DEFAULT 0,
+  last_downloaded_at timestamp with time zone,
+  expires_at timestamp with time zone,
+  is_active boolean DEFAULT true,
+  created_at timestamp with time zone DEFAULT timezone('UTC'::text, now()),
+  updated_at timestamp with time zone DEFAULT timezone('UTC'::text, now()),
+  CONSTRAINT downloads_pkey PRIMARY KEY (id),
+  CONSTRAINT downloads_payment_id_fkey FOREIGN KEY (payment_id) REFERENCES public.pagamentos(pagamento_id),
+  CONSTRAINT downloads_product_id_fkey FOREIGN KEY (product_id) REFERENCES public.produtos(id),
+  CONSTRAINT downloads_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id)
+);
+CREATE TABLE public.favorites (
+  id integer NOT NULL DEFAULT nextval('favorites_id_seq'::regclass),
+  user_id uuid,
+  product_id integer,
+  created_at timestamp with time zone DEFAULT timezone('UTC'::text, now()),
+  CONSTRAINT favorites_pkey PRIMARY KEY (id),
+  CONSTRAINT favorites_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id),
+  CONSTRAINT favorites_product_id_fkey FOREIGN KEY (product_id) REFERENCES public.produtos(id)
+);
+CREATE TABLE public.notificacoes (
+  id integer NOT NULL DEFAULT nextval('notificacoes_id_seq'::regclass),
+  user_id uuid,
+  title character varying NOT NULL,
+  message text NOT NULL,
+  type character varying DEFAULT 'info'::character varying CHECK (type::text = ANY (ARRAY['info'::character varying, 'success'::character varying, 'warning'::character varying, 'error'::character varying]::text[])),
+  is_read boolean DEFAULT false,
+  action_url text,
+  created_at timestamp with time zone DEFAULT timezone('UTC'::text, now()),
+  CONSTRAINT notificacoes_pkey PRIMARY KEY (id),
+  CONSTRAINT notificacoes_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id)
+);
+CREATE TABLE public.pagamentos (
+  pagamento_id text NOT NULL,
+  status text NOT NULL CHECK (status = ANY (ARRAY['pending'::text, 'approved'::text, 'rejected'::text, 'cancelled'::text, 'refunded'::text])),
+  email text NOT NULL,
+  nome_cliente text NOT NULL,
+  valor numeric NOT NULL CHECK (valor >= 0::numeric),
+  download_url ARRAY,
+  itens jsonb NOT NULL,
+  qr_code text,
+  transaction_id text,
+  qr_code_base64 text,
+  notification_url text,
+  expires_at timestamp with time zone,
+  paid_at timestamp with time zone,
+  created_at timestamp with time zone DEFAULT timezone('UTC'::text, now()),
+  updated_at timestamp with time zone DEFAULT timezone('UTC'::text, now()),
+  CONSTRAINT pagamentos_pkey PRIMARY KEY (pagamento_id)
+);
+CREATE TABLE public.pedido_itens (
+  id bigint NOT NULL DEFAULT nextval('pedido_itens_id_seq'::regclass),
+  pedido_id bigint NOT NULL,
+  produto_id bigint NOT NULL,
+  nome_produto character varying NOT NULL,
+  preco_unitario numeric NOT NULL,
+  quantidade integer NOT NULL DEFAULT 1,
+  tamanho character varying,
+  cor character varying,
+  variacao_tamanho_id bigint,
+  variacao_cor_id bigint,
+  subtotal numeric NOT NULL,
+  created_at timestamp with time zone NOT NULL DEFAULT timezone('utc'::text, now()),
+  CONSTRAINT pedido_itens_pkey PRIMARY KEY (id),
+  CONSTRAINT pedido_itens_pedido_id_fkey FOREIGN KEY (pedido_id) REFERENCES public.pedidos(id),
+  CONSTRAINT pedido_itens_produto_id_fkey FOREIGN KEY (produto_id) REFERENCES public.produtos(id),
+  CONSTRAINT pedido_itens_variacao_tamanho_id_fkey FOREIGN KEY (variacao_tamanho_id) REFERENCES public.product_variations(id),
+  CONSTRAINT pedido_itens_variacao_cor_id_fkey FOREIGN KEY (variacao_cor_id) REFERENCES public.product_variations(id)
+);
+CREATE TABLE public.pedidos (
+  id bigint NOT NULL DEFAULT nextval('pedidos_id_seq'::regclass),
+  user_id uuid,
+  email_cliente character varying NOT NULL,
+  nome_cliente character varying NOT NULL,
+  telefone character varying,
+  cpf character varying,
+  cep character varying,
+  rua character varying,
+  numero character varying,
+  complemento character varying,
+  bairro character varying,
+  cidade character varying,
+  estado character varying,
+  subtotal numeric NOT NULL DEFAULT 0.00,
+  desconto numeric DEFAULT 0.00,
+  taxa_entrega numeric DEFAULT 0.00,
+  total numeric NOT NULL DEFAULT 0.00,
+  status character varying DEFAULT 'pendente'::character varying CHECK (status::text = ANY (ARRAY['pendente'::character varying, 'confirmado'::character varying, 'processando'::character varying, 'enviado'::character varying, 'entregue'::character varying, 'cancelado'::character varying, 'devolvido'::character varying]::text[])),
+  metodo_pagamento character varying DEFAULT 'pix'::character varying,
+  created_at timestamp with time zone NOT NULL DEFAULT timezone('utc'::text, now()),
+  updated_at timestamp with time zone NOT NULL DEFAULT timezone('utc'::text, now()),
+  CONSTRAINT pedidos_pkey PRIMARY KEY (id),
+  CONSTRAINT pedidos_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id)
+);
+CREATE TABLE public.product_variations (
+  id bigint NOT NULL DEFAULT nextval('product_variations_id_seq'::regclass),
+  product_id bigint NOT NULL,
+  type character varying NOT NULL CHECK (type::text = ANY (ARRAY['size'::character varying, 'color'::character varying]::text[])),
+  name character varying NOT NULL,
+  value character varying NOT NULL,
+  stock_quantity integer DEFAULT 0,
+  price_modifier numeric DEFAULT 0.00,
+  is_available boolean DEFAULT true,
+  created_at timestamp with time zone NOT NULL DEFAULT timezone('utc'::text, now()),
+  updated_at timestamp with time zone NOT NULL DEFAULT timezone('utc'::text, now()),
+  CONSTRAINT product_variations_pkey PRIMARY KEY (id),
+  CONSTRAINT fk_product_variations_product_id FOREIGN KEY (product_id) REFERENCES public.produtos(id)
+);
+CREATE TABLE public.produtos (
+  id integer NOT NULL DEFAULT nextval('produtos_id_seq'::regclass),
+  name character varying NOT NULL,
+  description text,
+  price numeric NOT NULL CHECK (price >= 0::numeric),
+  original_price numeric CHECK (original_price >= 0::numeric),
+  image_url text NOT NULL,
+  category character varying NOT NULL,
+  stock_quantity integer DEFAULT 0 CHECK (stock_quantity >= 0),
+  is_active boolean DEFAULT true,
+  is_featured boolean DEFAULT false,
+  download_url text,
+  file_size character varying,
+  file_format character varying,
+  tags ARRAY,
+  created_at timestamp with time zone DEFAULT timezone('UTC'::text, now()),
+  updated_at timestamp with time zone DEFAULT timezone('UTC'::text, now()),
+  images ARRAY,
+  CONSTRAINT produtos_pkey PRIMARY KEY (id)
+);
