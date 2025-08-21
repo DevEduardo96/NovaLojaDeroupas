@@ -71,8 +71,45 @@ export const orderService = {
       console.log('Dados do pedido:', orderData);
       console.log('Itens do carrinho:', cartItems);
 
+      // Validar dados obrigatórios
+      if (!orderData.nomeCliente || !orderData.email) {
+        throw new Error('Nome do cliente e email são obrigatórios');
+      }
+
+      if (!cartItems || cartItems.length === 0) {
+        throw new Error('Carrinho não pode estar vazio');
+      }
+
+      // Mapear corretamente os dados dos itens do carrinho
+      const validCartItems = cartItems.map(item => {
+        // Se o item tem a estrutura { product: {...}, quantity: ... }
+        if (item.product) {
+          return {
+            id: item.product.id,
+            name: item.product.name,
+            price: item.product.price,
+            quantity: item.quantity,
+            selectedSize: item.selectedSize,
+            selectedColor: item.selectedColor,
+            sizeVariationId: item.sizeVariationId,
+            colorVariationId: item.colorVariationId
+          };
+        }
+        // Se o item já tem a estrutura direta
+        return {
+          id: item.id,
+          name: item.name,
+          price: item.price,
+          quantity: item.quantity,
+          selectedSize: item.selectedSize,
+          selectedColor: item.selectedColor,
+          sizeVariationId: item.sizeVariationId,
+          colorVariationId: item.colorVariationId
+        };
+      });
+
       // Calcular totais
-      const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      const subtotal = validCartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
       const total = subtotal - discount + deliveryFee;
 
       console.log('💰 Totais calculados:', { subtotal, discount, deliveryFee, total });
@@ -86,30 +123,44 @@ export const orderService = {
 
       console.log('👤 Usuário atual:', user?.id || 'Não autenticado');
 
-      // Criar pedido principal
+      // Preparar dados para inserção na tabela pedidos
       const orderInsert = {
         user_id: user?.id || null,
         email_cliente: orderData.email,
         nome_cliente: orderData.nomeCliente,
-        telefone: orderData.telefone,
+        telefone: orderData.telefone || null,
         cpf: orderData.cpf || null,
-        cep: orderData.cep,
-        rua: orderData.rua,
-        numero: orderData.numero,
+        cep: orderData.cep || null,
+        rua: orderData.rua || null,
+        numero: orderData.numero || null,
         complemento: orderData.complemento || null,
-        bairro: orderData.bairro,
-        cidade: orderData.cidade,
-        estado: orderData.estado,
-        subtotal,
-        desconto: discount,
-        taxa_entrega: deliveryFee,
-        total,
+        bairro: orderData.bairro || null,
+        cidade: orderData.cidade || null,
+        estado: orderData.estado || null,
+        subtotal: Number(subtotal.toFixed(2)),
+        desconto: Number(discount.toFixed(2)),
+        taxa_entrega: Number(deliveryFee.toFixed(2)),
+        total: Number(total.toFixed(2)),
         status: 'pendente',
-        metodo_pagamento: paymentMethod,
+        metodo_pagamento: paymentMethod
       };
 
       console.log('📝 Inserindo pedido na tabela pedidos:', orderInsert);
 
+      // Verificar se a tabela existe
+      const { data: tableCheck, error: tableError } = await supabase
+        .from('pedidos')
+        .select('id')
+        .limit(1);
+
+      if (tableError) {
+        console.error('❌ Erro ao verificar tabela pedidos:', tableError);
+        throw new Error(`Tabela pedidos não encontrada: ${tableError.message}`);
+      }
+
+      console.log('✅ Tabela pedidos existe e está acessível');
+
+      // Inserir pedido
       const { data: order, error: orderError } = await supabase
         .from('pedidos')
         .insert(orderInsert)
@@ -124,23 +175,29 @@ export const orderService = {
           details: orderError.details,
           hint: orderError.hint
         });
+        
+        // Verificar se é um problema de RLS
+        if (orderError.code === '42501' || orderError.message?.includes('permission denied')) {
+          throw new Error('Erro de permissão. Verifique as políticas RLS da tabela pedidos.');
+        }
+        
         throw new Error(`Falha ao criar pedido: ${orderError.message}`);
       }
 
       console.log('✅ Pedido criado com sucesso:', order);
 
       // Criar itens do pedido
-      const orderItems: Omit<OrderItem, 'id' | 'created_at'>[] = cartItems.map(item => ({
+      const orderItems = validCartItems.map(item => ({
         pedido_id: order.id,
         produto_id: item.id,
         nome_produto: item.name,
-        preco_unitario: item.price,
+        preco_unitario: Number(item.price.toFixed(2)),
         quantidade: item.quantity,
         tamanho: item.selectedSize || null,
         cor: item.selectedColor || null,
         variacao_tamanho_id: item.sizeVariationId || null,
         variacao_cor_id: item.colorVariationId || null,
-        subtotal: item.price * item.quantity,
+        subtotal: Number((item.price * item.quantity).toFixed(2))
       }));
 
       console.log('📦 Inserindo itens do pedido na tabela pedido_itens:', orderItems);
@@ -158,6 +215,15 @@ export const orderService = {
           details: itemsError.details,
           hint: itemsError.hint
         });
+        
+        // Se falhou ao criar itens, tentar remover o pedido criado
+        try {
+          await supabase.from('pedidos').delete().eq('id', order.id);
+          console.log('🗑️ Pedido removido devido ao erro nos itens');
+        } catch (deleteError) {
+          console.error('❌ Erro ao remover pedido após falha nos itens:', deleteError);
+        }
+        
         throw new Error(`Falha ao criar itens do pedido: ${itemsError.message}`);
       }
 

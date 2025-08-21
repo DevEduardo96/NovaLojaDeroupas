@@ -56,35 +56,42 @@ export const CheckoutPage: React.FC = () => {
 
       await api.wakeUpServer();
 
-      // Adaptação para o novo fluxo onde o pedido é criado primeiro
+      // Preparar dados do pedido para o orderService
       const orderDataForService: OrderData = {
         nomeCliente: formData.nomeCliente,
         email: formData.email,
-        telefone: formData.telefone, // Certifique-se que esses campos existem no formData
-        cpf: formData.cpf,
-        cep: formData.cep,
-        rua: formData.rua,
-        numero: formData.numero,
-        complemento: formData.complemento,
-        bairro: formData.bairro,
-        cidade: formData.cidade,
-        estado: formData.estado
+        telefone: formData.telefone || '',
+        cpf: formData.cpf || '',
+        cep: formData.cep || '',
+        rua: formData.rua || '',
+        numero: formData.numero || '',
+        complemento: formData.complemento || '',
+        bairro: formData.bairro || '',
+        cidade: formData.cidade || '',
+        estado: formData.estado || ''
       };
 
       console.log('🚀 Processando checkout...');
       console.log('📋 Dados do formulário:', formData);
+      console.log('📋 Dados formatados para orderService:', orderDataForService);
       console.log('🛒 Itens do carrinho:', cartItems);
+      console.log('🛒 Itens validados:', validItems);
 
-      // Criar pedido
+      // Criar pedido no Supabase primeiro
       console.log('📝 Criando pedido no Supabase...');
       const order = await orderService.createOrder(
         orderDataForService,
-        validItems, // Usando validItems aqui
-        user?.id // Passando o ID do usuário, se existir
+        validItems,
+        'pix', // método de pagamento
+        0, // desconto
+        0  // taxa de entrega
       );
 
       console.log('✅ Pedido criado com ID:', order.id);
       console.log('📊 Detalhes completos do pedido:', order);
+
+      // Salvar o ID do pedido para referência
+      localStorage.setItem('currentOrderId', order.id.toString());
 
 
       const paymentDataPayload = {
