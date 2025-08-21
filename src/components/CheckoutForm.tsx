@@ -59,10 +59,33 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
     return Object.keys(newErrors).length === 0;
   };
 
+  // Verificar se o formulário está preenchido corretamente
+  const isFormValid = () => {
+    return formData.nomeCliente.trim() &&
+           formData.email.trim() &&
+           /\S+@\S+\.\S+/.test(formData.email) &&
+           formData.telefone.trim() &&
+           formData.cep.trim() &&
+           formData.rua.trim() &&
+           formData.numero.trim() &&
+           formData.bairro.trim() &&
+           formData.cidade.trim() &&
+           formData.estado.trim();
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    console.log('🚀 Formulário de checkout enviado!');
+    console.log('📋 Dados do formulário:', formData);
+    console.log('🛒 Itens do carrinho:', items);
+    console.log('💰 Total:', total);
+    
     if (validateForm()) {
+      console.log('✅ Validação passou, enviando para checkout...');
       onSubmit(formData);
+    } else {
+      console.log('❌ Validação falhou, erros:', errors);
     }
   };
 
@@ -295,23 +318,65 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
           </div>
         </div>
 
-        <button
-          type="submit"
-          disabled={isLoading}
-          className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 text-white font-semibold py-4 px-6 rounded-lg transition-colors duration-200 flex items-center justify-center space-x-2"
-        >
-          {isLoading ? (
-            <>
-              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-              <span>Processando...</span>
-            </>
-          ) : (
-            <>
-              <CreditCard className="w-5 h-5" />
-              <span>Gerar QR Code PIX</span>
-            </>
+        {/* Status do Formulário */}
+        {isFormValid() && (
+          <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+            <div className="flex items-center space-x-2">
+              <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
+                <span className="text-white text-xs">✓</span>
+              </div>
+              <span className="text-green-800 font-medium">
+                Formulário preenchido corretamente! Pronto para finalizar.
+              </span>
+            </div>
+          </div>
+        )}
+
+        {/* Botão de Envio do Formulário */}
+        <div className="pt-6 border-t border-gray-200">
+          <button
+            type="submit"
+            disabled={isLoading || !isFormValid()}
+            className={`w-full font-bold py-4 px-8 rounded-lg transition-all duration-200 flex items-center justify-center space-x-3 shadow-lg transform ${
+              isLoading 
+                ? 'bg-gray-400 cursor-not-allowed' 
+                : !isFormValid()
+                ? 'bg-gray-300 cursor-not-allowed'
+                : 'bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 hover:shadow-xl hover:scale-[1.02] cursor-pointer'
+            } text-white`}
+          >
+            {isLoading ? (
+              <>
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
+                <span className="text-lg">Processando pedido...</span>
+              </>
+            ) : !isFormValid() ? (
+              <>
+                <CreditCard className="w-6 h-6 opacity-50" />
+                <span className="text-lg">Preencha todos os campos obrigatórios</span>
+              </>
+            ) : (
+              <>
+                <CreditCard className="w-6 h-6" />
+                <span className="text-lg">🚀 FINALIZAR COMPRA COM PIX</span>
+              </>
+            )}
+          </button>
+          
+          {/* Informações adicionais sobre o processo */}
+          <div className="mt-4 text-center text-sm text-gray-600">
+            <p>✓ Pagamento 100% seguro via PIX</p>
+            <p>✓ Aprovação instantânea</p>
+            <p>✓ Entrega em até 5 dias úteis</p>
+          </div>
+
+          {/* Dica para campos obrigatórios */}
+          {!isFormValid() && (
+            <div className="mt-3 text-center text-sm text-amber-600">
+              <p>⚠️ Preencha todos os campos obrigatórios para continuar</p>
+            </div>
           )}
-        </button>
+        </div>
       </form>
     </div>
   );
