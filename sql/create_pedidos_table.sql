@@ -72,6 +72,17 @@ CREATE TRIGGER update_pedidos_updated_at
     FOR EACH ROW 
     EXECUTE FUNCTION update_updated_at_column();
 
+-- Inserir produtos de exemplo se a tabela estiver vazia
+INSERT INTO produtos (name, description, price, category, image_url, download_url, file_format, is_available) 
+SELECT * FROM (VALUES
+  ('Template Site Moderno', 'Template responsivo para sites modernos', 199.90, 'templates', '/logo02.webp', 'https://example.com/download1', 'zip', true),
+  ('Landing Page Premium', 'Landing page otimizada para conversão', 149.90, 'landing-pages', '/logo02.webp', 'https://example.com/download2', 'zip', true),
+  ('E-commerce Template', 'Template completo para loja virtual', 299.90, 'e-commerce', '/logo02.webp', 'https://example.com/download3', 'zip', true),
+  ('Dashboard Admin', 'Dashboard administrativo profissional', 249.90, 'dashboards', '/logo02.webp', 'https://example.com/download4', 'zip', true),
+  ('Portfolio Criativo', 'Template para portfolio de designers', 179.90, 'portfolios', '/logo02.webp', 'https://example.com/download5', 'zip', true)
+) AS t(name, description, price, category, image_url, download_url, file_format, is_available)
+WHERE NOT EXISTS (SELECT 1 FROM produtos LIMIT 1);
+
 -- Habilitar RLS
 ALTER TABLE pedidos ENABLE ROW LEVEL SECURITY;
 ALTER TABLE pedido_itens ENABLE ROW LEVEL SECURITY;

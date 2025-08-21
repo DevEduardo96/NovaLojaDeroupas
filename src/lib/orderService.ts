@@ -1,4 +1,3 @@
-
 import { supabase } from './supabase';
 import { CartItem } from '../types';
 
@@ -60,64 +59,91 @@ export interface OrderWithItems extends Order {
 }
 
 export const orderService = {
-  // Criar um novo pedido completo
   async createOrder(
     orderData: OrderData,
     cartItems: CartItem[],
-    userId?: string
+    paymentMethod: string = 'pix',
+    discount: number = 0,
+    deliveryFee: number = 0
   ): Promise<OrderWithItems> {
     try {
-      // Calcular totais
-      const subtotal = cartItems.reduce(
-        (sum, item) => sum + (item.product.price * item.quantity),
-        0
-      );
-      const desconto = 0;
-      const taxa_entrega = 0;
-      const total = subtotal - desconto + taxa_entrega;
+      console.log('🛒 Iniciando criação do pedido...');
+      console.log('Dados do pedido:', orderData);
+      console.log('Itens do carrinho:', cartItems);
 
-      // Criar o pedido principal
+      // Calcular totais
+      const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      const total = subtotal - discount + deliveryFee;
+
+      console.log('💰 Totais calculados:', { subtotal, discount, deliveryFee, total });
+
+      // Obter usuário atual
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+
+      if (userError) {
+        console.warn('⚠️ Erro ao obter usuário:', userError);
+      }
+
+      console.log('👤 Usuário atual:', user?.id || 'Não autenticado');
+
+      // Criar pedido principal
+      const orderInsert = {
+        user_id: user?.id || null,
+        email_cliente: orderData.email,
+        nome_cliente: orderData.nomeCliente,
+        telefone: orderData.telefone,
+        cpf: orderData.cpf || null,
+        cep: orderData.cep,
+        rua: orderData.rua,
+        numero: orderData.numero,
+        complemento: orderData.complemento || null,
+        bairro: orderData.bairro,
+        cidade: orderData.cidade,
+        estado: orderData.estado,
+        subtotal,
+        desconto: discount,
+        taxa_entrega: deliveryFee,
+        total,
+        status: 'pendente',
+        metodo_pagamento: paymentMethod,
+      };
+
+      console.log('📝 Inserindo pedido na tabela pedidos:', orderInsert);
+
       const { data: order, error: orderError } = await supabase
         .from('pedidos')
-        .insert({
-          user_id: userId,
-          email_cliente: orderData.email,
-          nome_cliente: orderData.nomeCliente,
-          telefone: orderData.telefone,
-          cpf: orderData.cpf,
-          cep: orderData.cep,
-          rua: orderData.rua,
-          numero: orderData.numero,
-          complemento: orderData.complemento,
-          bairro: orderData.bairro,
-          cidade: orderData.cidade,
-          estado: orderData.estado,
-          subtotal,
-          desconto,
-          taxa_entrega,
-          total,
-          status: 'pendente',
-          metodo_pagamento: 'pix',
-        })
+        .insert(orderInsert)
         .select()
         .single();
 
       if (orderError) {
-        console.error('Erro ao criar pedido:', orderError);
-        throw new Error(`Erro ao criar pedido: ${orderError.message}`);
+        console.error('❌ Erro ao criar pedido:', orderError);
+        console.error('Detalhes do erro:', {
+          code: orderError.code,
+          message: orderError.message,
+          details: orderError.details,
+          hint: orderError.hint
+        });
+        throw new Error(`Falha ao criar pedido: ${orderError.message}`);
       }
 
-      // Criar os itens do pedido
-      const orderItems = cartItems.map(item => ({
+      console.log('✅ Pedido criado com sucesso:', order);
+
+      // Criar itens do pedido
+      const orderItems: Omit<OrderItem, 'id' | 'created_at'>[] = cartItems.map(item => ({
         pedido_id: order.id,
-        produto_id: item.product.id,
-        nome_produto: item.product.name,
-        preco_unitario: item.product.price,
+        produto_id: item.id,
+        nome_produto: item.name,
+        preco_unitario: item.price,
         quantidade: item.quantity,
-        tamanho: item.selectedSize,
-        cor: item.selectedColor,
-        subtotal: item.product.price * item.quantity,
+        tamanho: item.selectedSize || null,
+        cor: item.selectedColor || null,
+        variacao_tamanho_id: item.sizeVariationId || null,
+        variacao_cor_id: item.colorVariationId || null,
+        subtotal: item.price * item.quantity,
       }));
+
+      console.log('📦 Inserindo itens do pedido na tabela pedido_itens:', orderItems);
 
       const { data: items, error: itemsError } = await supabase
         .from('pedido_itens')
@@ -125,19 +151,32 @@ export const orderService = {
         .select();
 
       if (itemsError) {
-        console.error('Erro ao criar itens do pedido:', itemsError);
-        // Se falhar ao criar itens, cancelar o pedido
-        await supabase.from('pedidos').delete().eq('id', order.id);
-        throw new Error(`Erro ao criar itens do pedido: ${itemsError.message}`);
+        console.error('❌ Erro ao criar itens do pedido:', itemsError);
+        console.error('Detalhes do erro:', {
+          code: itemsError.code,
+          message: itemsError.message,
+          details: itemsError.details,
+          hint: itemsError.hint
+        });
+        throw new Error(`Falha ao criar itens do pedido: ${itemsError.message}`);
       }
 
-      return {
+      console.log('✅ Itens do pedido criados com sucesso:', items);
+
+      const result = {
         ...order,
         itens: items || [],
       };
+
+      console.log('🎉 Pedido completo criado:', result);
+
+      return result;
     } catch (error) {
-      console.error('Erro em createOrder:', error);
-      throw error instanceof Error ? error : new Error('Erro desconhecido ao criar pedido');
+      console.error('💥 Erro crítico em createOrder:', error);
+      if (error instanceof Error) {
+        console.error('Stack trace:', error.stack);
+      }
+      throw error;
     }
   },
 

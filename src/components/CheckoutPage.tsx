@@ -18,7 +18,7 @@ export const CheckoutPage: React.FC = () => {
 
   const totalAmount = getTotal();
 
-  const handleSubmit = async (formData: { nomeCliente: string; email: string }) => {
+  const handleSubmit = async (formData: { nomeCliente: string; email: string; telefone: string; cpf: string; cep: string; rua: string; numero: string; complemento: string; bairro: string; cidade: string; estado: string }) => {
     try {
       setIsLoading(true);
 
@@ -71,7 +71,21 @@ export const CheckoutPage: React.FC = () => {
         estado: formData.estado
       };
 
-      const order = await orderService.createOrder(orderDataForService, validItems, user?.id);
+      console.log('🚀 Processando checkout...');
+      console.log('📋 Dados do formulário:', formData);
+      console.log('🛒 Itens do carrinho:', cartItems);
+
+      // Criar pedido
+      console.log('📝 Criando pedido no Supabase...');
+      const order = await orderService.createOrder(
+        orderDataForService,
+        validItems, // Usando validItems aqui
+        user?.id // Passando o ID do usuário, se existir
+      );
+
+      console.log('✅ Pedido criado com ID:', order.id);
+      console.log('📊 Detalhes completos do pedido:', order);
+
 
       const paymentDataPayload = {
         email_cliente: formData.email,
