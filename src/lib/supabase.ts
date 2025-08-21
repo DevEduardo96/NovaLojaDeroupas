@@ -354,5 +354,4 @@ export const productService = {
   },
 };
 
-// Re-export para conveniência
-export type { Product, ProductVariation, ProductWithVariations };
+

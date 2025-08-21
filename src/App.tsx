@@ -1,4 +1,4 @@
-import React, { useState, createContext, useContext } from "react";
+import { useState, createContext, useContext } from "react";
 import { Router, Route, Switch, useLocation } from "wouter";
 import { Header } from "./components/Header";
 import { Cart } from "./components/Cart";
@@ -10,7 +10,7 @@ import { PaymentStatus } from "./components/PaymentStatus";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { useCart } from "./hooks/useCart";
 import { api } from "./services/api";
-import type { Product, PaymentData } from "./types";
+import type { PaymentData } from "./types";
 import { Login } from "./pages/Login";
 import { Register } from "./pages/Register";
 import { Favorites } from "./pages/Favorites";
@@ -35,7 +35,7 @@ const PaymentDataContext = createContext<{
 }>({ paymentData: null, setPaymentData: () => {} });
 
 function AppContent() {
-  const [location, setLocation] = useLocation();
+  const [, setLocation] = useLocation();
   const {
     items,
     addToCart,
