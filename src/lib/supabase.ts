@@ -52,10 +52,33 @@ export interface ProductWithVariations extends Product {
   colors: ProductVariation[];
 }
 
+// Cache simples para produtos
+const productCache = new Map<string, { data: any; timestamp: number }>();
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutos
+
+// Função helper para cache
+const getCachedData = (key: string) => {
+  const cached = productCache.get(key);
+  if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+    return cached.data;
+  }
+  return null;
+};
+
+const setCachedData = (key: string, data: any) => {
+  productCache.set(key, { data, timestamp: Date.now() });
+};
+
 // Serviço de produtos
 export const productService = {
   // Buscar todos os produtos
   async getAllProducts(): Promise<Product[]> {
+    const cacheKey = 'all-products';
+    const cached = getCachedData(cacheKey);
+    if (cached) {
+      return cached;
+    }
+
     try {
       const { data, error } = await supabase
         .from("produtos")
@@ -64,12 +87,15 @@ export const productService = {
 
       if (error) {
         console.error("Error fetching products:", error);
-        return [];
+        throw new Error(`Erro ao buscar produtos: ${error.message}`);
       }
-      return data || [];
+      
+      const products = data || [];
+      setCachedData(cacheKey, products);
+      return products;
     } catch (error) {
       console.error("Error in getAllProducts:", error);
-      return [];
+      throw error instanceof Error ? error : new Error("Erro desconhecido ao buscar produtos");
     }
   },
 
@@ -92,18 +118,35 @@ export const productService = {
 
   // Buscar produtos pelo nome ou descrição
   async searchProducts(query: string): Promise<Product[]> {
+    const normalizedQuery = query.trim().toLowerCase();
+    if (!normalizedQuery) {
+      return this.getAllProducts();
+    }
+
+    const cacheKey = `search-${normalizedQuery}`;
+    const cached = getCachedData(cacheKey);
+    if (cached) {
+      return cached;
+    }
+
     try {
       const { data, error } = await supabase
         .from("produtos")
         .select("*")
-        .or(`name.ilike.%${query}%,description.ilike.%${query}%`)
-        .order("id", { ascending: true });
+        .or(`name.ilike.%${normalizedQuery}%,description.ilike.%${normalizedQuery}%,category.ilike.%${normalizedQuery}%`)
+        .order("id", { ascending: true })
+        .limit(50); // Limitar resultados para melhor performance
 
-      if (error) throw error;
-      return data || [];
+      if (error) {
+        throw new Error(`Erro na busca: ${error.message}`);
+      }
+      
+      const products = data || [];
+      setCachedData(cacheKey, products);
+      return products;
     } catch (error) {
       console.error("Error in searchProducts:", error);
-      throw error;
+      throw error instanceof Error ? error : new Error("Erro desconhecido na busca");
     }
   },
 
@@ -157,17 +200,31 @@ export const productService = {
 
   // Buscar categorias únicas
   async getCategories(): Promise<string[]> {
+    const cacheKey = 'categories';
+    const cached = getCachedData(cacheKey);
+    if (cached) {
+      return cached;
+    }
+
     try {
       const { data, error } = await supabase
         .from("produtos")
-        .select("category");
+        .select("category")
+        .not("category", "is", null)
+        .not("category", "eq", "");
 
-      if (error) throw error;
+      if (error) {
+        throw new Error(`Erro ao buscar categorias: ${error.message}`);
+      }
+      
       const uniqueCategories = new Set(data?.map((item) => item.category) || []);
-      return Array.from(uniqueCategories).filter(Boolean);
+      const categories = Array.from(uniqueCategories).filter(Boolean).sort();
+      
+      setCachedData(cacheKey, categories);
+      return categories;
     } catch (error) {
       console.error("Error in getCategories:", error);
-      throw error;
+      throw error instanceof Error ? error : new Error("Erro desconhecido ao buscar categorias");
     }
   },
 
@@ -220,10 +277,35 @@ export const productService = {
         .eq("id", id);
 
       if (error) throw error;
+      
+      // Limpar cache relacionado
+      this.clearCache();
     } catch (error) {
       console.error("Error in deleteProductVariation:", error);
       throw error;
     }
+  },
+
+  // Limpar cache
+  clearCache(): void {
+    productCache.clear();
+  },
+
+  // Limpar cache específico
+  clearCacheByKey(pattern: string): void {
+    for (const key of productCache.keys()) {
+      if (key.includes(pattern)) {
+        productCache.delete(key);
+      }
+    }
+  },
+
+  // Obter estatísticas do cache
+  getCacheStats() {
+    return {
+      size: productCache.size,
+      keys: Array.from(productCache.keys())
+    };
   },
 
   // Corrigido: verificar estoque combinando tamanho + cor

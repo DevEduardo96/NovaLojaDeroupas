@@ -26,25 +26,41 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   useEffect(() => {
     let isMounted = true;
+    let sessionTimeout: NodeJS.Timeout;
 
     // Get initial session
     const getInitialSession = async () => {
       const now = Date.now();
       // Prevent excessive session checks - minimum 5 seconds between calls
-      if (now - lastSessionCheck.current < 5000) {
+      if (now - lastSessionCheck.current < 5000 && !loading) {
         setLoading(false);
         return;
       }
       lastSessionCheck.current = now;
 
       try {
-        const { data: { session }, error } = await supabase.auth.getSession();
+        // Add timeout to session check
+        const sessionPromise = supabase.auth.getSession();
+        const timeoutPromise = new Promise((_, reject) => {
+          sessionTimeout = setTimeout(() => reject(new Error("Session check timeout")), 10000);
+        });
+
+        const { data: { session }, error } = await Promise.race([
+          sessionPromise,
+          timeoutPromise
+        ]) as any;
+        
+        clearTimeout(sessionTimeout);
         
         if (!isMounted) return;
         
         if (error) {
           console.error("Error getting initial session:", error);
-          // Se houver erro de sessão, limpa o estado
+          // Se houver erro de sessão, limpa o estado mas não falha silenciosamente
+          if (error.message?.includes('Invalid JWT') || error.message?.includes('expired')) {
+            // Token expirado, limpa e permite re-login
+            await supabase.auth.signOut();
+          }
           setSession(null);
           setUser(null);
         } else {
@@ -52,9 +68,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
           setUser(session?.user ?? null);
         }
       } catch (error) {
+        clearTimeout(sessionTimeout);
         console.error("Error in getInitialSession:", error);
-        setSession(null);
-        setUser(null);
+        
+        if (isMounted) {
+          // Se é timeout ou erro de rede, não limpa a sessão existente
+          if (error instanceof Error && error.message.includes('timeout')) {
+            console.warn("Session check timeout, mantendo estado atual");
+          } else {
+            setSession(null);
+            setUser(null);
+          }
+        }
       } finally {
         if (isMounted) {
           setLoading(false);
