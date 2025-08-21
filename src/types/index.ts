@@ -23,6 +23,12 @@ export interface User {
 export interface CartItem {
   product: Product;
   quantity: number;
+  selectedSize?: string;
+  selectedColor?: string;
+  variationInfo?: {
+    size?: ProductVariation;
+    color?: ProductVariation;
+  };
 }
 
 export interface Favorite {

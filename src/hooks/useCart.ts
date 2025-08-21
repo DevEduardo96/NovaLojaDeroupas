@@ -24,13 +24,13 @@ export const useCart = () => {
       const variationKey = `${product.id}-${product.selectedSize || ''}-${product.selectedColor || ''}`;
 
       const existingItem = prevItems.find(item => {
-        const itemVariationKey = `${item.id}-${item.selectedSize || ''}-${item.selectedColor || ''}`;
+        const itemVariationKey = `${item.product.id}-${item.selectedSize || ''}-${item.selectedColor || ''}`;
         return itemVariationKey === variationKey;
       });
 
       if (existingItem) {
         return prevItems.map(item => {
-          const itemVariationKey = `${item.id}-${item.selectedSize || ''}-${item.selectedColor || ''}`;
+          const itemVariationKey = `${item.product.id}-${item.selectedSize || ''}-${item.selectedColor || ''}`;
           return itemVariationKey === variationKey
             ? { ...item, quantity: item.quantity + 1 }
             : item;
@@ -38,7 +38,7 @@ export const useCart = () => {
       }
 
       return [...prevItems, { 
-        ...product, 
+        product: product,
         quantity: 1,
         selectedSize: product.selectedSize,
         selectedColor: product.selectedColor,
@@ -50,7 +50,7 @@ export const useCart = () => {
   const removeFromCart = useCallback((productId: number, selectedSize?: string, selectedColor?: string) => {
     const variationKeyToRemove = `${productId}-${selectedSize || ''}-${selectedColor || ''}`;
     setItems((prev) => prev.filter((item) => {
-      const itemVariationKey = `${item.id}-${item.selectedSize || ''}-${item.selectedColor || ''}`;
+      const itemVariationKey = `${item.product.id}-${item.selectedSize || ''}-${item.selectedColor || ''}`;
       return itemVariationKey !== variationKeyToRemove;
     }));
   }, []);
@@ -65,7 +65,7 @@ export const useCart = () => {
       const variationKeyToUpdate = `${productId}-${selectedSize || ''}-${selectedColor || ''}`;
       setItems((prev) =>
         prev.map((item) => {
-          const itemVariationKey = `${item.id}-${item.selectedSize || ''}-${item.selectedColor || ''}`;
+          const itemVariationKey = `${item.product.id}-${item.selectedSize || ''}-${item.selectedColor || ''}`;
           return itemVariationKey === variationKeyToUpdate ? { ...item, quantity } : item;
         })
       );
@@ -79,7 +79,13 @@ export const useCart = () => {
 
   const getTotal = useCallback(() => {
     return items.reduce(
-      (total, item) => total + item.product.price * item.quantity,
+      (total, item) => {
+        // Safety check to ensure item.product exists and has a price
+        if (item.product && typeof item.product.price === 'number') {
+          return total + item.product.price * item.quantity;
+        }
+        return total;
+      },
       0
     );
   }, [items]);

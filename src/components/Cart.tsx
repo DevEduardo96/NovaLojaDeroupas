@@ -6,8 +6,8 @@ interface CartProps {
   items: CartItem[];
   isOpen: boolean;
   onClose: () => void;
-  onUpdateQuantity: (productId: number, quantity: number) => void;
-  onRemoveItem: (productId: number) => void;
+  onUpdateQuantity: (productId: number, quantity: number, selectedSize?: string, selectedColor?: string) => void;
+  onRemoveItem: (productId: number, selectedSize?: string, selectedColor?: string) => void;
   onCheckout: () => void;
   total: number;
 }
@@ -64,7 +64,7 @@ export const Cart: React.FC<CartProps> = ({
               <div className="space-y-4">
                 {items.map((item) => (
                   <div
-                    key={item.product.id}
+                    key={`${item.product.id}-${item.selectedSize || ''}-${item.selectedColor || ''}`}
                     className="flex items-center space-x-4 bg-gray-50 p-4 rounded-lg"
                   >
                     <img
@@ -75,10 +75,13 @@ export const Cart: React.FC<CartProps> = ({
 
                     <div className="flex-1 min-w-0">
                       <h3 className="text-lg font-medium text-gray-900 truncate">
-                        {item.name}
+                        {item.product.name}
                       </h3>
                       <p className="text-sm text-gray-500 mt-1 line-clamp-2">
-                        {item.description}
+                        {item.product.description}
+                      </p>
+                      <p className="text-sm font-medium text-purple-600 mt-1">
+                        {formatPrice(item.product.price)}
                       </p>
                       {(item.selectedSize || item.selectedColor) && (
                         <div className="flex space-x-4 mt-2 text-xs text-gray-600">
@@ -100,7 +103,7 @@ export const Cart: React.FC<CartProps> = ({
                     <div className="flex items-center space-x-2">
                       <button
                         onClick={() =>
-                          onUpdateQuantity(item.product.id, item.quantity - 1)
+                          onUpdateQuantity(item.product.id, item.quantity - 1, item.selectedSize, item.selectedColor)
                         }
                         className="p-1 hover:bg-gray-200 rounded-full transition-colors"
                       >
@@ -113,7 +116,7 @@ export const Cart: React.FC<CartProps> = ({
 
                       <button
                         onClick={() =>
-                          onUpdateQuantity(item.product.id, item.quantity + 1)
+                          onUpdateQuantity(item.product.id, item.quantity + 1, item.selectedSize, item.selectedColor)
                         }
                         className="p-1 hover:bg-gray-200 rounded-full transition-colors"
                       >
@@ -122,7 +125,7 @@ export const Cart: React.FC<CartProps> = ({
                     </div>
 
                     <button
-                      onClick={() => onRemoveItem(item.product.id)}
+                      onClick={() => onRemoveItem(item.product.id, item.selectedSize, item.selectedColor)}
                       className="p-2 hover:bg-red-100 text-red-500 rounded-full transition-colors"
                     >
                       <X className="w-4 h-4" />
