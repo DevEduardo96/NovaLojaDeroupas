@@ -34,7 +34,7 @@ export const CheckoutPage: React.FC = () => {
       // 🔍 Validar dados do formulário
       const validation = validateCheckout(formData);
       if (!validation.isValid) {
-        throw new Error(validation.errors[0]); // Mostrar primeiro erro
+        throw new Error(validation.errors[0]);
       }
 
       const totalAmount = getTotal();
@@ -56,44 +56,32 @@ export const CheckoutPage: React.FC = () => {
         throw new Error('Dados do carrinho inválidos. Recarregue a página e tente novamente.');
       }
 
-      const carrinhoFormatado = validItems.map(item => ({
-        id: item.product.id,
-        name: item.product.name,
-        quantity: item.quantity
-      }));
-
-      console.log('Enviando dados para pagamento:', {
-        carrinho: carrinhoFormatado,
-        nomeCliente: formData.nomeCliente,
-        email: formData.email,
-        total: totalAmount
-      });
-
-      await api.wakeUpServer();
-
-      // Preparar dados do pedido para o orderService
-      const orderDataForService: OrderData = {
-        nomeCliente: formData.nomeCliente,
-        email: formData.email,
-        telefone: formData.telefone || '',
-        cpf: formData.cpf || '',
-        cep: formData.cep || '',
-        rua: formData.rua || '',
-        numero: formData.numero || '',
-        complemento: formData.complemento || '',
-        bairro: formData.bairro || '',
-        cidade: formData.cidade || '',
-        estado: formData.estado || ''
-      };
-
       console.log('🚀 Processando checkout...');
       console.log('📋 Dados do formulário:', formData);
-      console.log('📋 Dados formatados para orderService:', orderDataForService);
       console.log('🛒 Itens do carrinho:', cartItems);
       console.log('🛒 Itens validados:', validItems);
 
-      // Criar pedido no Supabase primeiro (com retry)
-      console.log('📝 Criando pedido no Supabase...');
+      await api.wakeUpServer();
+
+      // 📝 Preparar dados do pedido conforme schema da tabela pedidos
+      const orderDataForService: OrderData = {
+        nomeCliente: formData.nomeCliente?.trim() || '',
+        email: formData.email?.trim() || '',
+        telefone: formData.telefone?.trim() || '',
+        cpf: formData.cpf?.trim() || '',
+        cep: formData.cep?.trim() || '',
+        rua: formData.rua?.trim() || '',
+        numero: formData.numero?.trim() || '',
+        complemento: formData.complemento?.trim() || '',
+        bairro: formData.bairro?.trim() || '',
+        cidade: formData.cidade?.trim() || '',
+        estado: formData.estado?.trim() || ''
+      };
+
+      console.log('📋 Dados formatados para orderService:', orderDataForService);
+
+      // 🎯 Criar pedido no Supabase primeiro (PRIORIDADE)
+      console.log('📝 Criando pedido na tabela pedidos...');
       const order = await supabaseRetry.executeWithRetry(
         () => orderService.createOrder(
           orderDataForService,
@@ -105,22 +93,47 @@ export const CheckoutPage: React.FC = () => {
         'Criação de pedido'
       );
 
-      console.log('✅ Pedido criado com ID:', order.id);
-      console.log('📊 Detalhes completos do pedido:', order);
+      console.log('✅ Pedido criado na tabela pedidos com ID:', order.id);
+      console.log('📊 Detalhes do pedido:', {
+        id: order.id,
+        email_cliente: order.email_cliente,
+        nome_cliente: order.nome_cliente,
+        telefone: order.telefone,
+        endereco: {
+          cep: order.cep,
+          rua: order.rua,
+          numero: order.numero,
+          complemento: order.complemento,
+          bairro: order.bairro,
+          cidade: order.cidade,
+          estado: order.estado
+        },
+        total: order.total,
+        status: order.status,
+        itens: order.itens?.length || 0
+      });
 
-      // Salvar o ID do pedido para referência
+      // Salvar ID do pedido para referência
       localStorage.setItem('currentOrderId', order.id.toString());
+
+      // 💳 Preparar dados para pagamento (formato antigo para compatibilidade)
+      const carrinhoFormatado = validItems.map(item => ({
+        id: item.product.id,
+        name: item.product.name,
+        quantity: item.quantity
+      }));
 
       const paymentDataPayload = {
         email_cliente: formData.email,
         nome_cliente: formData.nomeCliente,
         valor_total: totalAmount,
         carrinho: carrinhoFormatado,
-        pedido_id: order.id // Vincular com o pedido do Supabase
+        pedido_id: order.id // Vincular com o pedido criado
       };
 
-      console.log('💳 Payload completo para pagamento:', paymentDataPayload);
+      console.log('💳 Payload para pagamento:', paymentDataPayload);
 
+      // 💳 Criar pagamento PIX
       const paymentResponse = await apiRetry.executeWithRetry(
         () => api.createPayment({
           carrinho: carrinhoFormatado,
@@ -137,25 +150,36 @@ export const CheckoutPage: React.FC = () => {
         throw new Error('QR Code não foi gerado. Tente novamente.');
       }
 
-      toast.success('Pedido criado com sucesso!');
+      toast.success('Pedido criado com sucesso! Redirecionando para pagamento...');
 
-      // Redirecionar para a página de pagamento
+      // 🎯 Redirecionar para página de pagamento
       navigate('/payment', {
         state: {
           paymentData: paymentResponse,
           customerData: {
             nome: formData.nomeCliente,
-            email: formData.email
+            email: formData.email,
+            telefone: formData.telefone,
+            endereco: {
+              cep: formData.cep,
+              rua: formData.rua,
+              numero: formData.numero,
+              complemento: formData.complemento,
+              bairro: formData.bairro,
+              cidade: formData.cidade,
+              estado: formData.estado
+            }
           },
-          orderData: order // Incluir dados do pedido do Supabase
+          orderData: order // Dados completos do pedido
         }
       });
 
       clearCart();
+
     } catch (error: any) {
       console.error('💥 Erro no checkout:', error);
 
-      // Se o pagamento falhou mas o pedido foi criado, cancelar o pedido
+      // 🔄 Rollback: Se pagamento falhou mas pedido foi criado, cancelar
       const currentOrderId = localStorage.getItem('currentOrderId');
       if (currentOrderId) {
         try {
@@ -168,13 +192,12 @@ export const CheckoutPage: React.FC = () => {
         }
       }
 
-      // 🛡️ Usar error handler melhorado
+      // 🛡️ Tratamento de erro melhorado
       const friendlyMessage = handleError(error, 'Checkout');
       toast.error(friendlyMessage);
 
-      // Se o erro é retryable, mostrar opção de retry
       if (isRetryable(error)) {
-        toast.error('Você pode tentar novamente', {
+        toast.error('Você pode tentar novamente em alguns instantes', {
           duration: 5000,
           icon: '🔄'
         });

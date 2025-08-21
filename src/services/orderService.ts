@@ -4,15 +4,15 @@ import { CartItem } from '../types';
 export interface OrderData {
   nomeCliente: string;
   email: string;
-  telefone: string;
+  telefone?: string;
   cpf?: string;
-  cep: string;
-  rua: string;
-  numero: string;
+  cep?: string;
+  rua?: string;
+  numero?: string;
   complemento?: string;
-  bairro: string;
-  cidade: string;
-  estado: string;
+  bairro?: string;
+  cidade?: string;
+  estado?: string;
 }
 
 export interface Order {
@@ -209,7 +209,7 @@ export const orderService = {
         console.warn('⚠️ Erro ao obter usuário (não crítico):', userError);
       }
 
-      // 🔧 PREPARAR DADOS PARA INSERÇÃO
+      // 🔧 PREPARAR DADOS CONFORME SCHEMA DA TABELA PEDIDOS
       const orderInsert = {
         user_id: userId,
         email_cliente: orderData.email.trim(),
@@ -223,13 +223,24 @@ export const orderService = {
         bairro: orderData.bairro?.trim() || null,
         cidade: orderData.cidade?.trim() || null,
         estado: orderData.estado?.trim() || null,
-        subtotal,
+        subtotal: Number(subtotal.toFixed(2)),
         desconto: Number(discount.toFixed(2)),
         taxa_entrega: Number(deliveryFee.toFixed(2)),
-        total,
+        total: Number(total.toFixed(2)),
         status: 'pendente',
         metodo_pagamento: paymentMethod
       };
+
+      console.log('📋 Dados formatados para tabela pedidos:', {
+        ...orderInsert,
+        user_id: orderInsert.user_id ? 'PRESENTE' : 'NULL',
+        totais: {
+          subtotal: orderInsert.subtotal,
+          desconto: orderInsert.desconto,
+          taxa_entrega: orderInsert.taxa_entrega,
+          total: orderInsert.total
+        }
+      });
 
       console.log('📝 Inserindo pedido:', orderInsert);
 
