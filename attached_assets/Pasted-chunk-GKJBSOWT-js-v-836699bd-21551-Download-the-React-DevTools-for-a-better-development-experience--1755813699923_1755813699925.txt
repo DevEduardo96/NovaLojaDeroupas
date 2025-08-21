@@ -1,0 +1,126 @@
+chunk-GKJBSOWT.js?v=836699bd:21551 Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: INITIAL_SESSION eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+SupabaseProductDetail.tsx:79 Loading product with ID: 10
+SupabaseProductDetail.tsx:79 Loading product with ID: 10
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+SupabaseProductDetail.tsx:82 Loaded product data: {id: 10, name: 'camisa do pato', description: 'CapCut Mod APK Pro Latest Version 2025 é a versão … Instagram, YouTube e muito mais, sem limitações.', price: 2.99, original_price: null, …}
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+SupabaseProductDetail.tsx:82 Loaded product data: {id: 10, name: 'camisa do pato', description: 'CapCut Mod APK Pro Latest Version 2025 é a versão … Instagram, YouTube e muito mais, sem limitações.', price: 2.99, original_price: null, …}
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+api.ts:69 Criando pagamento: {carrinho: Array(1), nomeCliente: 'Eduardo de Araújo Sousa', email: 'eduardoaraujo_96@outlook.com', total: 2.99}
+apiClient.ts:28 [API] 200  - https://backend-nectix.onrender.com/api/payments/criar-pagamento
+api.ts:73 Pagamento criado com sucesso: {id: 122659869065, status: 'pending', qr_code: '00020126580014br.gov.bcb.pix013695629cb5-2137-487a…009Sao Paulo62250521mpqrinter1226598690656304EC89', qr_code_base64: 'iVBORw0KGgoAAAANSUhEUgAABWQAAAVkAQAAAAB79iscAAAOh0…vaO8F7b2gvRe09/Jl2v8DkbXaJtVwMTcAAAAASUVORK5CYII=', ticket_url: 'https://www.mercadopago.com.br/payments/1226598690…4638705&hash=c5c6beab-f813-42b6-8f4d-a7f5a8a4ae13', …}
+PaymentStatus.tsx:39 Verificando status do pagamento: 122659869065
+api.ts:123 Consultando status do pagamento: 122659869065
+PaymentStatus.tsx:39 Verificando status do pagamento: 122659869065
+api.ts:123 Consultando status do pagamento: 122659869065
+apiClient.ts:28 [API] 200  - https://backend-nectix.onrender.com/api/payments/status/122659869065
+api.ts:134 Status obtido: {id: 122659869065, status: 'pending', status_detail: 'pending_waiting_transfer', transaction_amount: 2.99}
+PaymentStatus.tsx:44 Status atual: pending
+apiClient.ts:28 [API] 200  - https://backend-nectix.onrender.com/api/payments/status/122659869065
+api.ts:134 Status obtido: {id: 122659869065, status: 'pending', status_detail: 'pending_waiting_transfer', transaction_amount: 2.99}
+PaymentStatus.tsx:44 Status atual: pending
+PaymentStatus.tsx:39 Verificando status do pagamento: 122659869065
+api.ts:123 Consultando status do pagamento: 122659869065
+apiClient.ts:28 [API] 200  - https://backend-nectix.onrender.com/api/payments/status/122659869065
+api.ts:134 Status obtido: {id: 122659869065, status: 'pending', status_detail: 'pending_waiting_transfer', transaction_amount: 2.99}
+PaymentStatus.tsx:44 Status atual: pending
+PaymentStatus.tsx:39 Verificando status do pagamento: 122659869065
+api.ts:123 Consultando status do pagamento: 122659869065
+apiClient.ts:28 [API] 200  - https://backend-nectix.onrender.com/api/payments/status/122659869065
+api.ts:134 Status obtido: {id: 122659869065, status: 'pending', status_detail: 'pending_waiting_transfer', transaction_amount: 2.99}
+PaymentStatus.tsx:44 Status atual: pending
+PaymentStatus.tsx:39 Verificando status do pagamento: 122659869065
+api.ts:123 Consultando status do pagamento: 122659869065
+apiClient.ts:28 [API] 200  - https://backend-nectix.onrender.com/api/payments/status/122659869065
+api.ts:134 Status obtido: {id: 122659869065, status: 'pending', status_detail: 'pending_waiting_transfer', transaction_amount: 2.99}
+PaymentStatus.tsx:44 Status atual: pending
+PaymentStatus.tsx:39 Verificando status do pagamento: 122659869065
+api.ts:123 Consultando status do pagamento: 122659869065
+apiClient.ts:28 [API] 200  - https://backend-nectix.onrender.com/api/payments/status/122659869065
+api.ts:134 Status obtido: {id: 122659869065, status: 'pending', status_detail: 'pending_waiting_transfer', transaction_amount: 2.99}
+PaymentStatus.tsx:44 Status atual: pending
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+PaymentStatus.tsx:39 Verificando status do pagamento: 122659869065
+api.ts:123 Consultando status do pagamento: 122659869065
+apiClient.ts:28 [API] 200  - https://backend-nectix.onrender.com/api/payments/status/122659869065
+api.ts:134 Status obtido: {id: 122659869065, status: 'pending', status_detail: 'pending_waiting_transfer', transaction_amount: 2.99}
+PaymentStatus.tsx:44 Status atual: pending
+PaymentStatus.tsx:39 Verificando status do pagamento: 122659869065
+api.ts:123 Consultando status do pagamento: 122659869065
+apiClient.ts:28 [API] 200  - https://backend-nectix.onrender.com/api/payments/status/122659869065
+api.ts:134 Status obtido: {id: 122659869065, status: 'pending', status_detail: 'pending_waiting_transfer', transaction_amount: 2.99}
+PaymentStatus.tsx:44 Status atual: pending
+PaymentStatus.tsx:39 Verificando status do pagamento: 122659869065
+api.ts:123 Consultando status do pagamento: 122659869065
+apiClient.ts:28 [API] 200  - https://backend-nectix.onrender.com/api/payments/status/122659869065
+api.ts:134 Status obtido: {id: 122659869065, status: 'pending', status_detail: 'pending_waiting_transfer', transaction_amount: 2.99}
+PaymentStatus.tsx:44 Status atual: pending
+PaymentStatus.tsx:39 Verificando status do pagamento: 122659869065
+api.ts:123 Consultando status do pagamento: 122659869065
+apiClient.ts:28 [API] 200  - https://backend-nectix.onrender.com/api/payments/status/122659869065
+api.ts:134 Status obtido: {id: 122659869065, status: 'pending', status_detail: 'pending_waiting_transfer', transaction_amount: 2.99}
+PaymentStatus.tsx:44 Status atual: pending
+PaymentStatus.tsx:39 Verificando status do pagamento: 122659869065
+api.ts:123 Consultando status do pagamento: 122659869065
+apiClient.ts:28 [API] 200  - https://backend-nectix.onrender.com/api/payments/status/122659869065
+api.ts:134 Status obtido: {id: 122659869065, status: 'pending', status_detail: 'pending_waiting_transfer', transaction_amount: 2.99}
+PaymentStatus.tsx:44 Status atual: pending
+PaymentStatus.tsx:39 Verificando status do pagamento: 122659869065
+api.ts:123 Consultando status do pagamento: 122659869065
+apiClient.ts:28 [API] 200  - https://backend-nectix.onrender.com/api/payments/status/122659869065
+api.ts:134 Status obtido: {id: 122659869065, status: 'pending', status_detail: 'pending_waiting_transfer', transaction_amount: 2.99}
+PaymentStatus.tsx:44 Status atual: pending
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+PaymentStatus.tsx:39 Verificando status do pagamento: 122659869065
+api.ts:123 Consultando status do pagamento: 122659869065
+apiClient.ts:28 [API] 200  - https://backend-nectix.onrender.com/api/payments/status/122659869065
+api.ts:134 Status obtido: {id: 122659869065, status: 'pending', status_detail: 'pending_waiting_transfer', transaction_amount: 2.99}
+PaymentStatus.tsx:44 Status atual: pending
+PaymentStatus.tsx:39 Verificando status do pagamento: 122659869065
+api.ts:123 Consultando status do pagamento: 122659869065
+apiClient.ts:28 [API] 200  - https://backend-nectix.onrender.com/api/payments/status/122659869065
+api.ts:134 Status obtido: {id: 122659869065, status: 'pending', status_detail: 'pending_waiting_transfer', transaction_amount: 2.99}
+PaymentStatus.tsx:44 Status atual: pending
+PaymentStatus.tsx:39 Verificando status do pagamento: 122659869065
+api.ts:123 Consultando status do pagamento: 122659869065
+apiClient.ts:28 [API] 200  - https://backend-nectix.onrender.com/api/payments/status/122659869065
+api.ts:134 Status obtido: {id: 122659869065, status: 'pending', status_detail: 'pending_waiting_transfer', transaction_amount: 2.99}
+PaymentStatus.tsx:44 Status atual: pending
