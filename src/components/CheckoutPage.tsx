@@ -29,6 +29,8 @@ const CheckoutPage: React.FC = () => {
     bairro: "",
     cidade: "",
     estado: "",
+    cor: "",
+    tamanho: "",
     carrinho: [] as CarrinhoItem[],
     total: 0,
   });
@@ -83,8 +85,18 @@ const CheckoutPage: React.FC = () => {
 
     // ✅ Validação local
     const validation = validateCheckout(formData);
-    if (!validation.isValid) {
-      setErrors(validation.errors);
+    
+    // Validação adicional para cor e tamanho
+    const additionalErrors = [];
+    if (!formData.cor.trim()) {
+      additionalErrors.push("Cor é obrigatória");
+    }
+    if (!formData.tamanho.trim()) {
+      additionalErrors.push("Tamanho é obrigatório");
+    }
+    
+    if (!validation.isValid || additionalErrors.length > 0) {
+      setErrors([...validation.errors, ...additionalErrors]);
       setLoading(false);
       return;
     }
@@ -96,6 +108,10 @@ const CheckoutPage: React.FC = () => {
         name: item.name,
         price: item.price,
         quantity: item.quantity,
+        variacoes: {
+          cor: formData.cor.trim() || undefined,
+          tamanho: formData.tamanho.trim() || undefined
+        }
       })),
       nomeCliente: formData.nomeCliente.trim(),
       email: formData.email.trim(),
@@ -355,6 +371,28 @@ const CheckoutPage: React.FC = () => {
           className="w-full border p-2 rounded"
           required
         />
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <input
+            type="text"
+            name="cor"
+            placeholder="Cor do produto"
+            value={formData.cor}
+            onChange={handleChange}
+            className="w-full border p-2 rounded"
+            required
+          />
+
+          <input
+            type="text"
+            name="tamanho"
+            placeholder="Tamanho do produto"
+            value={formData.tamanho}
+            onChange={handleChange}
+            className="w-full border p-2 rounded"
+            required
+          />
+        </div>
 
         <div className="p-3 border rounded bg-gray-50">
           <h3 className="font-semibold mb-2">Resumo do pedido</h3>
