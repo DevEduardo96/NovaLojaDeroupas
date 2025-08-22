@@ -84,4 +84,47 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
     if (validateForm()) {
       console.log('✅ Validação passou, enviando para checkout...');
       
-      // **ESTRUTURA ATUALIZADA** -
+      // **ESTRUTURA ATUALIZADA** - Enviar todos os dados para o backend
+      const checkoutData = {
+        // Carrinho com informações completas
+        carrinho: items.map(item => ({
+          id: item.product.id,
+          name: item.product.name,
+          price: item.product.price,
+          quantity: item.quantity,
+          variacoes: {
+            cor: item.product.selectedColor || undefined,
+            tamanho: item.product.selectedSize || undefined,
+            // Incluir outras variações se existirem
+            ...(item.product.variationInfo && {
+              cor_info: item.product.variationInfo.color,
+              tamanho_info: item.product.variationInfo.size
+            })
+          }
+        })),
+        // Dados do cliente
+        nomeCliente: formData.nomeCliente,
+        email: formData.email,
+        telefone: formData.telefone,
+        // Endereço estruturado
+        endereco: {
+          cep: formData.cep,
+          rua: formData.rua,
+          numero: formData.numero,
+          complemento: formData.complemento || undefined,
+          bairro: formData.bairro,
+          cidade: formData.cidade,
+          estado: formData.estado
+        },
+        // Total da compra
+        total: total,
+        // CPF opcional
+        ...(formData.cpf && { cpf: formData.cpf })
+      };
+      
+      console.log('📦 Dados completos para o backend:', checkoutData);
+      onSubmit(checkoutData);
+    } else {
+      console.log('❌ Validação falhou, erros:', errors);
+    }
+  };
