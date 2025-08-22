@@ -139,7 +139,7 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
         nomeCliente: formData.nomeCliente.trim(),
         email: formData.email.trim(),
         // TELEFONE OBRIGATÓRIO (conforme createPaymentSchema)
-        telefone: formData.telefone.replace(/\D/g, ''), // Enviar apenas números
+        telefone: formData.telefone.trim(), // Enviar telefone formatado
         // ENDEREÇO OBRIGATÓRIO (conforme enderecoSchema)
         endereco: {
           cep: formData.cep.replace(/\D/g, ''), // Remover formatação do CEP
