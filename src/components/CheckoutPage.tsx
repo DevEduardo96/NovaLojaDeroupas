@@ -380,44 +380,80 @@ const CheckoutPage: React.FC = () => {
           required
         />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Seleção de Cor */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-3">
-              Cor do produto *
-            </label>
-            <div className="space-y-2">
-              {['Branco', 'Preto'].map((cor) => (
-                <label key={cor} className="flex items-center">
-                  <input
-                    type="checkbox"
-                    checked={formData.cor === cor}
-                    onChange={() => handleCheckboxChange('cor', cor)}
-                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                  />
-                  <span className="ml-2 text-sm text-gray-900">{cor}</span>
-                </label>
-              ))}
+        {/* Seção de Variações do Produto */}
+        <div className="bg-gray-50 p-4 rounded-lg border">
+          <h3 className="text-lg font-semibold text-gray-800 mb-4">Opções do Produto</h3>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Seleção de Cor */}
+            <div className="space-y-3">
+              <label className="block text-sm font-medium text-gray-700">
+                Cor do produto *
+              </label>
+              <div className="space-y-3">
+                {['Branco', 'Preto'].map((cor) => (
+                  <label 
+                    key={cor} 
+                    className="flex items-center p-3 border border-gray-200 rounded-md hover:bg-gray-50 cursor-pointer transition-colors"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={formData.cor === cor}
+                      onChange={() => handleCheckboxChange('cor', cor)}
+                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                    />
+                    <div className="ml-3 flex items-center space-x-3">
+                      <div 
+                        className={`w-6 h-6 rounded-full border-2 ${
+                          cor === 'Branco' 
+                            ? 'bg-white border-gray-400' 
+                            : 'bg-black border-black'
+                        }`}
+                      />
+                      <span className="text-sm font-medium text-gray-900">{cor}</span>
+                    </div>
+                  </label>
+                ))}
+              </div>
+              {formData.cor && (
+                <p className="text-xs text-green-600 mt-2">
+                  ✓ Cor selecionada: {formData.cor}
+                </p>
+              )}
             </div>
-          </div>
 
-          {/* Seleção de Tamanho */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-3">
-              Tamanho do produto *
-            </label>
-            <div className="space-y-2">
-              {['P', 'M', 'G'].map((tamanho) => (
-                <label key={tamanho} className="flex items-center">
-                  <input
-                    type="checkbox"
-                    checked={formData.tamanho === tamanho}
-                    onChange={() => handleCheckboxChange('tamanho', tamanho)}
-                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                  />
-                  <span className="ml-2 text-sm text-gray-900">{tamanho}</span>
-                </label>
-              ))}
+            {/* Seleção de Tamanho */}
+            <div className="space-y-3">
+              <label className="block text-sm font-medium text-gray-700">
+                Tamanho do produto *
+              </label>
+              <div className="grid grid-cols-3 gap-2">
+                {['P', 'M', 'G'].map((tamanho) => (
+                  <label 
+                    key={tamanho}
+                    className={`
+                      flex items-center justify-center p-3 border-2 rounded-md cursor-pointer transition-all
+                      ${formData.tamanho === tamanho 
+                        ? 'border-blue-500 bg-blue-50 text-blue-700' 
+                        : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                      }
+                    `}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={formData.tamanho === tamanho}
+                      onChange={() => handleCheckboxChange('tamanho', tamanho)}
+                      className="sr-only"
+                    />
+                    <span className="font-medium">{tamanho}</span>
+                  </label>
+                ))}
+              </div>
+              {formData.tamanho && (
+                <p className="text-xs text-green-600 mt-2">
+                  ✓ Tamanho selecionado: {formData.tamanho}
+                </p>
+              )}
             </div>
           </div>
         </div>
