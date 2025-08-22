@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { User, Mail, CreditCard, Phone, Hash, MapPin, Home, Package } from 'lucide-react';
 import { CartItem } from '../types';
 
@@ -38,11 +38,36 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
     if (items && items.length > 0) {
       // Pegar as seleções do primeiro item do carrinho
       const firstItem = items[0];
-      if (firstItem.selectedColor && firstItem.selectedSize) {
+      console.log('🔍 Preenchendo campos automaticamente:', firstItem);
+      
+      let newCor = '';
+      let newTamanho = '';
+      
+      // Verificar múltiplas formas de obter cor e tamanho
+      if (firstItem.selectedColor) {
+        newCor = firstItem.selectedColor;
+      } else if (firstItem.product && firstItem.product.selectedColor) {
+        newCor = firstItem.product.selectedColor;
+      } else if (firstItem.variationInfo && firstItem.variationInfo.color) {
+        newCor = firstItem.variationInfo.color.name;
+      }
+      
+      if (firstItem.selectedSize) {
+        newTamanho = firstItem.selectedSize;
+      } else if (firstItem.product && firstItem.product.selectedSize) {
+        newTamanho = firstItem.product.selectedSize;
+      } else if (firstItem.variationInfo && firstItem.variationInfo.size) {
+        newTamanho = firstItem.variationInfo.size.name;
+      }
+      
+      console.log('🎨 Cor encontrada:', newCor);
+      console.log('📏 Tamanho encontrado:', newTamanho);
+      
+      if (newCor || newTamanho) {
         setFormData(prev => ({
           ...prev,
-          cor: firstItem.selectedColor || '',
-          tamanho: firstItem.selectedSize || ''
+          cor: newCor || prev.cor,
+          tamanho: newTamanho || prev.tamanho
         }));
       }
     }
@@ -157,16 +182,37 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
       // **ESTRUTURA EXATA CONFORME ZOD DO BACKEND**
       const checkoutData = {
         // Carrinho com informações completas (conforme createPaymentSchema)
-        carrinho: items.map(item => ({
-          id: item.product.id,
-          name: item.product.name,
-          price: item.product.price,
-          quantity: item.quantity,
-          variacoes: {
-            cor: item.product.selectedColor || item.selectedColor || formData.cor || undefined,
-            tamanho: item.product.selectedSize || item.selectedSize || formData.tamanho || undefined
+        carrinho: items.map(item => {
+          // Determinar cor e tamanho de múltiplas fontes
+          let itemCor = formData.cor;
+          let itemTamanho = formData.tamanho;
+          
+          // Prioridade: formData > item direto > produto > variationInfo
+          if (!itemCor) {
+            itemCor = item.selectedColor || 
+                     (item.product && item.product.selectedColor) ||
+                     (item.variationInfo && item.variationInfo.color && item.variationInfo.color.name) ||
+                     undefined;
           }
-        })),
+          
+          if (!itemTamanho) {
+            itemTamanho = item.selectedSize || 
+                         (item.product && item.product.selectedSize) ||
+                         (item.variationInfo && item.variationInfo.size && item.variationInfo.size.name) ||
+                         undefined;
+          }
+          
+          return {
+            id: item.product.id,
+            name: item.product.name,
+            price: item.product.price,
+            quantity: item.quantity,
+            variacoes: {
+              cor: itemCor || undefined,
+              tamanho: itemTamanho || undefined
+            }
+          };
+        }),
         // Dados do cliente (conforme createPaymentSchema)
         nomeCliente: formData.nomeCliente.trim(),
         email: formData.email.trim(),
