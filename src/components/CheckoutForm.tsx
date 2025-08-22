@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { User, Mail, CreditCard, Phone, Hash, MapPin, Home } from 'lucide-react';
+import { User, Mail, CreditCard, Phone, Hash, MapPin, Home, Package } from 'lucide-react';
 import { CartItem } from '../types';
 
 interface CheckoutFormProps {
@@ -26,10 +26,27 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
     complemento: '',
     bairro: '',
     cidade: '',
-    estado: ''
+    estado: '',
+    cor: '',
+    tamanho: ''
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  // Preencher automaticamente cor e tamanho baseado nos itens do carrinho
+  useEffect(() => {
+    if (items && items.length > 0) {
+      // Pegar as seleções do primeiro item do carrinho
+      const firstItem = items[0];
+      if (firstItem.selectedColor && firstItem.selectedSize) {
+        setFormData(prev => ({
+          ...prev,
+          cor: firstItem.selectedColor || '',
+          tamanho: firstItem.selectedSize || ''
+        }));
+      }
+    }
+  }, [items]);
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('pt-BR', {
@@ -61,12 +78,19 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
     if (!formData.cidade.trim()) newErrors.cidade = 'Cidade é obrigatória';
     if (!formData.estado.trim()) newErrors.estado = 'Estado é obrigatório';
 
+    // Validar cor e tamanho se houver itens no carrinho que precisem dessas informações
+    const hasVariations = items.some(item => item.selectedColor || item.selectedSize);
+    if (hasVariations) {
+      if (!formData.cor.trim()) newErrors.cor = 'Cor é obrigatória';
+      if (!formData.tamanho.trim()) newErrors.tamanho = 'Tamanho é obrigatório';
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const isFormValid = () => {
-    return formData.nomeCliente.trim() &&
+    const basicValidation = formData.nomeCliente.trim() &&
            formData.email.trim() &&
            /\S+@\S+\.\S+/.test(formData.email) &&
            formData.telefone.trim() &&
@@ -77,6 +101,14 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
            formData.bairro.trim() &&
            formData.cidade.trim() &&
            formData.estado.trim();
+
+    // Verificar se há variações nos itens do carrinho
+    const hasVariations = items.some(item => item.selectedColor || item.selectedSize);
+    if (hasVariations) {
+      return basicValidation && formData.cor.trim() && formData.tamanho.trim();
+    }
+
+    return basicValidation;
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -131,8 +163,8 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
           price: item.product.price,
           quantity: item.quantity,
           variacoes: {
-            cor: item.product.selectedColor || item.selectedColor || undefined,
-            tamanho: item.product.selectedSize || item.selectedSize || undefined
+            cor: item.product.selectedColor || item.selectedColor || formData.cor || undefined,
+            tamanho: item.product.selectedSize || item.selectedSize || formData.tamanho || undefined
           }
         })),
         // Dados do cliente (conforme createPaymentSchema)
@@ -436,6 +468,78 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
           </div>
         </div>
 
+        {/* Variações do Produto */}
+        {items.some(item => item.selectedColor || item.selectedSize) && (
+          <div>
+            <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center">
+              <Package className="w-5 h-5 mr-2" />
+              Variações do produto
+            </h3>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="cor" className="block text-sm font-medium text-gray-700 mb-1">
+                  Cor *
+                </label>
+                <input
+                  type="text"
+                  id="cor"
+                  name="cor"
+                  value={formData.cor}
+                  onChange={handleInputChange}
+                  className={`w-full px-3 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                    errors.cor ? 'border-red-500' : 'border-gray-300'
+                  }`}
+                  placeholder="Cor selecionada"
+                />
+                {errors.cor && (
+                  <p className="text-red-500 text-xs mt-1">{errors.cor}</p>
+                )}
+              </div>
+
+              <div>
+                <label htmlFor="tamanho" className="block text-sm font-medium text-gray-700 mb-1">
+                  Tamanho *
+                </label>
+                <input
+                  type="text"
+                  id="tamanho"
+                  name="tamanho"
+                  value={formData.tamanho}
+                  onChange={handleInputChange}
+                  className={`w-full px-3 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                    errors.tamanho ? 'border-red-500' : 'border-gray-300'
+                  }`}
+                  placeholder="Tamanho selecionado"
+                />
+                {errors.tamanho && (
+                  <p className="text-red-500 text-xs mt-1">{errors.tamanho}</p>
+                )}
+              </div>
+            </div>
+
+            {/* Informações dos itens do carrinho */}
+            <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+              <h4 className="text-sm font-medium text-gray-700 mb-2">Itens selecionados:</h4>
+              <div className="space-y-2">
+                {items.map((item, index) => (
+                  <div key={`${item.product.id}-${item.selectedSize || ''}-${item.selectedColor || ''}`} className="text-sm text-gray-600">
+                    <span className="font-medium">{item.product.name}</span>
+                    {(item.selectedSize || item.selectedColor) && (
+                      <span className="ml-2">
+                        ({item.selectedSize && `Tamanho: ${item.selectedSize}`}
+                        {item.selectedSize && item.selectedColor && ', '}
+                        {item.selectedColor && `Cor: ${item.selectedColor}`})
+                      </span>
+                    )}
+                    <span className="ml-2 text-gray-500">x{item.quantity}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Resumo do total */}
         <div className="border-t pt-6">
           <div className="flex justify-between items-center text-xl font-bold">
@@ -469,7 +573,9 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
           </button>
           {!isFormValid() && (
             <p className="text-sm text-gray-500 mt-2 text-center">
-              Preencha todos os campos obrigatórios (*)
+              Preencha todos os campos obrigatórios (*) 
+              {items.some(item => item.selectedColor || item.selectedSize) && 
+                " - incluindo cor e tamanho"}
             </p>
           )}
         </div>
