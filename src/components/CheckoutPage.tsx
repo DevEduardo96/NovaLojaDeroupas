@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation } from 'wouter';
 import { CheckoutForm } from './CheckoutForm';
 import { api } from '../services/api';
 import { useCart } from '../hooks/useCart';
@@ -12,7 +12,7 @@ import { toast } from 'react-hot-toast';
 export const CheckoutPage: React.FC = () => {
   const { items: cartItems, getTotal, clearCart } = useCart();
   const [isProcessing, setIsProcessing] = useState(false);
-  const navigate = useNavigate();
+  const [, setLocation] = useLocation();
   const { handleError } = useErrorHandler();
   const isRetryable = (error: any) => {
     return error?.code === 'NETWORK_ERROR' || 
@@ -182,26 +182,7 @@ export const CheckoutPage: React.FC = () => {
       toast.success('Pedido criado com sucesso! Redirecionando para pagamento...');
 
       // 🎯 Redirecionar para página de pagamento
-      navigate('/payment', {
-        state: {
-          paymentData: paymentResponse,
-          customerData: {
-            nome: formData.nomeCliente,
-            email: formData.email,
-            telefone: formData.telefone,
-            endereco: {
-              cep: formData.cep,
-              rua: formData.rua,
-              numero: formData.numero,
-              complemento: formData.complemento,
-              bairro: formData.bairro,
-              cidade: formData.cidade,
-              estado: formData.estado
-            }
-          },
-          orderData: order // Dados completos do pedido
-        }
-      });
+      setLocation('/pagamento');
 
       clearCart();
 
@@ -249,7 +230,7 @@ export const CheckoutPage: React.FC = () => {
             Adicione produtos ao carrinho antes de finalizar a compra.
           </p>
           <button
-            onClick={() => navigate('/')}
+            onClick={() => setLocation('/')}
             className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
           >
             Ver produtos
