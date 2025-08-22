@@ -1,304 +1,249 @@
-import React, { useState } from 'react';
-import { useLocation } from 'wouter';
-import { CheckoutForm } from './CheckoutForm';
-import { api } from '../services/api';
-import { useCart } from '../hooks/useCart';
-import { orderService, type OrderData } from '../services/orderService';
-import { useErrorHandler } from '../utils/errorHandler';
-import { useValidation } from '../utils/validation';
-import { useSupabaseRetry, useApiRetry } from '../hooks/useRetry';
-import { toast } from 'react-hot-toast';
+import React, { useState, useEffect } from "react";
+import { useValidation } from "../utils/validation";
 
-export const CheckoutPage: React.FC = () => {
-  const { items: cartItems, getTotal, clearCart } = useCart();
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [, setLocation] = useLocation();
-  const { handleError } = useErrorHandler();
-  const isRetryable = (error: any) => {
-    return error?.code === 'NETWORK_ERROR' || 
-           error?.message?.includes('timeout') || 
-           error?.message?.includes('fetch');
-  };
+interface CarrinhoItem {
+  id: number;
+  name: string;
+  quantity: number;
+  price: number;
+}
+
+const CheckoutPage: React.FC = () => {
   const { validateCheckout } = useValidation();
-  const supabaseRetry = useSupabaseRetry();
-  const apiRetry = useApiRetry();
 
+  const [formData, setFormData] = useState({
+    nomeCliente: "",
+    email: "",
+    telefone: "",
+    cep: "",
+    rua: "",
+    numero: "",
+    bairro: "",
+    cidade: "",
+    estado: "",
+    carrinho: [] as CarrinhoItem[],
+    total: 0,
+  });
 
+  const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState<string[]>([]);
 
-  const handleCheckoutSubmit = async (formData: any) => {
-    if (isProcessing) return;
+  // 📝 Atualiza campos do formulário
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
 
-    setIsProcessing(true);
+  // 📦 Carrinho de exemplo (simulação)
+  useEffect(() => {
+    const carrinhoExemplo = [
+      { id: 10, name: "Camisa do pato", quantity: 1, price: 2.99 },
+    ];
+    const total = carrinhoExemplo.reduce(
+      (acc, item) => acc + item.price * item.quantity,
+      0
+    );
+    setFormData((prev) => ({ ...prev, carrinho: carrinhoExemplo, total }));
+  }, []);
+
+  // 🚀 Enviar dados
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrors([]);
+    setLoading(true);
+
+    // ✅ Validação local
+    const validation = validateCheckout(formData);
+    if (!validation.isValid) {
+      setErrors(validation.errors);
+      setLoading(false);
+      return;
+    }
+
+    // ✅ Montar payload no formato esperado pelo backend (Zod schema)
+    const payload = {
+      carrinho: formData.carrinho.map((item) => ({
+        id: item.id,
+        name: item.name,
+        price: item.price,
+        quantity: item.quantity,
+      })),
+      nomeCliente: formData.nomeCliente.trim(),
+      email: formData.email.trim(),
+      telefone: formData.telefone.trim(),
+      endereco: {
+        cep: formData.cep.trim(),
+        rua: formData.rua.trim(),
+        numero: formData.numero.trim(),
+        bairro: formData.bairro.trim(),
+        cidade: formData.cidade.trim(),
+        estado: formData.estado.trim(),
+      },
+      total: formData.total,
+    };
 
     try {
-      // 🔍 Validar dados do formulário
-      const validation = validateCheckout(formData);
-      if (!validation.isValid) {
-        throw new Error(validation.errors[0]);
-      }
+      console.log("📦 Payload enviado para backend:", payload);
 
-      const totalAmount = getTotal();
-
-      if (!cartItems || cartItems.length === 0) {
-        throw new Error('Carrinho vazio. Adicione produtos antes de finalizar a compra.');
-      }
-
-      const validItems = cartItems.filter(item =>
-        item &&
-        item.product &&
-        typeof item.product.id === 'number' &&
-        typeof item.product.name === 'string' &&
-        typeof item.quantity === 'number' &&
-        item.quantity > 0
-      );
-
-      if (validItems.length === 0) {
-        throw new Error('Dados do carrinho inválidos. Recarregue a página e tente novamente.');
-      }
-
-      console.log('🚀 Processando checkout...');
-      console.log('📋 Dados do formulário:', formData);
-      console.log('🛒 Itens do carrinho:', cartItems);
-      console.log('🛒 Itens validados:', validItems);
-
-      await api.wakeUpServer();
-
-      // 📝 Preparar dados do pedido conforme schema da tabela pedidos
-      const orderDataForService: OrderData = {
-        nomeCliente: formData.nomeCliente?.trim() || '',
-        email: formData.email?.trim() || '',
-        telefone: formData.telefone?.trim() || '',
-        cpf: formData.cpf?.trim() || '',
-        cep: formData.cep?.trim() || '',
-        rua: formData.rua?.trim() || '',
-        numero: formData.numero?.trim() || '',
-        complemento: formData.complemento?.trim() || '',
-        bairro: formData.bairro?.trim() || '',
-        cidade: formData.cidade?.trim() || '',
-        estado: formData.estado?.trim() || ''
-      };
-
-      console.log('📋 Dados formatados para orderService:', orderDataForService);
-
-
-      // Salvar ID do pedido para referência
-      // localStorage.setItem('currentOrderId', order.id.toString()); // Comentado para evitar duplicação
-
-      // 💳 Preparar dados para pagamento (formato antigo para compatibilidade)
-      const carrinhoFormatado = validItems.map(item => ({
-        id: item.product.id,
-        name: item.product.name,
-        quantity: item.quantity
-      }));
-
-      const paymentDataPayload = {
-        email_cliente: formData.email,
-        nome_cliente: formData.nomeCliente,
-        valor_total: totalAmount,
-        carrinho: carrinhoFormatado,
-        pedido_id: null // Will be set after order creation
-      };
-
-      console.log('💳 Payload para pagamento:', paymentDataPayload);
-
-      // 🎯 PRIMEIRO: Criar pedido no Supabase (PRIORIDADE MÁXIMA)
-      console.log('📝 INICIANDO criação do pedido na tabela pedidos...');
-      console.log('📋 Dados que serão enviados:', orderDataForService);
-      console.log('🛒 Itens que serão enviados:', validItems);
-
-      let order;
-      try {
-        order = await supabaseRetry.executeWithRetry(
-          () => orderService.createOrder(
-            orderDataForService,
-            validItems,
-            'pix', // método de pagamento
-            0, // desconto
-            0  // taxa de entrega
-          ),
-          'Criação de pedido'
-        );
-        
-        console.log('✅ SUCESSO! Pedido criado na tabela pedidos com ID:', order.id);
-        console.log('📊 Detalhes completos do pedido criado:', order);
-        
-        localStorage.setItem('currentOrderId', order.id.toString());
-
-      } catch (orderError) {
-        console.error('❌ ERRO CRÍTICO ao criar pedido:', orderError);
-        console.error('Stack trace:', orderError.stack);
-        throw new Error(`Falha ao criar pedido: ${orderError.message}`);
-      }
-
-      // 💳 SEGUNDO: Criar pagamento PIX (após pedido salvo)
-      console.log('💳 Iniciando criação do pagamento PIX...');
-      const paymentResponse = await apiRetry.executeWithRetry(
-        () => api.createPayment({
-          carrinho: carrinhoFormatado,
-          nomeCliente: formData.nomeCliente,
-          email: formData.email,
-          telefone: formData.telefone,
-          endereco: {
-            cep: formData.cep,
-            rua: formData.rua,
-            numero: formData.numero,
-            complemento: formData.complemento,
-            bairro: formData.bairro,
-            cidade: formData.cidade,
-            estado: formData.estado
-          },
-          total: totalAmount
-        }),
-        'Pagamento PIX'
-      );
-
-      console.log('💳 Resposta do pagamento:', paymentResponse);
-
-      if (!paymentResponse?.qr_code_base64) {
-        // Se pagamento falhou mas pedido foi criado, cancelar pedido
-        console.log('🔄 Pagamento falhou, cancelando pedido...');
-        await orderService.cancelOrder(order.id);
-        throw new Error('QR Code não foi gerado. Tente novamente.');
-      }
-      console.log('📊 Detalhes do pedido:', {
-        id: order.id,
-        email_cliente: order.email_cliente,
-        nome_cliente: order.nome_cliente,
-        telefone: order.telefone,
-        endereco: {
-          cep: order.cep,
-          rua: order.rua,
-          numero: order.numero,
-          complemento: order.complemento,
-          bairro: order.bairro,
-          cidade: order.cidade,
-          estado: order.estado
-        },
-        total: order.total,
-        status: order.status,
-        itens: order.itens?.length || 0
-      });
-
-      toast.success('Pedido criado com sucesso! Redirecionando para pagamento...');
-
-      // 🎯 Redirecionar para página de pagamento
-      setLocation('/pagamento');
-
-      clearCart();
-
-    } catch (error: any) {
-      console.error('💥 Erro no checkout:', error);
-
-      // 🔄 Rollback: Se pagamento falhou mas pedido foi criado, cancelar
-      const currentOrderId = localStorage.getItem('currentOrderId');
-      if (currentOrderId) {
-        try {
-          console.log('🔄 Cancelando pedido devido ao erro no pagamento...');
-          await orderService.cancelOrder(parseInt(currentOrderId));
-          localStorage.removeItem('currentOrderId');
-          console.log('✅ Pedido cancelado com sucesso');
-        } catch (cancelError) {
-          console.error('❌ Erro ao cancelar pedido:', cancelError);
+      const response = await fetch(
+        "https://backend-nectix.onrender.com/api/payments/criar-pagamento",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
         }
+      );
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || "Erro no pagamento");
       }
 
-      // 🛡️ Tratamento de erro melhorado
-      const friendlyMessage = handleError(error, 'Checkout');
-      toast.error(friendlyMessage);
-
-      if (isRetryable(error)) {
-        toast.error('Você pode tentar novamente em alguns instantes', {
-          duration: 5000,
-          icon: '🔄'
-        });
-      }
+      alert("Pagamento criado com sucesso!");
+      console.log("✅ Resposta backend:", data);
+    } catch (err: any) {
+      setErrors([err.message || "Erro inesperado"]);
     } finally {
-      setIsProcessing(false);
-      supabaseRetry.reset();
-      apiRetry.reset();
+      setLoading(false);
     }
   };
 
-  if (!cartItems || cartItems.length === 0) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">
-            Carrinho vazio
-          </h1>
-          <p className="text-gray-600 mb-8">
-            Adicione produtos ao carrinho antes de finalizar a compra.
-          </p>
-          <button
-            onClick={() => setLocation('/')}
-            className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            Ver produtos
-          </button>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-white rounded-lg shadow-md">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h1 className="text-2xl font-bold text-gray-900">
-              Finalizar compra
-            </h1>
-            <p className="text-gray-600 mt-1">
-              {cartItems.length} item(s) - Total: R$ {getTotal().toFixed(2)}
-            </p>
-          </div>
+    <div className="max-w-lg mx-auto p-6 bg-white shadow rounded-lg">
+      <h2 className="text-2xl font-bold mb-4">Checkout</h2>
 
-          <div className="p-6">
-            {/* Resumo dos itens */}
-            <div className="mb-8">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">
-                Resumo do pedido
-              </h2>
-              <div className="space-y-3">
-                {cartItems.map((item, index) => (
-                  <div key={index} className="flex justify-between items-center">
-                    <div>
-                      <span className="font-medium">{item.product.name}</span>
-                      {(item.selectedSize || item.selectedColor) && (
-                        <div className="text-sm text-gray-500">
-                          {item.selectedSize && `Tamanho: ${item.selectedSize}`}
-                          {item.selectedSize && item.selectedColor && ' • '}
-                          {item.selectedColor && `Cor: ${item.selectedColor}`}
-                        </div>
-                      )}
-                      <span className="text-sm text-gray-500">
-                        Quantidade: {item.quantity}
-                      </span>
-                    </div>
-                    <span className="font-medium">
-                      R$ {(item.product.price * item.quantity).toFixed(2)}
-                    </span>
-                  </div>
-                ))}
-              </div>
-              <div className="border-t pt-3 mt-3">
-                <div className="flex justify-between items-center font-bold">
-                  <span>Total:</span>
-                  <span>R$ {getTotal().toFixed(2)}</span>
-                </div>
-              </div>
+      {/* 🔔 Exibir erros */}
+      {errors.length > 0 && (
+        <div className="bg-red-100 text-red-700 p-3 rounded mb-4">
+          <ul>
+            {errors.map((err, i) => (
+              <li key={i}>⚠️ {err}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <input
+          type="text"
+          name="nomeCliente"
+          placeholder="Nome completo"
+          value={formData.nomeCliente}
+          onChange={handleChange}
+          className="w-full border p-2 rounded"
+          required
+        />
+
+        <input
+          type="email"
+          name="email"
+          placeholder="Email"
+          value={formData.email}
+          onChange={handleChange}
+          className="w-full border p-2 rounded"
+          required
+        />
+
+        <input
+          type="text"
+          name="telefone"
+          placeholder="Telefone"
+          value={formData.telefone}
+          onChange={handleChange}
+          className="w-full border p-2 rounded"
+          required
+        />
+
+        <input
+          type="text"
+          name="cep"
+          placeholder="CEP"
+          value={formData.cep}
+          onChange={handleChange}
+          className="w-full border p-2 rounded"
+          required
+        />
+
+        <input
+          type="text"
+          name="rua"
+          placeholder="Rua"
+          value={formData.rua}
+          onChange={handleChange}
+          className="w-full border p-2 rounded"
+          required
+        />
+
+        <input
+          type="text"
+          name="numero"
+          placeholder="Número"
+          value={formData.numero}
+          onChange={handleChange}
+          className="w-full border p-2 rounded"
+          required
+        />
+
+        <input
+          type="text"
+          name="bairro"
+          placeholder="Bairro"
+          value={formData.bairro}
+          onChange={handleChange}
+          className="w-full border p-2 rounded"
+          required
+        />
+
+        <input
+          type="text"
+          name="cidade"
+          placeholder="Cidade"
+          value={formData.cidade}
+          onChange={handleChange}
+          className="w-full border p-2 rounded"
+          required
+        />
+
+        <input
+          type="text"
+          name="estado"
+          placeholder="Estado"
+          value={formData.estado}
+          onChange={handleChange}
+          className="w-full border p-2 rounded"
+          required
+        />
+
+        <div className="p-3 border rounded bg-gray-50">
+          <h3 className="font-semibold mb-2">Resumo do pedido</h3>
+          {formData.carrinho.map((item) => (
+            <div key={item.id} className="flex justify-between">
+              <span>
+                {item.name} x{item.quantity}
+              </span>
+              <span>R$ {(item.price * item.quantity).toFixed(2)}</span>
             </div>
-
-            {/* Formulário de checkout */}
-            <CheckoutForm
-              items={cartItems}
-              total={getTotal()}
-              onSubmit={handleCheckoutSubmit}
-              isLoading={isProcessing}
-            />
+          ))}
+          <div className="flex justify-between font-bold mt-2">
+            <span>Total:</span>
+            <span>R$ {formData.total.toFixed(2)}</span>
           </div>
         </div>
-      </div>
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full bg-green-500 text-white py-2 rounded hover:bg-green-600"
+        >
+          {loading ? "Processando..." : "Finalizar Pedido"}
+        </button>
+      </form>
     </div>
   );
 };
+
+export default CheckoutPage;

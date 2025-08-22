@@ -11,13 +11,13 @@ export class ValidationUtils {
    */
   static validateEmail(email: string): ValidationResult {
     const errors: string[] = [];
-    
+
     if (!email || !email.trim()) {
       errors.push('Email é obrigatório');
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
       errors.push('Email deve ter um formato válido');
     }
-    
+
     return { isValid: errors.length === 0, errors };
   }
 
@@ -26,14 +26,14 @@ export class ValidationUtils {
    */
   static validateCPF(cpf: string): ValidationResult {
     const errors: string[] = [];
-    
+
     if (cpf && cpf.trim()) {
       const cleanCPF = cpf.replace(/\D/g, '');
       if (cleanCPF.length !== 11) {
         errors.push('CPF deve ter 11 dígitos');
       }
     }
-    
+
     return { isValid: errors.length === 0, errors };
   }
 
@@ -42,7 +42,7 @@ export class ValidationUtils {
    */
   static validateCEP(cep: string): ValidationResult {
     const errors: string[] = [];
-    
+
     if (!cep || !cep.trim()) {
       errors.push('CEP é obrigatório');
     } else {
@@ -51,7 +51,7 @@ export class ValidationUtils {
         errors.push('CEP deve ter 8 dígitos');
       }
     }
-    
+
     return { isValid: errors.length === 0, errors };
   }
 
@@ -60,7 +60,7 @@ export class ValidationUtils {
    */
   static validatePhone(phone: string): ValidationResult {
     const errors: string[] = [];
-    
+
     if (!phone || !phone.trim()) {
       errors.push('Telefone é obrigatório');
     } else {
@@ -69,7 +69,7 @@ export class ValidationUtils {
         errors.push('Telefone deve ter 10 ou 11 dígitos');
       }
     }
-    
+
     return { isValid: errors.length === 0, errors };
   }
 
@@ -79,7 +79,7 @@ export class ValidationUtils {
   static validateCheckoutData(data: any): ValidationResult {
     const errors: string[] = [];
 
-    // Validações obrigatórias
+    // Nome
     if (!data.nomeCliente || !data.nomeCliente.trim()) {
       errors.push('Nome é obrigatório');
     } else if (data.nomeCliente.trim().length < 2) {
@@ -87,26 +87,26 @@ export class ValidationUtils {
     }
 
     // Email
-    const emailValidation = this.validateEmail(data.email);
+    const emailValidation = ValidationUtils.validateEmail(data.email);
     if (!emailValidation.isValid) {
       errors.push(...emailValidation.errors);
     }
 
     // Telefone
-    const phoneValidation = this.validatePhone(data.telefone);
+    const phoneValidation = ValidationUtils.validatePhone(data.telefone);
     if (!phoneValidation.isValid) {
       errors.push(...phoneValidation.errors);
     }
 
     // CEP
-    const cepValidation = this.validateCEP(data.cep);
+    const cepValidation = ValidationUtils.validateCEP(data.cep);
     if (!cepValidation.isValid) {
       errors.push(...cepValidation.errors);
     }
 
-    // CPF (opcional, mas se fornecido deve ser válido)
+    // CPF (opcional)
     if (data.cpf) {
-      const cpfValidation = this.validateCPF(data.cpf);
+      const cpfValidation = ValidationUtils.validateCPF(data.cpf);
       if (!cpfValidation.isValid) {
         errors.push(...cpfValidation.errors);
       }
@@ -162,9 +162,9 @@ export class ValidationUtils {
   }
 }
 
-// Hook para usar validações em componentes
+// 🔹 Hook para usar validações em componentes React
 export const useValidation = () => {
-  const validateField = (fieldName: string, value: string) => {
+  const validateField = (fieldName: string, value: string): ValidationResult => {
     switch (fieldName) {
       case 'email':
         return ValidationUtils.validateEmail(value);
@@ -192,5 +192,9 @@ export const useValidation = () => {
     }
   };
 
-  return { validateField, formatField, validateCheckout: ValidationUtils.validateCheckoutData };
+  return {
+    validateField,
+    formatField,
+    validateCheckout: ValidationUtils.validateCheckoutData,
+  };
 };

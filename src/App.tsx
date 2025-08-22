@@ -5,11 +5,10 @@ import { Cart } from "./components/Cart";
 import Hero from "./components/Hero";
 import SupabaseProductGrid from "./components/SupabaseProductGrid";
 import { SupabaseProductDetail } from "./components/SupabaseProductDetail";
-import { CheckoutPage } from "./components/CheckoutPage";
+import CheckoutPage from "./components/CheckoutPage";
 import { PaymentStatus } from "./components/PaymentStatus";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { useCart } from "./hooks/useCart";
-import { api } from "./services/api";
 import type { PaymentData } from "./types";
 import { Login } from "./pages/Login";
 import { Register } from "./pages/Register";
@@ -25,7 +24,6 @@ import { WhatsAppButton } from "./components/WhatsAppButton";
 import ScrollToTop from "./components/ScrollToTo";
 import { AuthProvider } from "./contexts/AuthContext";
 import { FavoritesProvider } from "./contexts/FavoritesContext";
-import toast from "react-hot-toast";
 import { ProfilePage } from "./pages/ProfilePage";
 
 // Payment Data Context
