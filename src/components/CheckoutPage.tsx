@@ -1,240 +1,249 @@
-import React, { useState } from 'react';
-import { useLocation } from 'wouter';
-import { CheckoutForm } from './CheckoutForm';
-import { api } from '../services/api';
-import { useCart } from '../hooks/useCart';
-import { orderService, type OrderData } from '../services/orderService';
-import { useErrorHandler } from '../utils/errorHandler';
-import { useValidation } from '../utils/validation';
-import { useSupabaseRetry, useApiRetry } from '../hooks/useRetry';
-import { toast } from 'react-hot-toast';
+import React, { useState, useEffect } from "react";
+import { useValidation } from "../utils/validation";
 
-export const CheckoutPage: React.FC = () => {
-  const { items: cartItems, getTotal, clearCart } = useCart();
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [paymentData, setPaymentData] = useState<{
-    qrCodeBase64: string;
-    ticketUrl: string;
-  } | null>(null);
-  const [, setLocation] = useLocation();
-  const { handleError } = useErrorHandler();
+interface CarrinhoItem {
+  id: number;
+  name: string;
+  quantity: number;
+  price: number;
+}
+
+const CheckoutPage: React.FC = () => {
   const { validateCheckout } = useValidation();
-  const supabaseRetry = useSupabaseRetry();
-  const apiRetry = useApiRetry();
 
-  const isRetryable = (error: any) => {
-    return error?.code === 'NETWORK_ERROR' ||
-           error?.message?.includes('timeout') ||
-           error?.message?.includes('fetch');
+  const [formData, setFormData] = useState({
+    nomeCliente: "",
+    email: "",
+    telefone: "",
+    cep: "",
+    rua: "",
+    numero: "",
+    bairro: "",
+    cidade: "",
+    estado: "",
+    carrinho: [] as CarrinhoItem[],
+    total: 0,
+  });
+
+  const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState<string[]>([]);
+
+  // 📝 Atualiza campos do formulário
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
   };
 
-  const handleCheckoutSubmit = async (formData: any) => {
-    if (isProcessing) return;
-    setIsProcessing(true);
+  // 📦 Carrinho de exemplo (simulação)
+  useEffect(() => {
+    const carrinhoExemplo = [
+      { id: 10, name: "Camisa do pato", quantity: 1, price: 2.99 },
+    ];
+    const total = carrinhoExemplo.reduce(
+      (acc, item) => acc + item.price * item.quantity,
+      0
+    );
+    setFormData((prev) => ({ ...prev, carrinho: carrinhoExemplo, total }));
+  }, []);
+
+  // 🚀 Enviar dados
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrors([]);
+    setLoading(true);
+
+    // ✅ Validação local
+    const validation = validateCheckout(formData);
+    if (!validation.isValid) {
+      setErrors(validation.errors);
+      setLoading(false);
+      return;
+    }
+
+    // ✅ Montar payload no formato esperado pelo backend (Zod schema)
+    const payload = {
+      carrinho: formData.carrinho.map((item) => ({
+        id: item.id,
+        name: item.name,
+        price: item.price,
+        quantity: item.quantity,
+      })),
+      nomeCliente: formData.nomeCliente.trim(),
+      email: formData.email.trim(),
+      telefone: formData.telefone.trim(),
+      endereco: {
+        cep: formData.cep.trim(),
+        rua: formData.rua.trim(),
+        numero: formData.numero.trim(),
+        bairro: formData.bairro.trim(),
+        cidade: formData.cidade.trim(),
+        estado: formData.estado.trim(),
+      },
+      total: formData.total,
+    };
 
     try {
-      // 🔍 Validar formulário
-      const validation = validateCheckout(formData);
-      if (!validation.isValid) throw new Error(validation.errors[0]);
+      console.log("📦 Payload enviado para backend:", payload);
 
-      const totalAmount = getTotal();
-      if (!cartItems || cartItems.length === 0) {
-        throw new Error('Carrinho vazio. Adicione produtos antes de finalizar a compra.');
-      }
-
-      const validItems = cartItems.filter(item =>
-        item && item.product && typeof item.product.id === 'number' &&
-        typeof item.product.name === 'string' && typeof item.quantity === 'number' &&
-        item.quantity > 0
-      );
-
-      if (validItems.length === 0) {
-        throw new Error('Dados do carrinho inválidos. Recarregue a página e tente novamente.');
-      }
-
-      await api.wakeUpServer();
-
-      // 📝 Preparar dados do pedido
-      const orderDataForService: OrderData = {
-        nomeCliente: formData.nomeCliente?.trim() || '',
-        email: formData.email?.trim() || '',
-        telefone: formData.telefone?.trim() || '',
-        cpf: formData.cpf?.trim() || '',
-        cep: formData.cep?.trim() || '',
-        rua: formData.rua?.trim() || '',
-        numero: formData.numero?.trim() || '',
-        complemento: formData.complemento?.trim() || '',
-        bairro: formData.bairro?.trim() || '',
-        cidade: formData.cidade?.trim() || '',
-        estado: formData.estado?.trim() || ''
-      };
-
-      // Preparar dados para pagamento
-      const carrinhoFormatado = validItems.map(item => ({
-        id: item.product.id,
-        name: item.product.name,
-        quantity: item.quantity
-      }));
-
-      // 🎯 Criar pedido no Supabase
-      const order = await supabaseRetry.executeWithRetry(
-        () => orderService.createOrder(orderDataForService, validItems, 'pix', 0, 0),
-        'Criação de pedido'
-      );
-      localStorage.setItem('currentOrderId', order.id.toString());
-
-      // 💳 Criar pagamento PIX
-      const paymentResponse = await apiRetry.executeWithRetry(
-        () => api.createPayment({
-          carrinho: carrinhoFormatado,
-          nomeCliente: formData.nomeCliente,
-          email: formData.email,
-          telefone: formData.telefone,
-          endereco: {
-            cep: formData.cep,
-            rua: formData.rua,
-            numero: formData.numero,
-            complemento: formData.complemento,
-            bairro: formData.bairro,
-            cidade: formData.cidade,
-            estado: formData.estado
-          },
-          total: totalAmount
-        }),
-        'Pagamento PIX'
-      );
-
-      if (!paymentResponse?.qr_code_base64) {
-        await orderService.cancelOrder(order.id);
-        throw new Error('QR Code não foi gerado. Tente novamente.');
-      }
-
-      // Salvar QR Code para exibir
-      setPaymentData({
-        qrCodeBase64: paymentResponse.qr_code_base64,
-        ticketUrl: paymentResponse.ticket_url
-      });
-
-      toast.success('Pedido criado! Escaneie o QR Code para pagar.');
-
-      clearCart();
-    } catch (error: any) {
-      console.error('💥 Erro no checkout:', error);
-
-      const currentOrderId = localStorage.getItem('currentOrderId');
-      if (currentOrderId) {
-        try {
-          await orderService.cancelOrder(parseInt(currentOrderId));
-          localStorage.removeItem('currentOrderId');
-        } catch (cancelError) {
-          console.error('❌ Erro ao cancelar pedido:', cancelError);
+      const response = await fetch(
+        "https://backend-nectix.onrender.com/api/payments/criar-pagamento",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
         }
+      );
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || "Erro no pagamento");
       }
 
-      const friendlyMessage = handleError(error, 'Checkout');
-      toast.error(friendlyMessage);
-
-      if (isRetryable(error)) {
-        toast.error('Você pode tentar novamente em alguns instantes', { duration: 5000, icon: '🔄' });
-      }
+      alert("Pagamento criado com sucesso!");
+      console.log("✅ Resposta backend:", data);
+    } catch (err: any) {
+      setErrors([err.message || "Erro inesperado"]);
     } finally {
-      setIsProcessing(false);
-      supabaseRetry.reset();
-      apiRetry.reset();
+      setLoading(false);
     }
   };
 
-  if (!cartItems || cartItems.length === 0) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Carrinho vazio</h1>
-          <p className="text-gray-600 mb-8">Adicione produtos ao carrinho antes de finalizar a compra.</p>
-          <button
-            onClick={() => setLocation('/')}
-            className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            Ver produtos
-          </button>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-white rounded-lg shadow-md">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h1 className="text-2xl font-bold text-gray-900">Finalizar compra</h1>
-            <p className="text-gray-600 mt-1">
-              {cartItems.length} item(s) - Total: R$ {getTotal().toFixed(2)}
-            </p>
-          </div>
+    <div className="max-w-lg mx-auto p-6 bg-white shadow rounded-lg">
+      <h2 className="text-2xl font-bold mb-4">Checkout</h2>
 
-          <div className="p-6">
-            {/* Resumo dos itens */}
-            <div className="mb-8">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Resumo do pedido</h2>
-              <div className="space-y-3">
-                {cartItems.map((item, index) => (
-                  <div key={index} className="flex justify-between items-center">
-                    <div>
-                      <span className="font-medium">{item.product.name}</span>
-                      {(item.selectedSize || item.selectedColor) && (
-                        <div className="text-sm text-gray-500">
-                          {item.selectedSize && `Tamanho: ${item.selectedSize}`}
-                          {item.selectedSize && item.selectedColor && ' • '}
-                          {item.selectedColor && `Cor: ${item.selectedColor}`}
-                        </div>
-                      )}
-                      <span className="text-sm text-gray-500">Quantidade: {item.quantity}</span>
-                    </div>
-                    <span className="font-medium">R$ {(item.product.price * item.quantity).toFixed(2)}</span>
-                  </div>
-                ))}
-              </div>
-              <div className="border-t pt-3 mt-3">
-                <div className="flex justify-between items-center font-bold">
-                  <span>Total:</span>
-                  <span>R$ {getTotal().toFixed(2)}</span>
-                </div>
-              </div>
+      {/* 🔔 Exibir erros */}
+      {errors.length > 0 && (
+        <div className="bg-red-100 text-red-700 p-3 rounded mb-4">
+          <ul>
+            {errors.map((err, i) => (
+              <li key={i}>⚠️ {err}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <input
+          type="text"
+          name="nomeCliente"
+          placeholder="Nome completo"
+          value={formData.nomeCliente}
+          onChange={handleChange}
+          className="w-full border p-2 rounded"
+          required
+        />
+
+        <input
+          type="email"
+          name="email"
+          placeholder="Email"
+          value={formData.email}
+          onChange={handleChange}
+          className="w-full border p-2 rounded"
+          required
+        />
+
+        <input
+          type="text"
+          name="telefone"
+          placeholder="Telefone"
+          value={formData.telefone}
+          onChange={handleChange}
+          className="w-full border p-2 rounded"
+          required
+        />
+
+        <input
+          type="text"
+          name="cep"
+          placeholder="CEP"
+          value={formData.cep}
+          onChange={handleChange}
+          className="w-full border p-2 rounded"
+          required
+        />
+
+        <input
+          type="text"
+          name="rua"
+          placeholder="Rua"
+          value={formData.rua}
+          onChange={handleChange}
+          className="w-full border p-2 rounded"
+          required
+        />
+
+        <input
+          type="text"
+          name="numero"
+          placeholder="Número"
+          value={formData.numero}
+          onChange={handleChange}
+          className="w-full border p-2 rounded"
+          required
+        />
+
+        <input
+          type="text"
+          name="bairro"
+          placeholder="Bairro"
+          value={formData.bairro}
+          onChange={handleChange}
+          className="w-full border p-2 rounded"
+          required
+        />
+
+        <input
+          type="text"
+          name="cidade"
+          placeholder="Cidade"
+          value={formData.cidade}
+          onChange={handleChange}
+          className="w-full border p-2 rounded"
+          required
+        />
+
+        <input
+          type="text"
+          name="estado"
+          placeholder="Estado"
+          value={formData.estado}
+          onChange={handleChange}
+          className="w-full border p-2 rounded"
+          required
+        />
+
+        <div className="p-3 border rounded bg-gray-50">
+          <h3 className="font-semibold mb-2">Resumo do pedido</h3>
+          {formData.carrinho.map((item) => (
+            <div key={item.id} className="flex justify-between">
+              <span>
+                {item.name} x{item.quantity}
+              </span>
+              <span>R$ {(item.price * item.quantity).toFixed(2)}</span>
             </div>
-
-            {/* Formulário de checkout */}
-            <CheckoutForm
-              items={cartItems}
-              total={getTotal()}
-              onSubmit={handleCheckoutSubmit}
-              isLoading={isProcessing}
-            />
-
-            {/* QR Code PIX */}
-            {paymentData && (
-              <div className="mt-8 text-center">
-                <h2 className="text-xl font-semibold mb-4">Pagamento PIX</h2>
-                <p className="mb-2">Escaneie o QR Code abaixo para pagar:</p>
-                <img
-                  src={`data:image/png;base64,${paymentData.qrCodeBase64}`}
-                  alt="QR Code PIX"
-                  className="mx-auto mb-4"
-                />
-                <p>Ou clique no botão para abrir o link do pagamento:</p>
-                <a
-                  href={paymentData.ticketUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-block mt-2 px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700"
-                >
-                  Pagar via Mercado Pago
-                </a>
-              </div>
-            )}
-
+          ))}
+          <div className="flex justify-between font-bold mt-2">
+            <span>Total:</span>
+            <span>R$ {formData.total.toFixed(2)}</span>
           </div>
         </div>
-      </div>
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full bg-green-500 text-white py-2 rounded hover:bg-green-600"
+        >
+          {loading ? "Processando..." : "Finalizar Pedido"}
+        </button>
+      </form>
     </div>
   );
 };
+
+export default CheckoutPage;
