@@ -1,0 +1,137 @@
+client:495 [vite] connecting...
+client:618 [vite] connected.
+chunk-GKJBSOWT.js?v=836699bd:21551 Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools
+AuthContext.tsx:99 Auth state changed: INITIAL_SESSION undefined
+login:1 [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) null
+AuthContext.tsx:99 Auth state changed: SIGNED_IN eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+SupabaseProductDetail.tsx:79 Loading product with ID: 10
+SupabaseProductDetail.tsx:79 Loading product with ID: 10
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+SupabaseProductDetail.tsx:82 Loaded product data: Object
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+SupabaseProductDetail.tsx:82 Loaded product data: Object
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+CheckoutPage.tsx:143 🔍 Debug render - showQRCode: false paymentData: null
+CheckoutPage.tsx:143 🔍 Debug render - showQRCode: false paymentData: null
+CheckoutPage.tsx:143 🔍 Debug render - showQRCode: false paymentData: null
+CheckoutPage.tsx:143 🔍 Debug render - showQRCode: false paymentData: null
+CheckoutPage.tsx:143 🔍 Debug render - showQRCode: false paymentData: null
+CheckoutPage.tsx:143 🔍 Debug render - showQRCode: false paymentData: null
+CheckoutPage.tsx:143 🔍 Debug render - showQRCode: false paymentData: null
+CheckoutPage.tsx:143 🔍 Debug render - showQRCode: false paymentData: null
+CheckoutPage.tsx:143 🔍 Debug render - showQRCode: false paymentData: null
+CheckoutPage.tsx:143 🔍 Debug render - showQRCode: false paymentData: null
+CheckoutPage.tsx:143 🔍 Debug render - showQRCode: false paymentData: null
+CheckoutPage.tsx:143 🔍 Debug render - showQRCode: false paymentData: null
+CheckoutPage.tsx:143 🔍 Debug render - showQRCode: false paymentData: null
+CheckoutPage.tsx:143 🔍 Debug render - showQRCode: false paymentData: null
+CheckoutPage.tsx:143 🔍 Debug render - showQRCode: false paymentData: null
+CheckoutPage.tsx:143 🔍 Debug render - showQRCode: false paymentData: null
+CheckoutPage.tsx:143 🔍 Debug render - showQRCode: false paymentData: null
+CheckoutPage.tsx:143 🔍 Debug render - showQRCode: false paymentData: null
+CheckoutPage.tsx:143 🔍 Debug render - showQRCode: false paymentData: null
+CheckoutPage.tsx:143 🔍 Debug render - showQRCode: false paymentData: null
+CheckoutPage.tsx:143 🔍 Debug render - showQRCode: false paymentData: null
+CheckoutPage.tsx:143 🔍 Debug render - showQRCode: false paymentData: null
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+CheckoutPage.tsx:115 📦 Payload enviado para backend: Object
+CheckoutPage.tsx:143 🔍 Debug render - showQRCode: false paymentData: null
+CheckoutPage.tsx:143 🔍 Debug render - showQRCode: false paymentData: null
+CheckoutPage.tsx:131 ✅ Resposta backend: Object
+CheckoutPage.tsx:134 🎯 Estado atualizado - showQRCode: true paymentData: Object
+CheckoutPage.tsx:143 🔍 Debug render - showQRCode: true paymentData: Object
+CheckoutPage.tsx:143 🔍 Debug render - showQRCode: true paymentData: Objectcliente: "Eduardo de araujo sousa"email: "eduardoaraujo_96@outlook.com"endereco: {cep: '64025-090', rua: 'Quadra 25', numero: '1353', bairro: 'Parque Piaui', cidade: 'Teresina', …}id: 122783742393produtos: Array(1)0: id: 10nome: "Camisa do pato"quantidade: 1variacoes: [[Prototype]]: Objectconstructor: ƒ Object()hasOwnProperty: ƒ hasOwnProperty()isPrototypeOf: ƒ isPrototypeOf()propertyIsEnumerable: ƒ propertyIsEnumerable()toLocaleString: ƒ toLocaleString()toString: ƒ toString()valueOf: ƒ valueOf()__defineGetter__: ƒ __defineGetter__()__defineSetter__: ƒ __defineSetter__()__lookupGetter__: ƒ __lookupGetter__()__lookupSetter__: ƒ __lookupSetter__()__proto__: (...)get __proto__: ƒ __proto__()set __proto__: ƒ __proto__()[[Prototype]]: Objectlength: 1[[Prototype]]: Array(0)qr_code: "00020126580014br.gov.bcb.pix013695629cb5-2137-487a-861d-5af90e9498d552040000530398654042.995802BR5916AE202507040751596009Sao Paulo62250521mpqrinter122783742393630428A3"qr_code_base64: "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"status: "pending"telefone: "8699461236"ticket_url: "https://www.mercadopago.com.br/payments/122783742393/ticket?caller_id=2084638705&hash=04907cb7-5a3e-4d5a-938e-b546a416a633"total: 2.99[[Prototype]]: Object
+CheckoutPage.tsx:173 ✅ QR Code carregado com sucesso
+zsceradvdzzhqynfnchh.supabase.co/auth/v1/token?grant_type=refresh_token:1  Failed to load resource: net::ERR_CONNECTION_CLOSED
+@supabase_supabase-js.js?v=836699bd:4653 TypeError: Failed to fetch
+    at @supabase_supabase-js.js?v=836699bd:4370:23
+    at _handleRequest2 (@supabase_supabase-js.js?v=836699bd:4651:20)
+    at _request (@supabase_supabase-js.js?v=836699bd:4641:22)
+    at @supabase_supabase-js.js?v=836699bd:6540:22
+    at @supabase_supabase-js.js?v=836699bd:4436:32
+    at @supabase_supabase-js.js?v=836699bd:4448:7
+    at new Promise (<anonymous>)
+    at retryable (@supabase_supabase-js.js?v=836699bd:4431:19)
+    at SupabaseAuthClient._refreshAccessToken (@supabase_supabase-js.js?v=836699bd:6535:20)
+    at SupabaseAuthClient._callRefreshToken (@supabase_supabase-js.js?v=836699bd:6663:42)
+_handleRequest2 @ @supabase_supabase-js.js?v=836699bd:4653
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+@supabase_supabase-js.js?v=836699bd:4370  POST https://zsceradvdzzhqynfnchh.supabase.co/auth/v1/token?grant_type=refresh_token net::ERR_CONNECTION_CLOSED
+(anonymous) @ @supabase_supabase-js.js?v=836699bd:4370
+_handleRequest2 @ @supabase_supabase-js.js?v=836699bd:4651
+_request @ @supabase_supabase-js.js?v=836699bd:4641
+(anonymous) @ @supabase_supabase-js.js?v=836699bd:6540
+(anonymous) @ @supabase_supabase-js.js?v=836699bd:4436
+(anonymous) @ @supabase_supabase-js.js?v=836699bd:4448
+retryable @ @supabase_supabase-js.js?v=836699bd:4431
+_refreshAccessToken @ @supabase_supabase-js.js?v=836699bd:6535
+_callRefreshToken @ @supabase_supabase-js.js?v=836699bd:6663
+__loadSession @ @supabase_supabase-js.js?v=836699bd:6034
+await in __loadSession
+_useSession @ @supabase_supabase-js.js?v=836699bd:5976
+(anonymous) @ @supabase_supabase-js.js?v=836699bd:6848
+(anonymous) @ @supabase_supabase-js.js?v=836699bd:5944
+(anonymous) @ @supabase_supabase-js.js?v=836699bd:5061
+@supabase_supabase-js.js?v=836699bd:4653 TypeError: Failed to fetch
+    at @supabase_supabase-js.js?v=836699bd:4370:23
+    at _handleRequest2 (@supabase_supabase-js.js?v=836699bd:4651:20)
+    at _request (@supabase_supabase-js.js?v=836699bd:4641:22)
+    at @supabase_supabase-js.js?v=836699bd:6540:22
+    at @supabase_supabase-js.js?v=836699bd:4436:32
+    at @supabase_supabase-js.js?v=836699bd:4448:7
+    at new Promise (<anonymous>)
+    at retryable (@supabase_supabase-js.js?v=836699bd:4431:19)
+    at SupabaseAuthClient._refreshAccessToken (@supabase_supabase-js.js?v=836699bd:6535:20)
+    at SupabaseAuthClient._callRefreshToken (@supabase_supabase-js.js?v=836699bd:6663:42)
+_handleRequest2 @ @supabase_supabase-js.js?v=836699bd:4653
+await in _handleRequest2
+_request @ @supabase_supabase-js.js?v=836699bd:4641
+(anonymous) @ @supabase_supabase-js.js?v=836699bd:6540
+(anonymous) @ @supabase_supabase-js.js?v=836699bd:4436
+(anonymous) @ @supabase_supabase-js.js?v=836699bd:4448
+retryable @ @supabase_supabase-js.js?v=836699bd:4431
+_refreshAccessToken @ @supabase_supabase-js.js?v=836699bd:6535
+_callRefreshToken @ @supabase_supabase-js.js?v=836699bd:6663
+__loadSession @ @supabase_supabase-js.js?v=836699bd:6034
+await in __loadSession
+_useSession @ @supabase_supabase-js.js?v=836699bd:5976
+(anonymous) @ @supabase_supabase-js.js?v=836699bd:6848
+(anonymous) @ @supabase_supabase-js.js?v=836699bd:5944
+(anonymous) @ @supabase_supabase-js.js?v=836699bd:5061
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
