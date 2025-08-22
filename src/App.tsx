@@ -5,7 +5,7 @@ import { Cart } from "./components/Cart";
 import Hero from "./components/Hero";
 import SupabaseProductGrid from "./components/SupabaseProductGrid";
 import { SupabaseProductDetail } from "./components/SupabaseProductDetail";
-import { CheckoutForm } from "./components/CheckoutForm";
+import { CheckoutPage } from "./components/CheckoutPage";
 import { PaymentStatus } from "./components/PaymentStatus";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { useCart } from "./hooks/useCart";
@@ -49,30 +49,7 @@ function AppContent() {
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const { paymentData, setPaymentData } = useContext(PaymentDataContext);
 
-  const handlePaymentSubmit = async (customerData: {
-    nomeCliente: string;
-    email: string;
-  }) => {
-    setIsProcessingPayment(true);
-    try {
-      const payment = await api.createPayment({
-        carrinho: items.map(item => ({
-          id: item.product.id,
-          name: item.product.name,
-          quantity: item.quantity
-        })),
-        nomeCliente: customerData.nomeCliente,
-        email: customerData.email,
-        total: getTotal(),
-      });
-      setPaymentData(payment);
-      setLocation("/pagamento");
-    } catch (error: any) {
-      toast.error(error.message || "Erro ao processar pagamento.");
-    } finally {
-      setIsProcessingPayment(false);
-    }
-  };
+
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -123,12 +100,7 @@ function AppContent() {
             </ProtectedRoute>
           </Route>
           <Route path="/checkout">
-            <CheckoutForm
-              items={items}
-              total={getTotal()}
-              onSubmit={handlePaymentSubmit}
-              isLoading={isProcessingPayment}
-            />
+            <CheckoutPage />
           </Route>
           <Route path="/pagamento">
             {paymentData ? (
