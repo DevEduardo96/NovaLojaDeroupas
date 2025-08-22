@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useValidation } from "../utils/validation";
+import { useCart } from "../hooks/useCart";
 
 interface CarrinhoItem {
   id: number;
@@ -18,6 +19,10 @@ interface PaymentResponse {
 
 const CheckoutPage: React.FC = () => {
   const { validateCheckout } = useValidation();
+  const { items: cartItems, getMostCommonVariations } = useCart();
+
+  // Obter variações mais comuns do carrinho para pré-preenchimento
+  const commonVariations = getMostCommonVariations();
 
   const [formData, setFormData] = useState({
     nomeCliente: "",
@@ -29,8 +34,8 @@ const CheckoutPage: React.FC = () => {
     bairro: "",
     cidade: "",
     estado: "",
-    cor: "",
-    tamanho: "",
+    cor: commonVariations.color || "",
+    tamanho: commonVariations.size || "",
     carrinho: [] as CarrinhoItem[],
     total: 0,
   });
@@ -58,17 +63,33 @@ const CheckoutPage: React.FC = () => {
     });
   };
 
-  // 📦 Carrinho de exemplo (simulação)
+  // 📦 Atualizar carrinho e variações baseado no carrinho real
   useEffect(() => {
-    const carrinhoExemplo = [
-      { id: 10, name: "Camisa do pato", quantity: 1, price: 2.99 },
-    ];
-    const total = carrinhoExemplo.reduce(
+    // Converter itens do carrinho para formato esperado
+    const carrinhoFormatado = cartItems.map(item => ({
+      id: item.product.id,
+      name: item.product.name,
+      quantity: item.quantity,
+      price: item.product.price,
+    }));
+
+    const total = carrinhoFormatado.reduce(
       (acc, item) => acc + item.price * item.quantity,
       0
     );
-    setFormData((prev) => ({ ...prev, carrinho: carrinhoExemplo, total }));
-  }, []);
+
+    // Atualizar variações mais comuns se ainda não foram definidas pelo usuário
+    const newCommonVariations = getMostCommonVariations();
+    
+    setFormData((prev) => ({ 
+      ...prev, 
+      carrinho: carrinhoFormatado, 
+      total,
+      // Só atualiza cor e tamanho se estiverem vazios (não foram alterados pelo usuário)
+      cor: prev.cor || newCommonVariations.color || "",
+      tamanho: prev.tamanho || newCommonVariations.size || "",
+    }));
+  }, [cartItems, getMostCommonVariations]);
 
   // 📋 Copiar código PIX
   const copyPixCode = () => {
@@ -382,7 +403,14 @@ const CheckoutPage: React.FC = () => {
 
         {/* Seção de Variações do Produto */}
         <div className="bg-gray-50 p-4 rounded-lg border">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">Opções do Produto</h3>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-gray-800">Opções do Produto</h3>
+            {(formData.cor || formData.tamanho) && (
+              <span className="text-xs text-blue-600 bg-blue-100 px-2 py-1 rounded-full">
+                📋 Pré-preenchido do carrinho
+              </span>
+            )}
+          </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Seleção de Cor */}
@@ -460,6 +488,27 @@ const CheckoutPage: React.FC = () => {
 
         <div className="p-3 border rounded bg-gray-50">
           <h3 className="font-semibold mb-2">Resumo do pedido</h3>
+          
+          {/* Variações selecionadas */}
+          {(formData.cor || formData.tamanho) && (
+            <div className="mb-3 p-2 bg-blue-50 border border-blue-200 rounded">
+              <p className="text-sm font-medium text-blue-800 mb-1">Variações selecionadas:</p>
+              <div className="flex flex-wrap gap-2">
+                {formData.cor && (
+                  <span className="text-xs bg-white px-2 py-1 rounded border text-blue-700">
+                    Cor: {formData.cor}
+                  </span>
+                )}
+                {formData.tamanho && (
+                  <span className="text-xs bg-white px-2 py-1 rounded border text-blue-700">
+                    Tamanho: {formData.tamanho}
+                  </span>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Itens do carrinho */}
           {formData.carrinho.map((item) => (
             <div key={item.id} className="flex justify-between">
               <span>
@@ -468,7 +517,8 @@ const CheckoutPage: React.FC = () => {
               <span>R$ {(item.price * item.quantity).toFixed(2)}</span>
             </div>
           ))}
-          <div className="flex justify-between font-bold mt-2">
+          
+          <div className="flex justify-between font-bold mt-2 pt-2 border-t">
             <span>Total:</span>
             <span>R$ {formData.total.toFixed(2)}</span>
           </div>

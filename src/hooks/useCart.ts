@@ -47,6 +47,34 @@ export const useCart = () => {
     });
   }, []);
 
+  // Função para obter as variações mais comuns no carrinho (para pré-preencher checkout)
+  const getMostCommonVariations = useCallback(() => {
+    const colorCount: { [key: string]: number } = {};
+    const sizeCount: { [key: string]: number } = {};
+
+    items.forEach(item => {
+      if (item.selectedColor) {
+        colorCount[item.selectedColor] = (colorCount[item.selectedColor] || 0) + item.quantity;
+      }
+      if (item.selectedSize) {
+        sizeCount[item.selectedSize] = (sizeCount[item.selectedSize] || 0) + item.quantity;
+      }
+    });
+
+    const mostCommonColor = Object.keys(colorCount).reduce((a, b) => 
+      colorCount[a] > colorCount[b] ? a : b, ''
+    );
+    
+    const mostCommonSize = Object.keys(sizeCount).reduce((a, b) => 
+      sizeCount[a] > sizeCount[b] ? a : b, ''
+    );
+
+    return {
+      color: mostCommonColor || '',
+      size: mostCommonSize || ''
+    };
+  }, [items]);
+
   const removeFromCart = useCallback((productId: number, selectedSize?: string, selectedColor?: string) => {
     const variationKeyToRemove = `${productId}-${selectedSize || ''}-${selectedColor || ''}`;
     setItems((prev) => prev.filter((item) => {
@@ -102,5 +130,6 @@ export const useCart = () => {
     clearCart,
     getTotal,
     getItemCount,
+    getMostCommonVariations,
   };
 };
