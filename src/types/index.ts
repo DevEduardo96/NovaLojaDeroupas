@@ -114,6 +114,16 @@ export interface CreatePaymentRequest {
   }>;
   nomeCliente: string;
   email: string;
+  telefone: string;
+  endereco: {
+    cep: string;
+    rua: string;
+    numero: string;
+    complemento?: string;
+    bairro: string;
+    cidade: string;
+    estado: string;
+  };
   total: number;
 }
 
