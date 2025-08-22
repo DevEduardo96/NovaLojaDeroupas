@@ -131,6 +131,7 @@ const CheckoutPage: React.FC = () => {
       console.log("✅ Resposta backend:", data);
       setPaymentData(data);
       setShowQRCode(true);
+      console.log("🎯 Estado atualizado - showQRCode:", true, "paymentData:", data);
     } catch (err: any) {
       setErrors([err.message || "Erro inesperado"]);
     } finally {
@@ -139,7 +140,10 @@ const CheckoutPage: React.FC = () => {
   };
 
   // 🎨 Renderizar QR Code
-  if (showQRCode && paymentData) {
+  console.log("🔍 Debug render - showQRCode:", showQRCode, "paymentData:", paymentData);
+  
+  // Força exibição se temos dados de pagamento
+  if ((showQRCode && paymentData) || (paymentData && paymentData.qr_code_base64)) {
     return (
       <div className="max-w-md mx-auto p-6 bg-white shadow-lg rounded-lg">
         <div className="text-center">
@@ -156,12 +160,23 @@ const CheckoutPage: React.FC = () => {
 
           {/* QR Code */}
           <div className="bg-white p-6 rounded-lg border-2 border-gray-200 mb-6">
-            <img
-              src={`data:image/png;base64,${paymentData.qr_code_base64}`}
-              alt="QR Code PIX"
-              className="w-full max-w-xs mx-auto"
-              style={{ imageRendering: 'pixelated' }}
-            />
+            {paymentData.qr_code_base64 ? (
+              <img
+                src={`data:image/png;base64,${paymentData.qr_code_base64}`}
+                alt="QR Code PIX"
+                className="w-full max-w-xs mx-auto"
+                style={{ imageRendering: 'pixelated' }}
+                onError={(e) => {
+                  console.error("❌ Erro ao carregar QR Code:", e);
+                  console.log("🔍 Base64 data:", paymentData.qr_code_base64?.substring(0, 100) + "...");
+                }}
+                onLoad={() => console.log("✅ QR Code carregado com sucesso")}
+              />
+            ) : (
+              <div className="w-64 h-64 bg-gray-200 rounded flex items-center justify-center mx-auto">
+                <p className="text-gray-500">QR Code indisponível</p>
+              </div>
+            )}
           </div>
 
           {/* Informações do Pagamento */}
@@ -364,6 +379,23 @@ const CheckoutPage: React.FC = () => {
         >
           {loading ? "Processando..." : "Finalizar Pedido"}
         </button>
+
+        {/* Debug temporário */}
+        {paymentData && (
+          <div className="mt-4 p-3 bg-yellow-100 border rounded">
+            <p className="text-sm font-semibold">🐛 Debug Info:</p>
+            <p className="text-xs">showQRCode: {showQRCode.toString()}</p>
+            <p className="text-xs">paymentData.id: {paymentData.id}</p>
+            <p className="text-xs">qr_code_base64 length: {paymentData.qr_code_base64?.length || 0}</p>
+            <button
+              type="button"
+              onClick={() => setShowQRCode(true)}
+              className="mt-2 px-3 py-1 bg-blue-500 text-white text-xs rounded"
+            >
+              Forçar mostrar QR Code
+            </button>
+          </div>
+        )}
       </form>
     </div>
   );
