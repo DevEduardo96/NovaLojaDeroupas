@@ -137,6 +137,16 @@ export const CheckoutPage: React.FC = () => {
           carrinho: carrinhoFormatado,
           nomeCliente: formData.nomeCliente,
           email: formData.email,
+          telefone: formData.telefone,
+          endereco: {
+            cep: formData.cep,
+            rua: formData.rua,
+            numero: formData.numero,
+            complemento: formData.complemento,
+            bairro: formData.bairro,
+            cidade: formData.cidade,
+            estado: formData.estado
+          },
           total: totalAmount
         }),
         'Pagamento PIX'
