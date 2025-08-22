@@ -50,6 +50,14 @@ const CheckoutPage: React.FC = () => {
     });
   };
 
+  // 📝 Handler para checkboxes de cor e tamanho
+  const handleCheckboxChange = (field: 'cor' | 'tamanho', value: string) => {
+    setFormData({
+      ...formData,
+      [field]: formData[field] === value ? "" : value,
+    });
+  };
+
   // 📦 Carrinho de exemplo (simulação)
   useEffect(() => {
     const carrinhoExemplo = [
@@ -372,26 +380,46 @@ const CheckoutPage: React.FC = () => {
           required
         />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <input
-            type="text"
-            name="cor"
-            placeholder="Cor do produto"
-            value={formData.cor}
-            onChange={handleChange}
-            className="w-full border p-2 rounded"
-            required
-          />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Seleção de Cor */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-3">
+              Cor do produto *
+            </label>
+            <div className="space-y-2">
+              {['Branco', 'Preto'].map((cor) => (
+                <label key={cor} className="flex items-center">
+                  <input
+                    type="checkbox"
+                    checked={formData.cor === cor}
+                    onChange={() => handleCheckboxChange('cor', cor)}
+                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                  />
+                  <span className="ml-2 text-sm text-gray-900">{cor}</span>
+                </label>
+              ))}
+            </div>
+          </div>
 
-          <input
-            type="text"
-            name="tamanho"
-            placeholder="Tamanho do produto"
-            value={formData.tamanho}
-            onChange={handleChange}
-            className="w-full border p-2 rounded"
-            required
-          />
+          {/* Seleção de Tamanho */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-3">
+              Tamanho do produto *
+            </label>
+            <div className="space-y-2">
+              {['P', 'M', 'G'].map((tamanho) => (
+                <label key={tamanho} className="flex items-center">
+                  <input
+                    type="checkbox"
+                    checked={formData.tamanho === tamanho}
+                    onChange={() => handleCheckboxChange('tamanho', tamanho)}
+                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                  />
+                  <span className="ml-2 text-sm text-gray-900">{tamanho}</span>
+                </label>
+              ))}
+            </div>
+          </div>
         </div>
 
         <div className="p-3 border rounded bg-gray-50">
