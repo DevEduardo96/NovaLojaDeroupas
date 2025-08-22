@@ -1,0 +1,257 @@
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+client:223 [vite] hot updated: /src/components/CheckoutPage.tsx
+client:223 [vite] hot updated: /src/index.css
+CheckoutPage.tsx?t=1755897818007:134 🔍 Debug render - showQRCode: false paymentData: null
+CheckoutPage.tsx?t=1755897818007:134 🔍 Debug render - showQRCode: false paymentData: null
+CheckoutPage.tsx?t=1755897818007:134 🔍 Debug render - showQRCode: false paymentData: null
+CheckoutPage.tsx?t=1755897818007:134 🔍 Debug render - showQRCode: false paymentData: null
+client:223 [vite] hot updated: /src/components/CheckoutPage.tsx
+client:223 [vite] hot updated: /src/index.css
+CheckoutPage.tsx?t=1755897818333:134 🔍 Debug render - showQRCode: false paymentData: null
+CheckoutPage.tsx?t=1755897818333:134 🔍 Debug render - showQRCode: false paymentData: null
+CheckoutPage.tsx?t=1755897818333:134 🔍 Debug render - showQRCode: false paymentData: null
+CheckoutPage.tsx?t=1755897818333:134 🔍 Debug render - showQRCode: false paymentData: null
+client:223 [vite] hot updated: /src/components/CheckoutPage.tsx
+client:223 [vite] hot updated: /src/index.css
+CheckoutPage.tsx?t=1755897818448:134 🔍 Debug render - showQRCode: false paymentData: null
+CheckoutPage.tsx?t=1755897818448:134 🔍 Debug render - showQRCode: false paymentData: null
+CheckoutPage.tsx?t=1755897818448:134 🔍 Debug render - showQRCode: false paymentData: null
+CheckoutPage.tsx?t=1755897818448:134 🔍 Debug render - showQRCode: false paymentData: null
+client:223 [vite] hot updated: /src/components/CheckoutPage.tsx
+client:223 [vite] hot updated: /src/index.css
+CheckoutPage.tsx?t=1755897818626:134 🔍 Debug render - showQRCode: false paymentData: null
+CheckoutPage.tsx?t=1755897818626:134 🔍 Debug render - showQRCode: false paymentData: null
+CheckoutPage.tsx?t=1755897818626:134 🔍 Debug render - showQRCode: false paymentData: null
+CheckoutPage.tsx?t=1755897818626:134 🔍 Debug render - showQRCode: false paymentData: null
+@supabase_supabase-js.js?v=09f4d50a:4370  POST https://zsceradvdzzhqynfnchh.supabase.co/auth/v1/token?grant_type=refresh_token net::ERR_CONNECTION_CLOSED
+(anonymous) @ @supabase_supabase-js.js?v=09f4d50a:4370
+_handleRequest2 @ @supabase_supabase-js.js?v=09f4d50a:4651
+_request @ @supabase_supabase-js.js?v=09f4d50a:4641
+(anonymous) @ @supabase_supabase-js.js?v=09f4d50a:6540
+(anonymous) @ @supabase_supabase-js.js?v=09f4d50a:4436
+(anonymous) @ @supabase_supabase-js.js?v=09f4d50a:4448
+retryable @ @supabase_supabase-js.js?v=09f4d50a:4431
+_refreshAccessToken @ @supabase_supabase-js.js?v=09f4d50a:6535
+_callRefreshToken @ @supabase_supabase-js.js?v=09f4d50a:6663
+__loadSession @ @supabase_supabase-js.js?v=09f4d50a:6034
+await in __loadSession
+_useSession @ @supabase_supabase-js.js?v=09f4d50a:5976
+(anonymous) @ @supabase_supabase-js.js?v=09f4d50a:6848
+(anonymous) @ @supabase_supabase-js.js?v=09f4d50a:5944
+(anonymous) @ @supabase_supabase-js.js?v=09f4d50a:5061
+@supabase_supabase-js.js?v=09f4d50a:4653 TypeError: Failed to fetch
+    at @supabase_supabase-js.js?v=09f4d50a:4370:23
+    at _handleRequest2 (@supabase_supabase-js.js?v=09f4d50a:4651:20)
+    at _request (@supabase_supabase-js.js?v=09f4d50a:4641:22)
+    at @supabase_supabase-js.js?v=09f4d50a:6540:22
+    at @supabase_supabase-js.js?v=09f4d50a:4436:32
+    at @supabase_supabase-js.js?v=09f4d50a:4448:7
+    at new Promise (<anonymous>)
+    at retryable (@supabase_supabase-js.js?v=09f4d50a:4431:19)
+    at SupabaseAuthClient._refreshAccessToken (@supabase_supabase-js.js?v=09f4d50a:6535:20)
+    at SupabaseAuthClient._callRefreshToken (@supabase_supabase-js.js?v=09f4d50a:6663:42)
+_handleRequest2 @ @supabase_supabase-js.js?v=09f4d50a:4653
+await in _handleRequest2
+_request @ @supabase_supabase-js.js?v=09f4d50a:4641
+(anonymous) @ @supabase_supabase-js.js?v=09f4d50a:6540
+(anonymous) @ @supabase_supabase-js.js?v=09f4d50a:4436
+(anonymous) @ @supabase_supabase-js.js?v=09f4d50a:4448
+retryable @ @supabase_supabase-js.js?v=09f4d50a:4431
+_refreshAccessToken @ @supabase_supabase-js.js?v=09f4d50a:6535
+_callRefreshToken @ @supabase_supabase-js.js?v=09f4d50a:6663
+__loadSession @ @supabase_supabase-js.js?v=09f4d50a:6034
+await in __loadSession
+_useSession @ @supabase_supabase-js.js?v=09f4d50a:5976
+(anonymous) @ @supabase_supabase-js.js?v=09f4d50a:6848
+(anonymous) @ @supabase_supabase-js.js?v=09f4d50a:5944
+(anonymous) @ @supabase_supabase-js.js?v=09f4d50a:5061
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+client:223 [vite] hot updated: /src/components/CheckoutPage.tsx
+client:223 [vite] hot updated: /src/index.css
+CheckoutPage.tsx:167 🔍 Debug render - showQRCode: false paymentData: null
+CheckoutPage.tsx:167 🔍 Debug render - showQRCode: false paymentData: null
+CheckoutPage.tsx:167 🔍 Debug render - showQRCode: false paymentData: null
+CheckoutPage.tsx:167 🔍 Debug render - showQRCode: false paymentData: null
+client:223 [vite] hot updated: /src/components/CheckoutPage.tsx
+client:223 [vite] hot updated: /src/index.css
+CheckoutPage.tsx:167 🔍 Debug render - showQRCode: false paymentData: null
+CheckoutPage.tsx:167 🔍 Debug render - showQRCode: false paymentData: null
+CheckoutPage.tsx:167 🔍 Debug render - showQRCode: false paymentData: null
+CheckoutPage.tsx:167 🔍 Debug render - showQRCode: false paymentData: null
+client:223 [vite] hot updated: /src/components/CheckoutPage.tsx
+client:223 [vite] hot updated: /src/index.css
+CheckoutPage.tsx:167 🔍 Debug render - showQRCode: false paymentData: null
+CheckoutPage.tsx:167 🔍 Debug render - showQRCode: false paymentData: null
+CheckoutPage.tsx:167 🔍 Debug render - showQRCode: false paymentData: null
+CheckoutPage.tsx:167 🔍 Debug render - showQRCode: false paymentData: null
+client:223 [vite] hot updated: /src/components/CheckoutPage.tsx
+client:223 [vite] hot updated: /src/index.css
+CheckoutPage.tsx:167 🔍 Debug render - showQRCode: false paymentData: null
+CheckoutPage.tsx:167 🔍 Debug render - showQRCode: false paymentData: null
+CheckoutPage.tsx:167 🔍 Debug render - showQRCode: false paymentData: null
+CheckoutPage.tsx:167 🔍 Debug render - showQRCode: false paymentData: null
+CheckoutPage.tsx:167 🔍 Debug render - showQRCode: false paymentData: null
+CheckoutPage.tsx:167 🔍 Debug render - showQRCode: false paymentData: null
+CheckoutPage.tsx:167 🔍 Debug render - showQRCode: false paymentData: null
+CheckoutPage.tsx:167 🔍 Debug render - showQRCode: false paymentData: null
+CheckoutPage.tsx:167 🔍 Debug render - showQRCode: false paymentData: null
+CheckoutPage.tsx:167 🔍 Debug render - showQRCode: false paymentData: null
+CheckoutPage.tsx:167 🔍 Debug render - showQRCode: false paymentData: null
+CheckoutPage.tsx:167 🔍 Debug render - showQRCode: false paymentData: null
+CheckoutPage.tsx:167 🔍 Debug render - showQRCode: false paymentData: null
+CheckoutPage.tsx:167 🔍 Debug render - showQRCode: false paymentData: null
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+CheckoutPage.tsx:139 📦 Payload enviado para backend: {carrinho: Array(1), nomeCliente: 'Eduardo de araujo sousa', email: 'eduardoaraujo_96@outlook.com', telefone: '8699461236', endereco: {…}, …}carrinho: Array(1)0: {id: 10, name: 'Camisa do pato', price: 2.99, quantity: 1, variacoes: {…}}length: 1[[Prototype]]: Array(0)email: "eduardoaraujo_96@outlook.com"endereco: {cep: '64025-090', rua: 'Quadra 25', numero: '1353', bairro: 'Parque Piaui', cidade: 'Teresina', …}nomeCliente: "Eduardo de araujo sousa"telefone: "8699461236"total: 2.99[[Prototype]]: Objectconstructor: ƒ Object()hasOwnProperty: ƒ hasOwnProperty()isPrototypeOf: ƒ isPrototypeOf()propertyIsEnumerable: ƒ propertyIsEnumerable()toLocaleString: ƒ toLocaleString()toString: ƒ toString()valueOf: ƒ valueOf()__defineGetter__: ƒ __defineGetter__()__defineSetter__: ƒ __defineSetter__()__lookupGetter__: ƒ __lookupGetter__()__lookupSetter__: ƒ __lookupSetter__()__proto__: (...)get __proto__: ƒ __proto__()set __proto__: ƒ __proto__()
+CheckoutPage.tsx:167 🔍 Debug render - showQRCode: false paymentData: null
+CheckoutPage.tsx:167 🔍 Debug render - showQRCode: false paymentData: null
+CheckoutPage.tsx:155 ✅ Resposta backend: {id: 122785474987, status: 'pending', qr_code: '00020126580014br.gov.bcb.pix013695629cb5-2137-487a…009Sao Paulo62250521mpqrinter1227854749876304FAFF', qr_code_base64: 'iVBORw0KGgoAAAANSUhEUgAABWQAAAVkAQAAAAB79iscAAANyE…094L2XtDeC9p7QXsvH6b9H9Yn28ZO2nKxAAAAAElFTkSuQmCC', ticket_url: 'https://www.mercadopago.com.br/payments/1227854749…4638705&hash=504feea3-e504-4952-a011-f00e1e608049', …}
+CheckoutPage.tsx:158 🎯 Estado atualizado - showQRCode: true paymentData: {id: 122785474987, status: 'pending', qr_code: '00020126580014br.gov.bcb.pix013695629cb5-2137-487a…009Sao Paulo62250521mpqrinter1227854749876304FAFF', qr_code_base64: 'iVBORw0KGgoAAAANSUhEUgAABWQAAAVkAQAAAAB79iscAAANyE…094L2XtDeC9p7QXsvH6b9H9Yn28ZO2nKxAAAAAElFTkSuQmCC', ticket_url: 'https://www.mercadopago.com.br/payments/1227854749…4638705&hash=504feea3-e504-4952-a011-f00e1e608049', …}
+CheckoutPage.tsx:167 🔍 Debug render - showQRCode: true paymentData: {id: 122785474987, status: 'pending', qr_code: '00020126580014br.gov.bcb.pix013695629cb5-2137-487a…009Sao Paulo62250521mpqrinter1227854749876304FAFF', qr_code_base64: 'iVBORw0KGgoAAAANSUhEUgAABWQAAAVkAQAAAAB79iscAAANyE…094L2XtDeC9p7QXsvH6b9H9Yn28ZO2nKxAAAAAElFTkSuQmCC', ticket_url: 'https://www.mercadopago.com.br/payments/1227854749…4638705&hash=504feea3-e504-4952-a011-f00e1e608049', …}
+CheckoutPage.tsx:167 🔍 Debug render - showQRCode: true paymentData: {id: 122785474987, status: 'pending', qr_code: '00020126580014br.gov.bcb.pix013695629cb5-2137-487a…009Sao Paulo62250521mpqrinter1227854749876304FAFF', qr_code_base64: 'iVBORw0KGgoAAAANSUhEUgAABWQAAAVkAQAAAAB79iscAAANyE…094L2XtDeC9p7QXsvH6b9H9Yn28ZO2nKxAAAAAElFTkSuQmCC', ticket_url: 'https://www.mercadopago.com.br/payments/1227854749…4638705&hash=504feea3-e504-4952-a011-f00e1e608049', …}
+CheckoutPage.tsx:197 ✅ QR Code carregado com sucesso
+@supabase_supabase-js.js?v=09f4d50a:4370  POST https://zsceradvdzzhqynfnchh.supabase.co/auth/v1/token?grant_type=refresh_token net::ERR_CONNECTION_CLOSED
+(anonymous) @ @supabase_supabase-js.js?v=09f4d50a:4370
+_handleRequest2 @ @supabase_supabase-js.js?v=09f4d50a:4651
+_request @ @supabase_supabase-js.js?v=09f4d50a:4641
+(anonymous) @ @supabase_supabase-js.js?v=09f4d50a:6540
+(anonymous) @ @supabase_supabase-js.js?v=09f4d50a:4436
+(anonymous) @ @supabase_supabase-js.js?v=09f4d50a:4448
+retryable @ @supabase_supabase-js.js?v=09f4d50a:4431
+_refreshAccessToken @ @supabase_supabase-js.js?v=09f4d50a:6535
+_callRefreshToken @ @supabase_supabase-js.js?v=09f4d50a:6663
+__loadSession @ @supabase_supabase-js.js?v=09f4d50a:6034
+await in __loadSession
+_useSession @ @supabase_supabase-js.js?v=09f4d50a:5976
+(anonymous) @ @supabase_supabase-js.js?v=09f4d50a:6848
+(anonymous) @ @supabase_supabase-js.js?v=09f4d50a:5944
+(anonymous) @ @supabase_supabase-js.js?v=09f4d50a:5061
+@supabase_supabase-js.js?v=09f4d50a:4653 TypeError: Failed to fetch
+    at @supabase_supabase-js.js?v=09f4d50a:4370:23
+    at _handleRequest2 (@supabase_supabase-js.js?v=09f4d50a:4651:20)
+    at _request (@supabase_supabase-js.js?v=09f4d50a:4641:22)
+    at @supabase_supabase-js.js?v=09f4d50a:6540:22
+    at @supabase_supabase-js.js?v=09f4d50a:4436:32
+    at @supabase_supabase-js.js?v=09f4d50a:4448:7
+    at new Promise (<anonymous>)
+    at retryable (@supabase_supabase-js.js?v=09f4d50a:4431:19)
+    at SupabaseAuthClient._refreshAccessToken (@supabase_supabase-js.js?v=09f4d50a:6535:20)
+    at SupabaseAuthClient._callRefreshToken (@supabase_supabase-js.js?v=09f4d50a:6663:42)
+_handleRequest2 @ @supabase_supabase-js.js?v=09f4d50a:4653
+await in _handleRequest2
+_request @ @supabase_supabase-js.js?v=09f4d50a:4641
+(anonymous) @ @supabase_supabase-js.js?v=09f4d50a:6540
+(anonymous) @ @supabase_supabase-js.js?v=09f4d50a:4436
+(anonymous) @ @supabase_supabase-js.js?v=09f4d50a:4448
+retryable @ @supabase_supabase-js.js?v=09f4d50a:4431
+_refreshAccessToken @ @supabase_supabase-js.js?v=09f4d50a:6535
+_callRefreshToken @ @supabase_supabase-js.js?v=09f4d50a:6663
+__loadSession @ @supabase_supabase-js.js?v=09f4d50a:6034
+await in __loadSession
+_useSession @ @supabase_supabase-js.js?v=09f4d50a:5976
+(anonymous) @ @supabase_supabase-js.js?v=09f4d50a:6848
+(anonymous) @ @supabase_supabase-js.js?v=09f4d50a:5944
+(anonymous) @ @supabase_supabase-js.js?v=09f4d50a:5061
+CheckoutPage.tsx:167 🔍 Debug render - showQRCode: false paymentData: null
+CheckoutPage.tsx:167 🔍 Debug render - showQRCode: false paymentData: null
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+@supabase_supabase-js.js?v=09f4d50a:4370  POST https://zsceradvdzzhqynfnchh.supabase.co/auth/v1/token?grant_type=refresh_token net::ERR_CONNECTION_CLOSED
+(anonymous) @ @supabase_supabase-js.js?v=09f4d50a:4370
+_handleRequest2 @ @supabase_supabase-js.js?v=09f4d50a:4651
+_request @ @supabase_supabase-js.js?v=09f4d50a:4641
+(anonymous) @ @supabase_supabase-js.js?v=09f4d50a:6540
+(anonymous) @ @supabase_supabase-js.js?v=09f4d50a:4436
+(anonymous) @ @supabase_supabase-js.js?v=09f4d50a:4448
+retryable @ @supabase_supabase-js.js?v=09f4d50a:4431
+_refreshAccessToken @ @supabase_supabase-js.js?v=09f4d50a:6535
+_callRefreshToken @ @supabase_supabase-js.js?v=09f4d50a:6663
+__loadSession @ @supabase_supabase-js.js?v=09f4d50a:6034
+await in __loadSession
+_useSession @ @supabase_supabase-js.js?v=09f4d50a:5976
+(anonymous) @ @supabase_supabase-js.js?v=09f4d50a:6848
+(anonymous) @ @supabase_supabase-js.js?v=09f4d50a:5944
+(anonymous) @ @supabase_supabase-js.js?v=09f4d50a:5061
+@supabase_supabase-js.js?v=09f4d50a:4653 TypeError: Failed to fetch
+    at @supabase_supabase-js.js?v=09f4d50a:4370:23
+    at _handleRequest2 (@supabase_supabase-js.js?v=09f4d50a:4651:20)
+    at _request (@supabase_supabase-js.js?v=09f4d50a:4641:22)
+    at @supabase_supabase-js.js?v=09f4d50a:6540:22
+    at @supabase_supabase-js.js?v=09f4d50a:4436:32
+    at @supabase_supabase-js.js?v=09f4d50a:4448:7
+    at new Promise (<anonymous>)
+    at retryable (@supabase_supabase-js.js?v=09f4d50a:4431:19)
+    at SupabaseAuthClient._refreshAccessToken (@supabase_supabase-js.js?v=09f4d50a:6535:20)
+    at SupabaseAuthClient._callRefreshToken (@supabase_supabase-js.js?v=09f4d50a:6663:42)
+_handleRequest2 @ @supabase_supabase-js.js?v=09f4d50a:4653
+await in _handleRequest2
+_request @ @supabase_supabase-js.js?v=09f4d50a:4641
+(anonymous) @ @supabase_supabase-js.js?v=09f4d50a:6540
+(anonymous) @ @supabase_supabase-js.js?v=09f4d50a:4436
+(anonymous) @ @supabase_supabase-js.js?v=09f4d50a:4448
+retryable @ @supabase_supabase-js.js?v=09f4d50a:4431
+_refreshAccessToken @ @supabase_supabase-js.js?v=09f4d50a:6535
+_callRefreshToken @ @supabase_supabase-js.js?v=09f4d50a:6663
+__loadSession @ @supabase_supabase-js.js?v=09f4d50a:6034
+await in __loadSession
+_useSession @ @supabase_supabase-js.js?v=09f4d50a:5976
+(anonymous) @ @supabase_supabase-js.js?v=09f4d50a:6848
+(anonymous) @ @supabase_supabase-js.js?v=09f4d50a:5944
+(anonymous) @ @supabase_supabase-js.js?v=09f4d50a:5061
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
