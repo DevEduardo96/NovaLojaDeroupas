@@ -32,6 +32,7 @@ const CheckoutPage: React.FC = () => {
     cep: "",
     rua: "",
     numero: "",
+    complemento: "",
     bairro: "",
     cidade: "",
     estado: "",
@@ -150,6 +151,7 @@ const CheckoutPage: React.FC = () => {
         cep: formData.cep.trim(),
         rua: formData.rua.trim(),
         numero: formData.numero.trim(),
+        complemento: formData.complemento.trim() || undefined,
         bairro: formData.bairro.trim(),
         cidade: formData.cidade.trim(),
         estado: formData.estado.trim(),
@@ -426,6 +428,14 @@ const CheckoutPage: React.FC = () => {
                       onChange={handleChange}
                       className="w-full border-2 border-gray-200 p-3 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all outline-none"
                       required
+                    />
+                    <input
+                      type="text"
+                      name="complemento"
+                      placeholder="Complemento (opcional)"
+                      value={formData.complemento}
+                      onChange={handleChange}
+                      className="w-full border-2 border-gray-200 p-3 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all outline-none"
                     />
                     <input
                       type="text"
