@@ -1,5 +1,5 @@
 import React from "react";
-import { ArrowRight, ShoppingBag, Star, Truck, Shield } from "lucide-react";
+import { ShoppingBag, Star } from "lucide-react";
 import { useLocation } from "wouter";
 import { useAuthCheck } from "../hooks/useAuthGuard";
 
@@ -16,93 +16,109 @@ const Hero: React.FC = () => {
   };
 
   return (
-    <section className="bg-white py-16 lg:py-24">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
+    <section className="bg-white min-h-screen flex items-center py-12 lg:py-0">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+        <div className="grid lg:grid-cols-5 gap-8 lg:gap-16 items-center">
           {/* Content Section */}
-          <div className="text-center lg:text-left space-y-8">
+          <div className="lg:col-span-2 text-center lg:text-left space-y-6 lg:space-y-8 order-2 lg:order-1">
             {/* Badge/Tag */}
-            <div className="inline-flex items-center space-x-2 bg-blue-50 text-blue-700 px-4 py-2 rounded-full text-sm font-medium">
-              <Star className="h-4 w-4 fill-current" />
-              <span>Melhores roupas personalizadas para todas as suas necessidades</span>
+            <div className="inline-flex items-center space-x-2 bg-gray-100 text-black px-4 py-2 rounded-full text-sm font-medium font-barlow">
+              <Star className="h-4 w-4" />
+              <span>Roupas Personalizadas</span>
             </div>
 
             {/* Main Heading */}
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold text-gray-900 leading-tight">
-              <span className="font-teko">Roupas Personalizadas</span>
-            </h1>
+            <div className="space-y-2">
+              <h1 className="text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-bold text-black leading-none tracking-tight">
+                <span className="font-teko block">Nectix</span>
+              </h1>
+              <div className="text-right lg:text-left">
+                <span className="text-4xl sm:text-5xl lg:text-6xl font-light text-gray-400 font-teko">02</span>
+              </div>
+            </div>
 
             {/* Subtitle */}
-            <p className="text-lg lg:text-xl text-gray-600 max-w-xl mx-auto lg:mx-0 font-barlow leading-relaxed">
+            <p className="text-lg text-gray-600 max-w-md mx-auto lg:mx-0 font-barlow leading-relaxed">
               Qualidade premium em roupas personalizadas, camisetas e acessórios para todas as suas necessidades.
             </p>
 
             {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-4">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-2">
               <button
                 onClick={handleExplorarProdutos}
-                className="flex items-center justify-center space-x-2 bg-blue-600 text-white px-8 py-4 rounded-md font-semibold text-lg hover:bg-blue-700 transition-colors duration-300"
+                className="flex items-center justify-center space-x-2 bg-black text-white px-8 py-4 rounded-none font-semibold text-base hover:bg-gray-800 transition-colors duration-300 font-barlow"
               >
-                <span>Explorar Loja</span>
-                <ArrowRight className="h-5 w-5" />
+                <ShoppingBag className="h-5 w-5" />
+                <span>Ver Produtos</span>
+              </button>
+              
+              <button className="flex items-center justify-center space-x-2 border border-gray-300 text-black px-8 py-4 rounded-none font-semibold text-base hover:bg-gray-50 transition-colors duration-300 font-barlow">
+                <span>View</span>
               </button>
             </div>
 
-            {/* Features */}
-            <div className="flex flex-col sm:flex-row gap-6 justify-center lg:justify-start items-center pt-8 border-t border-gray-100">
-              <div className="flex items-center space-x-2 text-sm text-gray-600">
-                <Truck className="h-5 w-5 text-green-600" />
-                <span>Entrega grátis acima de R$ 200</span>
+            {/* Features - Minimal */}
+            <div className="flex flex-wrap justify-center lg:justify-start gap-6 pt-6 text-sm text-gray-500">
+              <div className="flex items-center space-x-2">
+                <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
+                <span className="font-barlow">Free Shipping</span>
               </div>
-              <div className="flex items-center space-x-2 text-sm text-gray-600">
-                <Shield className="h-5 w-5 text-blue-600" />
-                <span>Garantia de qualidade</span>
+              <div className="flex items-center space-x-2">
+                <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
+                <span className="font-barlow">Premium Quality</span>
               </div>
-              <div className="flex items-center space-x-2 text-sm text-gray-600">
-                <Star className="h-5 w-5 text-yellow-500 fill-current" />
-                <span>Avaliação 5.0</span>
+              <div className="flex items-center space-x-2">
+                <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
+                <span className="font-barlow">Easy Returns</span>
               </div>
             </div>
           </div>
 
-          {/* Image Section */}
-          <div className="relative flex justify-center lg:justify-end">
-            <div className="relative w-full max-w-lg">
-              {/* Main Image */}
-              <div className="relative z-10 w-full">
+          {/* Image Section - Much Larger */}
+          <div className="lg:col-span-3 relative order-1 lg:order-2">
+            <div className="relative w-full h-[400px] sm:h-[500px] md:h-[500px] lg:h-[500px] xl:h-[600px]">
+              {/* Main Product Image */}
+              <div className="absolute inset-0 flex items-center justify-center">
                 <img
-                  src="/PARTE01.webp"
-                  alt="Pessoa vestindo camiseta personalizada"
-                  className="w-full h-auto object-cover rounded-lg shadow-lg"
+                  src="/modelobase.png"
+                  alt="Premium Hoodie"
+                  className="w-full h-full object-contain max-w-[500px]lg:object-cover lg:object-center"
                 />
               </div>
               
-              {/* Floating Cards */}
-              <div className="absolute -top-6 -left-6 bg-white p-4 rounded-lg shadow-lg z-20 border border-gray-100">
-                <div className="flex items-center space-x-3">
-                  <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                    <ShoppingBag className="h-6 w-6 text-blue-600" />
-                  </div>
-                  <div>
-                    <div className="font-semibold text-gray-900 text-sm">Camisetas</div>
-                    <div className="text-gray-500 text-xs">A partir de R$ 49</div>
-                  </div>
+              {/* Minimal Info Cards */}
+              <div className="absolute top-4 right-4 bg-white bg-opacity-90 backdrop-blur-sm p-3 rounded-sm shadow-sm border border-gray-100 hidden lg:block">
+                <div className="text-right">
+                  <div className="font-semibold text-black text-sm font-teko">R$ 129</div>
+                  <div className="text-gray-500 text-xs font-barlow">Premium</div>
                 </div>
               </div>
 
-              <div className="absolute -bottom-6 -right-6 bg-white p-4 rounded-lg shadow-lg z-20 border border-gray-100">
-                <div className="flex items-center space-x-3">
-                  <div className="w-12 h-12 bg-rose-100 rounded-full flex items-center justify-center">
-                    <Star className="h-6 w-6 text-rose-600 fill-current" />
-                  </div>
-                  <div>
-                    <div className="font-semibold text-gray-900 text-sm">Acessórios</div>
-                    <div className="text-gray-500 text-xs">Personalizados</div>
-                  </div>
+              <div className="absolute bottom-4 left-4 bg-white bg-opacity-90 backdrop-blur-sm p-3 rounded-sm shadow-sm border border-gray-100 hidden lg:block">
+                <div>
+                  <div className="font-semibold text-black text-sm font-teko">100% Cotton</div>
+                  <div className="text-gray-500 text-xs font-barlow">Sustainable</div>
+                </div>
+              </div>
+
+              {/* Size Indicator */}
+              <div className="absolute top-1/2 right-8 transform -translate-y-1/2 hidden xl:block">
+                <div className="flex flex-col space-y-2 text-gray-400">
+                  <span className="text-xs font-barlow">S</span>
+                  <span className="text-xs font-barlow font-bold text-black">M</span>
+                  <span className="text-xs font-barlow">L</span>
+                  <span className="text-xs font-barlow">XL</span>
                 </div>
               </div>
             </div>
           </div>
+        </div>
+
+        {/* Bottom Navigation Dots */}
+        <div className="flex justify-center lg:justify-start space-x-2 mt-8 lg:mt-12">
+          <div className="w-2 h-2 bg-black rounded-full"></div>
+          <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
+          <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
         </div>
       </div>
     </section>
