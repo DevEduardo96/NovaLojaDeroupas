@@ -2,7 +2,12 @@
 export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        'teko': ['Teko', 'sans-serif'],
+        'barlow': ['Barlow', 'sans-serif'],
+      },
+    },
   },
   plugins: [require("tailwind-scrollbar-hide")],
 };

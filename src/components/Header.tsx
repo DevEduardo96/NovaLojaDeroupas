@@ -2,13 +2,11 @@ import React, { useState, useEffect, useRef } from "react";
 import {
   ShoppingCart,
   Search,
-  Menu as MenuIcon,
-  X as CloseIcon,
   Heart,
   User,
   LogOut,
 } from "lucide-react";
-import { Link, useLocation } from "wouter";
+import { Link } from "wouter";
 import { useAuth } from "../contexts/AuthContext";
 
 interface HeaderProps {
@@ -77,10 +75,10 @@ export const Header: React.FC<HeaderProps> = ({
           <div className="flex items-center space-x-3">
             <Link to="/">
               <div className="flex items-center space-x-2 cursor-pointer">
-                <div className="w-10 h-10">
-                  <img src="/logo02.webp" alt="Logo" />
+                <div className="w-20 h-15">
+                  <img src="/ntix.webp" alt="Logo" />
                 </div>
-                <span className="text-xl font-bold text-gray-800">Nectix</span>
+               
               </div>
             </Link>
           </div>
@@ -88,20 +86,20 @@ export const Header: React.FC<HeaderProps> = ({
           {/* Menu Desktop */}
           <nav className="hidden md:flex gap-6 text-sm font-medium text-gray-600">
             <Link to="/" className="hover:text-indigo-600 transition-colors">
-              Início
+              INICIO
             </Link>
            
             <Link
               to="/suporte"
               className="hover:text-indigo-600 transition-colors"
             >
-              Suporte
+              SUPORTE
             </Link>
             <Link
               to="/sobre"
               className="hover:text-indigo-600 transition-colors"
             >
-              Sobre
+              SOBRE
             </Link>
           </nav>
 
