@@ -1,0 +1,20 @@
+User-agent: *
+Allow: /
+
+# Principais páginas
+Allow: /produtos
+Allow: /sobre
+Allow: /suporte
+Allow: /produto/*
+
+# Páginas administrativas
+Disallow: /meu-perfil
+Disallow: /checkout
+Disallow: /pagamento
+Disallow: /favorites
+
+# Sitemap
+Sitemap: https://nectixstore.com/sitemap.xml
+
+# Crawl-delay para evitar sobrecarga
+Crawl-delay: 1
