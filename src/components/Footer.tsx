@@ -9,15 +9,18 @@ const Footer: React.FC = () => {
         <div className="grid md:grid-cols-4 gap-8">
           {/* Company Info */}
           <div className="space-y-4">
-            <div className="flex items-center space-x-2">
-              <div className="w-10 h-10  from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-                <img src="/logowhite.webp" alt="" />
-              </div>
-              <span className="text-xl font-bold text-white">Nectix</span>
-            </div>
+            <div className="flex items-center space-x-3">
+                        <Link to="/">
+                          <div className="flex items-center space-x-2 cursor-pointer">
+                            <div className="w-20   h-15">
+                              <img src="/logofooter.webp" alt="Logo" />
+                            </div>
+                           
+                          </div>
+                        </Link>
+                      </div>
             <p className="text-gray-400">
-              Sua loja de produtos digitais premium. Cursos, e-books e templates
-              para acelerar seu crescimento.
+              Qualidade premium em roupas personalizadas, camisetas e acessórios para todas as suas necessidades.
             </p>
             <div className="flex space-x-4">
               {/*<a

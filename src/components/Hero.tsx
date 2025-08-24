@@ -80,7 +80,7 @@ const Hero: React.FC = () => {
               {/* Main Product Image */}
               <div className="absolute inset-0 flex items-center justify-center">
                 <img
-                  src="/modelobase.png"
+                  src="/modelobase.webp"
                   alt="Premium Hoodie"
                   className="w-full h-full object-contain max-w-[500px]lg:object-cover lg:object-center"
                 />
