@@ -33,7 +33,7 @@ const Hero: React.FC = () => {
                 <span className="font-teko block">Nectix</span>
               </h1>
               <div className="text-right lg:text-left">
-                <span className="text-4xl sm:text-5xl lg:text-6xl font-light text-gray-400 font-teko">02</span>
+                <span className="text-4xl sm:text-5xl lg:text-6xl font-light text-gray-400 font-teko">07</span>
               </div>
             </div>
 

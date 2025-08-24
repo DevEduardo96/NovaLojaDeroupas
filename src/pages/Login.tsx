@@ -7,7 +7,7 @@ import { Button } from '../components/ui/Button'
 import { Input } from '../components/ui/Input'
 
 export const Login: React.FC = () => {
-  const [location, setLocation] = useLocation()
+  const [, setLocation] = useLocation()
   const { signIn, user } = useAuth()
   const [formData, setFormData] = useState({
     email: '',
@@ -77,14 +77,16 @@ export const Login: React.FC = () => {
       <div className="max-w-md w-full space-y-8">
         {/* Logo */}
         <div className="text-center">
-          <div className="inline-flex items-center space-x-2 mb-4">
-            <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-xl">N</span>
-            </div>
-            <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              Nectix
-            </span>
-          </div>
+          <div className="flex items-center justify-center">
+  <Link to="/">
+    <div className="flex items-center space-x-2 cursor-pointer">
+      <div className="w-20 h-15">
+        <img src="/ntix.webp" alt="Logo" />
+      </div>
+    </div>
+  </Link>
+</div>
+
           <h2 className="text-3xl font-bold text-gray-900">
             Entre na sua conta
           </h2>
@@ -92,7 +94,7 @@ export const Login: React.FC = () => {
             Ou{' '}
             <Link
               to="/register"
-              className="text-blue-600 hover:text-blue-500 font-medium"
+              className="text-[#069b8b] font-medium"
             >
               crie uma nova conta
             </Link>
@@ -165,7 +167,7 @@ export const Login: React.FC = () => {
             <Button
               type="submit"
               disabled={loading}
-              className="w-full h-12 text-lg bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+              className="w-full h-12 text-lg bg-[#069b8b] hover:bg-[#000000] transition-colors duration-300"
             >
               {loading ? (
                 <>

@@ -1,5 +1,5 @@
 import React from "react";
-import { Users, Target, Award, Heart, Sparkles, Shirt, Scissors, Truck } from "lucide-react";
+import { Target, Award, Heart, Sparkles, Shirt, Scissors, Truck } from "lucide-react";
 
 const Sobre: React.FC = () => {
   const team = [
@@ -13,23 +13,23 @@ const Sobre: React.FC = () => {
 
   const values = [
     {
-      icon: <Target className="w-8 h-8" />,
+      icon: <Target  className="w-8 h-8 text-[#069b8b]" />,
       title: "Foco no Cliente",
       description:
         "Priorizamos sempre o seu estilo e satisfação com cada peça escolhida",
     },
     {
-      icon: <Award className="w-8 h-8" />,
+      icon: <Award  className="w-8 h-8 text-[#069b8b]" />,
       title: "Qualidade Premium",
       description: "Selecionamos apenas tecidos e materiais da mais alta qualidade",
     },
     {
-      icon: <Heart className="w-8 h-8" />,
+      icon: <Heart  className="w-8 h-8 text-[#069b8b]" />,
       title: "Paixão pela Moda",
       description: "Vivemos e respiramos moda, trazendo as últimas tendências para você",
     },
     {
-      icon: <Sparkles className="w-8 h-8" />,
+      icon: <Sparkles  className="w-8 h-8 text-[#069b8b]" />,
       title: "Estilo Único",
       description: "Cada peça é pensada para destacar sua personalidade única",
     },
@@ -37,17 +37,17 @@ const Sobre: React.FC = () => {
 
   const services = [
     {
-      icon: <Shirt className="w-12 h-12" />,
+      icon: <Shirt  className="w-8 h-8 text-[#069b8b]" />,
       title: "Roupas Personalizadas",
       description: "Camisetas, blusas e peças exclusivas com seu estilo único",
     },
     {
-      icon: <Scissors className="w-12 h-12" />,
+      icon: <Scissors  className="w-8 h-8 text-[#069b8b]" />,
       title: "Consultoria de Estilo",
       description: "Ajudamos você a encontrar o look perfeito para cada ocasião",
     },
     {
-      icon: <Truck className="w-12 h-12" />,
+      icon: <Truck  className="w-8 h-8 text-[#069b8b]" />,
       title: "Entrega Rápida",
       description: "Receba suas peças favoritas no conforto da sua casa",
     },
@@ -56,7 +56,7 @@ const Sobre: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero */}
-      <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+      <div className="bg-[#069b8b] text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
           <div className="text-center">
             <h1 className="text-4xl md:text-5xl font-bold mb-6 font-teko">
@@ -88,13 +88,13 @@ const Sobre: React.FC = () => {
             </p>
             <div className="grid grid-cols-2 gap-6">
               <div className="text-center">
-                <div className="text-3xl font-bold text-blue-600 mb-2 font-teko">
+                <div className="text-3xl font-bold text-[#069b8b]  mb-2 font-teko">
                   2000+
                 </div>
                 <div className="text-gray-600">Clientes Satisfeitos</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-blue-600 mb-2 font-teko">
+                <div className="text-3xl font-bold text-[#069b8b] mb-2 font-teko">
                   5★
                 </div>
                 <div className="text-gray-600">Avaliação Média</div>
@@ -204,7 +204,7 @@ const Sobre: React.FC = () => {
       </div>
 
       {/* CTA */}
-      <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-16">
+      <div className="bg-[#000000] text-white py-16">
         <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-bold mb-4 font-teko">Pronto para renovar seu guarda-roupa?</h2>
           <p className="text-xl text-blue-100 mb-8 font-barlow">
@@ -215,7 +215,7 @@ const Sobre: React.FC = () => {
             href="https://wa.me/558699461236?text=Olá%2C%20gostaria%20de%20conhecer%20a%20coleção%20da%20Nectix%20Store"
             target="_blank"
             rel="noopener noreferrer"
-            className="bg-white text-blue-600 px-8 py-4 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
+            className="bg-white text-[#069b8b] px-8 py-4 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
           >
             Ver Coleção
           </a>

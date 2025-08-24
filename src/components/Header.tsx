@@ -85,19 +85,19 @@ export const Header: React.FC<HeaderProps> = ({
 
           {/* Menu Desktop */}
           <nav className="hidden md:flex gap-6 text-sm font-medium text-gray-600">
-            <Link to="/" className="hover:text-indigo-600 transition-colors">
+            <Link to="/" className="hover:text-[#069b8b] transition-colors">
               INICIO
             </Link>
            
             <Link
               to="/suporte"
-              className="hover:text-indigo-600 transition-colors"
+              className="hover:text-[#069b8b] transition-colors"
             >
               SUPORTE
             </Link>
             <Link
               to="/sobre"
-              className="hover:text-indigo-600 transition-colors"
+              className="hover:text-[#069b8b] transition-colors"
             >
               SOBRE
             </Link>
@@ -128,17 +128,24 @@ export const Header: React.FC<HeaderProps> = ({
             </Link>
 
             {/* Cart */}
-            <button
-              onClick={onCartClick}
-              className="p-2 rounded-full hover:bg-gray-100 transition-colors relative"
-            >
-              <ShoppingCart className="h-6 w-6 text-gray-600" />
-              {cartItemCount > 0 && (
-                <span className="absolute -top-2 -right-2 bg-blue-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                  {cartItemCount}
-                </span>
-              )}
-            </button>
+           <button
+  onClick={onCartClick}
+  className="p-2 rounded-full hover:bg-gray-100 transition-colors relative"
+>
+  {/* Substituí o ícone pelo <img /> */}
+  <img 
+    src="/meu-carrinho.webp" 
+    alt="Carrinho de compras" 
+    className="h-7 w-7 object-contain" 
+  />
+
+  {cartItemCount > 0 && (
+    <span className="absolute -top-2 -right-2 bg-[#069b8b] text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+      {cartItemCount}
+    </span>
+  )}
+</button>
+
 
             {/* User */}
             {user ? (

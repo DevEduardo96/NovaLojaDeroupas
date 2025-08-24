@@ -7,10 +7,6 @@ import {
   Send,
   Clock,
   CheckCircle,
-  Package,
-  Truck,
-  RefreshCw,
-  CreditCard,
 } from "lucide-react";
 import { useForm, ValidationError } from "@formspree/react";
 
@@ -53,7 +49,7 @@ const Suporte: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+      <div className="bg-[#069b8b] text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
           <MessageCircle className="w-16 h-16 mx-auto mb-4" />
           <h1 className="text-4xl font-bold mb-4 font-teko">Central de Atendimento</h1>
@@ -163,16 +159,16 @@ const Suporte: React.FC = () => {
                 <button
                   type="submit"
                   disabled={state.submitting}
-                  className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center space-x-2"
+                  className="w-full bg-[#000000] hover:bg-[#2d2d2d] disabled:bg-blue-400 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center space-x-2"
                 >
                   {state.submitting ? (
                     <>
-                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                      <div className=" animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
                       <span>Enviando...</span>
                     </>
                   ) : (
                     <>
-                      <Send className="w-5 h-5" />
+                      <Send className= "w-5 h-5" />
                       <span>Enviar Mensagem</span>
                     </>
                   )}
@@ -189,19 +185,19 @@ const Suporte: React.FC = () => {
               </h2>
               <div className="space-y-4">
                 <div className="flex items-center space-x-3">
-                  <Mail className="w-5 h-5 text-blue-600" />
+                  <Mail className="w-5 h-5 text-[#000000]" />
                   <span>atendimento@nectixstore.com</span>
                 </div>
                 <div className="flex items-center space-x-3">
-                  <Phone className="w-5 h-5 text-blue-600" />
+                  <Phone className="w-5 h-5 text-[#000000]" />
                   <span>+55 (86) 99946-1236</span>
                 </div>
                 <div className="flex items-center space-x-3">
-                  <MapPin className="w-5 h-5 text-blue-600" />
+                  <MapPin className="w-5 h-5 text-[#000000]" />
                   <span>Teresina, PI - Brasil</span>
                 </div>
                 <div className="flex items-center space-x-3">
-                  <Clock className="w-5 h-5 text-blue-600" />
+                  <Clock className="w-5 h-5 text-[#000000]" />
                   <span>Seg - Sáb: 8h às 20h</span>
                 </div>
               </div>
