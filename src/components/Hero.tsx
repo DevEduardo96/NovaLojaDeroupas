@@ -11,7 +11,7 @@ const Hero: React.FC = () => {
     if (isAuthenticated) {
       setLocation("/produtos");
     } else {
-      setLocation("/login");
+      setLocation("/produtos");
     }
   };
 
@@ -51,7 +51,7 @@ const Hero: React.FC = () => {
                 <ShoppingBag className="h-5 w-5" />
                 <span>Ver Produtos</span>
               </button>
-              
+
               <button className="flex items-center justify-center space-x-2 border border-gray-300 text-black px-8 py-4 rounded-none font-semibold text-base hover:bg-gray-50 transition-colors duration-300 font-barlow">
                 <span>View</span>
               </button>
@@ -85,7 +85,7 @@ const Hero: React.FC = () => {
                   className="w-full h-full object-contain max-w-[500px]lg:object-cover lg:object-center"
                 />
               </div>
-              
+
               {/* Minimal Info Cards */}
               <div className="absolute top-4 right-4 bg-white bg-opacity-90 backdrop-blur-sm p-3 rounded-sm shadow-sm border border-gray-100 hidden lg:block">
                 <div className="text-right">

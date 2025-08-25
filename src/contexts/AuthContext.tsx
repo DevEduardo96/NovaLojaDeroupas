@@ -92,11 +92,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     // Listen for auth state changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
+    } = supabase.auth.onAuthStateChange(async (event, currentSession) => {
       if (!isMounted) return;
 
       if (import.meta.env.DEV) {
-        console.log("Auth state changed:", event, session?.user?.email);
+        console.log("Auth state changed:", event, currentSession?.user?.email);
       }
 
       // Evita múltiplos refresh simultâneos
@@ -112,8 +112,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         }, 1000);
       }
 
-      setSession(session);
-      setUser(session?.user ?? null);
+      setSession(currentSession);
+      setUser(currentSession?.user ?? null);
       setLoading(false);
     });
 

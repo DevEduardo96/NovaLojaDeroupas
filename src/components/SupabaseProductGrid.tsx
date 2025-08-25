@@ -26,8 +26,6 @@ const SupabaseProductGrid: React.FC<SupabaseProductGridProps> = ({
   onProductClick,
   onAddToCart,
 }) => {
-  useAuth();
-  useFavorites();
   const [products, setProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
