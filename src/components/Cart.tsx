@@ -1,7 +1,7 @@
 import React from "react";
 import { X, Plus, Minus, ShoppingBag } from "lucide-react";
 import { CartItem } from "../types";
-import { useNavigate } from 'react-router-dom'; // Importar useNavigate
+import { useAuth } from "../contexts/AuthContext";
 
 interface CartProps {
   items: CartItem[];
@@ -11,8 +11,6 @@ interface CartProps {
   onRemoveItem: (productId: number, selectedSize?: string, selectedColor?: string) => void;
   onCheckout: () => void;
   total: number;
-  user: any; // Assumindo que você tem um tipo para o usuário
-  setIsCheckoutOpen: (isOpen: boolean) => void; // Adicionar prop para controlar o estado do checkout
 }
 
 export const Cart: React.FC<CartProps> = ({
@@ -23,10 +21,8 @@ export const Cart: React.FC<CartProps> = ({
   onRemoveItem,
   onCheckout,
   total,
-  user, // Receber user como prop
-  setIsCheckoutOpen, // Receber setIsCheckoutOpen como prop
 }) => {
-  const navigate = useNavigate(); // Inicializar useNavigate
+  const { user } = useAuth();
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("pt-BR", {
@@ -44,11 +40,13 @@ export const Cart: React.FC<CartProps> = ({
     if (!user) {
       // Salvar intenção de checkout no localStorage
       localStorage.setItem('pendingCheckout', 'true');
-      // Se não estiver logado, redirecionar para login
-      navigate('/login');
+      // Fechar carrinho e ir para checkout (que vai redirecionar para login)
+      onClose();
+      onCheckout();
     } else {
-      // Se estiver logado, ir para checkout
-      setIsCheckoutOpen(true);
+      // Se estiver logado, ir direto para checkout
+      onClose();
+      onCheckout();
     }
   };
 

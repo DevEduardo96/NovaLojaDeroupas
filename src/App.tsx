@@ -25,6 +25,7 @@ import ScrollToTop from "./components/ScrollToTo";
 import { AuthProvider } from "./contexts/AuthContext";
 import { FavoritesProvider } from "./contexts/FavoritesContext";
 import { ProfilePage } from "./pages/ProfilePage";
+import { CheckoutGuard } from "./components/CheckoutGuard";
 import SEO from "./components/SEO";
 
 // Payment Data Context
@@ -73,14 +74,12 @@ function AppContent() {
               description="Explore nossa coleção completa de hoodies, camisetas, calças e acessórios. Roupas de qualidade premium com entrega para todo Brasil."
               keywords="produtos roupas online, coleção hoodies, camisetas premium, moda streetwear, roupas masculinas, roupas femininas"
             />
-            <ProtectedRoute>
-              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                <SupabaseProductGrid
-                  onAddToCart={addToCart}
-                  onProductClick={(product) => setLocation(`/produto/${product.id}`)}
-                />
-              </div>
-            </ProtectedRoute>
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+              <SupabaseProductGrid
+                onAddToCart={addToCart}
+                onProductClick={(product) => setLocation(`/produto/${product.id}`)}
+              />
+            </div>
           </Route>
 
           <Route path="/produto/:id">
@@ -135,7 +134,9 @@ function AppContent() {
               description="Finalize sua compra com segurança. Múltiplas formas de pagamento e entrega rápida para todo Brasil."
               keywords="finalizar compra, checkout seguro, pagamento online, carrinho compras"
             />
-            <CheckoutPage />
+            <CheckoutGuard>
+              <CheckoutPage />
+            </CheckoutGuard>
           </Route>
           <Route path="/pagamento">
             {paymentData ? (
@@ -204,7 +205,6 @@ function AppContent() {
         onUpdateQuantity={updateQuantity}
         onRemoveItem={removeFromCart}
         onCheckout={() => {
-          setIsCartOpen(false);
           setLocation("/checkout");
         }}
         total={getTotal()}

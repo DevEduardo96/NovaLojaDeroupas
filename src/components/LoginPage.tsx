@@ -194,22 +194,13 @@ const LoginPage: React.FC<LoginPageProps> = ({ onClose, onSuccess }) => {
           }, 1000);
         }
 
-        // Corrigir redirecionamento após login
-        if (userData) {
-          setMessage({ type: "success", text: "Login realizado com sucesso!" });
-
-          // Verificar se há intenção de checkout pendente
-          const pendingCheckout = localStorage.getItem('pendingCheckout');
-          const cartItems = localStorage.getItem('cart');
-          const hasItemsInCart = cartItems && JSON.parse(cartItems).length > 0;
-
+        // Callback de sucesso
+        if (onSuccess) {
+          onSuccess(userData);
+        } else {
+          // Se não há callback, navegar para página inicial
           setTimeout(() => {
-            if (pendingCheckout === 'true' && hasItemsInCart) {
-              localStorage.removeItem('pendingCheckout');
-              navigate("/", { state: { openCheckout: true } });
-            } else {
-              navigate("/");
-            }
+            navigate("/");
           }, 1000);
         }
       }
@@ -257,25 +248,22 @@ const LoginPage: React.FC<LoginPageProps> = ({ onClose, onSuccess }) => {
           newsletter: true,
         });
 
-        // Corrigir redirecionamento após registro
-        setMessage({
-          type: "success",
-          text: "Conta criada com sucesso! Verifique seu email.",
-        });
+        // Simular dados do usuário para callback
+        const userData = {
+          id: "new-user-123",
+          email: registerForm.email,
+          name: registerForm.name,
+        };
 
-        // Verificar se há intenção de checkout pendente
-        const pendingCheckout = localStorage.getItem('pendingCheckout');
-        const cartItems = localStorage.getItem('cart');
-        const hasItemsInCart = cartItems && JSON.parse(cartItems).length > 0;
-
-        setTimeout(() => {
-          if (pendingCheckout === 'true' && hasItemsInCart) {
-            localStorage.removeItem('pendingCheckout');
-            navigate("/", { state: { openCheckout: true } });
-          } else {
+        // Callback de sucesso
+        if (onSuccess) {
+          onSuccess(userData);
+        } else {
+          // Se não há callback, navegar para página inicial
+          setTimeout(() => {
             navigate("/");
-          }
-        }, 2000);
+          }, 2000);
+        }
 
 
         // Só mudar de aba se não for um modal
@@ -375,22 +363,13 @@ const LoginPage: React.FC<LoginPageProps> = ({ onClose, onSuccess }) => {
         }, 1000);
       }
 
-      // Corrigir redirecionamento após login social
-      if (userData) {
-        setMessage({ type: "success", text: `Login com ${provider} realizado com sucesso!` });
-
-        // Verificar se há intenção de checkout pendente
-        const pendingCheckout = localStorage.getItem('pendingCheckout');
-        const cartItems = localStorage.getItem('cart');
-        const hasItemsInCart = cartItems && JSON.parse(cartItems).length > 0;
-
+      // Callback de sucesso
+      if (onSuccess) {
+        onSuccess(userData);
+      } else {
+        // Se não há callback, navegar para página inicial
         setTimeout(() => {
-          if (pendingCheckout === 'true' && hasItemsInCart) {
-            localStorage.removeItem('pendingCheckout');
-            navigate("/", { state: { openCheckout: true } });
-          } else {
-            navigate("/");
-          }
+          navigate("/");
         }, 1000);
       }
 
