@@ -472,22 +472,28 @@ export const reviewService = {
     }
   },
 
-  // Verificar se o usuário já avaliou o produto
-  async hasUserReviewed(userId: string, productId: number): Promise<boolean> {
+  // Verificar se o usuário já avaliou o produto e retornar a avaliação
+  async getUserReview(userId: string, productId: number): Promise<Review | null> {
     try {
       const { data, error } = await supabase
         .from("avaliacoes")
-        .select("id")
+        .select("*")
         .eq("user_id", userId)
         .eq("product_id", productId)
         .maybeSingle();
 
       if (error) throw error;
-      return !!data;
+      return data;
     } catch (error) {
-      console.error("Error in hasUserReviewed:", error);
-      return false;
+      console.error("Error in getUserReview:", error);
+      return null;
     }
+  },
+
+  // Verificar se o usuário já avaliou o produto (compatibilidade)
+  async hasUserReviewed(userId: string, productId: number): Promise<boolean> {
+    const review = await this.getUserReview(userId, productId);
+    return !!review;
   },
 
   // Atualizar uma avaliação existente

@@ -348,10 +348,12 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({
             )}
 
             {activeTab === "reviews" && (
-              <ProductReviews 
-                productId={product.id} 
-                productName={product.name} 
-              />
+              <div className="bg-white rounded-lg p-6">
+                <ProductReviews 
+                  productId={product.id} 
+                  productName={product.name} 
+                />
+              </div>
             )}
           </div>
         </div>

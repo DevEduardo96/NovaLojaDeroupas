@@ -1,7 +1,7 @@
 
-import React, { useState, useEffect } from 'react';
-import { Star, MessageSquare, ThumbsUp, Edit, Trash2, Send } from 'lucide-react';
-import { reviewService, type Review } from '../lib/supabase';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Star, MessageSquare, ThumbsUp, Edit, Trash2, Send, AlertCircle } from 'lucide-react';
+import { reviewService, supabase, type Review } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { Button } from './ui/Button';
 import { formatDate } from '../lib/utils';
@@ -27,9 +27,10 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ productId, productName 
   });
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
-  const [hasUserReviewed, setHasUserReviewed] = useState(false);
+  const [userReview, setUserReview] = useState<Review | null>(null);
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [editingReview, setEditingReview] = useState<Review | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   // Form state
   const [formData, setFormData] = useState({
@@ -42,6 +43,32 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ productId, productName 
     if (user) {
       checkUserReview();
     }
+
+    // Setup real-time subscription
+    const subscription = supabase
+      .channel(`reviews-${productId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'avaliacoes',
+          filter: `product_id=eq.${productId}`
+        },
+        (payload) => {
+          console.log('Real-time review update:', payload);
+          // Reload reviews when changes occur
+          loadReviews();
+          if (user) {
+            checkUserReview();
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(subscription);
+    };
   }, [productId, user]);
 
   const loadReviews = async () => {
@@ -61,16 +88,19 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ productId, productName 
     }
   };
 
-  const checkUserReview = async () => {
-    if (!user) return;
+  const checkUserReview = useCallback(async () => {
+    if (!user) {
+      setUserReview(null);
+      return;
+    }
     
     try {
-      const hasReviewed = await reviewService.hasUserReviewed(user.id, productId);
-      setHasUserReviewed(hasReviewed);
+      const existingReview = await reviewService.getUserReview(user.id, productId);
+      setUserReview(existingReview);
     } catch (error) {
       console.error('Erro ao verificar avaliação do usuário:', error);
     }
-  };
+  }, [user, productId]);
 
   const handleSubmitReview = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -78,10 +108,14 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ productId, productName 
 
     try {
       setSubmitting(true);
+      setError(null);
 
-      if (editingReview) {
-        await reviewService.updateReview(editingReview.id, formData);
+      if (editingReview || userReview) {
+        // Update existing review
+        const reviewToUpdate = editingReview || userReview!;
+        await reviewService.updateReview(reviewToUpdate.id, formData);
       } else {
+        // Create new review
         await reviewService.createReview({
           user_id: user.id,
           product_id: productId,
@@ -95,33 +129,44 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ productId, productName 
       setShowReviewForm(false);
       setEditingReview(null);
       
-      // Reload reviews
-      await loadReviews();
-      await checkUserReview();
-    } catch (error) {
+      // Reload reviews and user review status
+      await Promise.all([loadReviews(), checkUserReview()]);
+    } catch (error: any) {
       console.error('Erro ao enviar avaliação:', error);
-      alert('Erro ao enviar avaliação. Tente novamente.');
+      
+      // Handle specific error cases
+      if (error.code === '23505') {
+        setError('Você já avaliou este produto. Use o botão "Editar" para modificar sua avaliação.');
+      } else {
+        setError('Erro ao enviar avaliação. Tente novamente.');
+      }
     } finally {
       setSubmitting(false);
     }
   };
 
-  const handleEditReview = (review: Review) => {
+  const handleEditReview = (review?: Review) => {
+    const reviewToEdit = review || userReview;
+    if (!reviewToEdit) return;
+
     setFormData({
-      rating: review.rating,
-      comment: review.comment || ''
+      rating: reviewToEdit.rating,
+      comment: reviewToEdit.comment || ''
     });
-    setEditingReview(review);
+    setEditingReview(reviewToEdit);
     setShowReviewForm(true);
+    setError(null);
   };
 
-  const handleDeleteReview = async (reviewId: number) => {
+  const handleDeleteReview = async (reviewId?: number) => {
     if (!user || !confirm('Tem certeza que deseja excluir sua avaliação?')) return;
 
     try {
-      await reviewService.deleteReview(reviewId, user.id);
-      await loadReviews();
-      await checkUserReview();
+      const idToDelete = reviewId || userReview?.id;
+      if (!idToDelete) return;
+
+      await reviewService.deleteReview(idToDelete, user.id);
+      await Promise.all([loadReviews(), checkUserReview()]);
     } catch (error) {
       console.error('Erro ao excluir avaliação:', error);
       alert('Erro ao excluir avaliação. Tente novamente.');
@@ -187,14 +232,40 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ productId, productName 
         <h3 className="text-lg font-semibold text-gray-900">
           Avaliações dos Clientes
         </h3>
-        {user && !hasUserReviewed && !showReviewForm && (
-          <Button
-            onClick={() => setShowReviewForm(true)}
-            className="bg-purple-600 hover:bg-purple-700"
-          >
-            <MessageSquare className="w-4 h-4 mr-2" />
-            Avaliar Produto
-          </Button>
+        {user && (
+          <div className="flex items-center space-x-2">
+            {userReview ? (
+              <>
+                <Button
+                  onClick={() => handleEditReview()}
+                  variant="outline"
+                  className="border-purple-600 text-purple-600 hover:bg-purple-50"
+                >
+                  <Edit className="w-4 h-4 mr-2" />
+                  Editar Minha Avaliação
+                </Button>
+                <Button
+                  onClick={() => handleDeleteReview()}
+                  variant="outline"
+                  className="border-red-600 text-red-600 hover:bg-red-50"
+                >
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  Excluir
+                </Button>
+              </>
+            ) : !showReviewForm && (
+              <Button
+                onClick={() => {
+                  setShowReviewForm(true);
+                  setError(null);
+                }}
+                className="bg-purple-600 hover:bg-purple-700"
+              >
+                <MessageSquare className="w-4 h-4 mr-2" />
+                Avaliar Produto
+              </Button>
+            )}
+          </div>
         )}
       </div>
 
@@ -221,8 +292,15 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ productId, productName 
       {showReviewForm && user && (
         <div className="bg-white border border-gray-200 rounded-lg p-6">
           <h4 className="font-semibold text-gray-900 mb-4">
-            {editingReview ? 'Editar Avaliação' : 'Avaliar Produto'}
+            {editingReview || userReview ? 'Editar Avaliação' : 'Avaliar Produto'}
           </h4>
+
+          {error && (
+            <div className="flex items-center space-x-2 p-3 bg-red-50 border border-red-200 rounded-md text-red-700">
+              <AlertCircle className="w-4 h-4 flex-shrink-0" />
+              <span className="text-sm">{error}</span>
+            </div>
+          )}
           
           <form onSubmit={handleSubmitReview} className="space-y-4">
             <div>
@@ -257,7 +335,7 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ productId, productName 
                 className="bg-purple-600 hover:bg-purple-700 disabled:opacity-50"
               >
                 <Send className="w-4 h-4 mr-2" />
-                {submitting ? 'Enviando...' : editingReview ? 'Atualizar' : 'Enviar Avaliação'}
+                {submitting ? 'Enviando...' : (editingReview || userReview) ? 'Atualizar Avaliação' : 'Enviar Avaliação'}
               </Button>
               <Button
                 type="button"
@@ -331,11 +409,14 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ productId, productName 
         <div className="text-center py-8">
           <MessageSquare className="w-12 h-12 text-gray-300 mx-auto mb-3" />
           <p className="text-gray-500 mb-4">
-            Seja o primeiro a avaliar este produto!
+            Ainda não há comentários para este produto. Seja o primeiro a avaliar!
           </p>
-          {user && !showReviewForm && (
+          {user && !userReview && !showReviewForm && (
             <Button
-              onClick={() => setShowReviewForm(true)}
+              onClick={() => {
+                setShowReviewForm(true);
+                setError(null);
+              }}
               className="bg-purple-600 hover:bg-purple-700"
             >
               Escrever Avaliação

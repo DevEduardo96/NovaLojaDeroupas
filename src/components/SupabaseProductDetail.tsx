@@ -635,11 +635,13 @@ export const SupabaseProductDetail: React.FC<SupabaseProductDetailProps> = ({
                 </div>
               )}
 
-              {activeTab === "reviews" && (
-                <ProductReviews 
-                  productId={product.id} 
-                  productName={product.name} 
-                />
+              {activeTab === "reviews" && product && (
+                <div className="bg-white rounded-lg">
+                  <ProductReviews 
+                    productId={product.id} 
+                    productName={product.name} 
+                  />
+                </div>
               )}
             </div>
           </div>
