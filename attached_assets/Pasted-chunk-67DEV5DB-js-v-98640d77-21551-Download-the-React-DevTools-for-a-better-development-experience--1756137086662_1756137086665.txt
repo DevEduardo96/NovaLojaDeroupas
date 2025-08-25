@@ -1,0 +1,102 @@
+chunk-67DEV5DB.js?v=98640d77:21551 Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools
+AuthContext.tsx:230 Uncaught ReferenceError: session is not defined
+    at AuthProvider (AuthContext.tsx:230:9)
+    at renderWithHooks (chunk-67DEV5DB.js?v=98640d77:11548:26)
+    at mountIndeterminateComponent (chunk-67DEV5DB.js?v=98640d77:14926:21)
+    at beginWork (chunk-67DEV5DB.js?v=98640d77:15914:22)
+    at HTMLUnknownElement.callCallback2 (chunk-67DEV5DB.js?v=98640d77:3674:22)
+    at Object.invokeGuardedCallbackDev (chunk-67DEV5DB.js?v=98640d77:3699:24)
+    at invokeGuardedCallback (chunk-67DEV5DB.js?v=98640d77:3733:39)
+    at beginWork$1 (chunk-67DEV5DB.js?v=98640d77:19765:15)
+    at performUnitOfWork (chunk-67DEV5DB.js?v=98640d77:19198:20)
+    at workLoopSync (chunk-67DEV5DB.js?v=98640d77:19137:13)
+AuthProvider @ AuthContext.tsx:230
+renderWithHooks @ chunk-67DEV5DB.js?v=98640d77:11548
+mountIndeterminateComponent @ chunk-67DEV5DB.js?v=98640d77:14926
+beginWork @ chunk-67DEV5DB.js?v=98640d77:15914
+callCallback2 @ chunk-67DEV5DB.js?v=98640d77:3674
+invokeGuardedCallbackDev @ chunk-67DEV5DB.js?v=98640d77:3699
+invokeGuardedCallback @ chunk-67DEV5DB.js?v=98640d77:3733
+beginWork$1 @ chunk-67DEV5DB.js?v=98640d77:19765
+performUnitOfWork @ chunk-67DEV5DB.js?v=98640d77:19198
+workLoopSync @ chunk-67DEV5DB.js?v=98640d77:19137
+renderRootSync @ chunk-67DEV5DB.js?v=98640d77:19116
+performConcurrentWorkOnRoot @ chunk-67DEV5DB.js?v=98640d77:18678
+workLoop @ chunk-67DEV5DB.js?v=98640d77:197
+flushWork @ chunk-67DEV5DB.js?v=98640d77:176
+performWorkUntilDeadline @ chunk-67DEV5DB.js?v=98640d77:384
+AuthContext.tsx:230 Uncaught ReferenceError: session is not defined
+    at AuthProvider (AuthContext.tsx:230:9)
+    at renderWithHooks (chunk-67DEV5DB.js?v=98640d77:11548:26)
+    at mountIndeterminateComponent (chunk-67DEV5DB.js?v=98640d77:14926:21)
+    at beginWork (chunk-67DEV5DB.js?v=98640d77:15914:22)
+    at HTMLUnknownElement.callCallback2 (chunk-67DEV5DB.js?v=98640d77:3674:22)
+    at Object.invokeGuardedCallbackDev (chunk-67DEV5DB.js?v=98640d77:3699:24)
+    at invokeGuardedCallback (chunk-67DEV5DB.js?v=98640d77:3733:39)
+    at beginWork$1 (chunk-67DEV5DB.js?v=98640d77:19765:15)
+    at performUnitOfWork (chunk-67DEV5DB.js?v=98640d77:19198:20)
+    at workLoopSync (chunk-67DEV5DB.js?v=98640d77:19137:13)
+AuthProvider @ AuthContext.tsx:230
+renderWithHooks @ chunk-67DEV5DB.js?v=98640d77:11548
+mountIndeterminateComponent @ chunk-67DEV5DB.js?v=98640d77:14926
+beginWork @ chunk-67DEV5DB.js?v=98640d77:15914
+callCallback2 @ chunk-67DEV5DB.js?v=98640d77:3674
+invokeGuardedCallbackDev @ chunk-67DEV5DB.js?v=98640d77:3699
+invokeGuardedCallback @ chunk-67DEV5DB.js?v=98640d77:3733
+beginWork$1 @ chunk-67DEV5DB.js?v=98640d77:19765
+performUnitOfWork @ chunk-67DEV5DB.js?v=98640d77:19198
+workLoopSync @ chunk-67DEV5DB.js?v=98640d77:19137
+renderRootSync @ chunk-67DEV5DB.js?v=98640d77:19116
+recoverFromConcurrentError @ chunk-67DEV5DB.js?v=98640d77:18736
+performConcurrentWorkOnRoot @ chunk-67DEV5DB.js?v=98640d77:18684
+workLoop @ chunk-67DEV5DB.js?v=98640d77:197
+flushWork @ chunk-67DEV5DB.js?v=98640d77:176
+performWorkUntilDeadline @ chunk-67DEV5DB.js?v=98640d77:384
+chunk-67DEV5DB.js?v=98640d77:14032 The above error occurred in the <AuthProvider> component:
+
+    at AuthProvider (http://localhost:5173/src/contexts/AuthContext.tsx:22:3)
+    at Router (http://localhost:5173/node_modules/.vite/deps/wouter.js?v=98640d77:235:17)
+    at App (http://localhost:5173/src/App.tsx:540:41)
+    at _a (http://localhost:5173/node_modules/.vite/deps/react-helmet-async.js?v=98640d77:624:5)
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+logCapturedError @ chunk-67DEV5DB.js?v=98640d77:14032
+update.callback @ chunk-67DEV5DB.js?v=98640d77:14052
+callCallback @ chunk-67DEV5DB.js?v=98640d77:11248
+commitUpdateQueue @ chunk-67DEV5DB.js?v=98640d77:11265
+commitLayoutEffectOnFiber @ chunk-67DEV5DB.js?v=98640d77:17093
+commitLayoutMountEffects_complete @ chunk-67DEV5DB.js?v=98640d77:17980
+commitLayoutEffects_begin @ chunk-67DEV5DB.js?v=98640d77:17969
+commitLayoutEffects @ chunk-67DEV5DB.js?v=98640d77:17920
+commitRootImpl @ chunk-67DEV5DB.js?v=98640d77:19353
+commitRoot @ chunk-67DEV5DB.js?v=98640d77:19277
+finishConcurrentRender @ chunk-67DEV5DB.js?v=98640d77:18760
+performConcurrentWorkOnRoot @ chunk-67DEV5DB.js?v=98640d77:18718
+workLoop @ chunk-67DEV5DB.js?v=98640d77:197
+flushWork @ chunk-67DEV5DB.js?v=98640d77:176
+performWorkUntilDeadline @ chunk-67DEV5DB.js?v=98640d77:384
+chunk-67DEV5DB.js?v=98640d77:19413 Uncaught ReferenceError: session is not defined
+    at AuthProvider (AuthContext.tsx:230:9)
+    at renderWithHooks (chunk-67DEV5DB.js?v=98640d77:11548:26)
+    at mountIndeterminateComponent (chunk-67DEV5DB.js?v=98640d77:14926:21)
+    at beginWork (chunk-67DEV5DB.js?v=98640d77:15914:22)
+    at beginWork$1 (chunk-67DEV5DB.js?v=98640d77:19753:22)
+    at performUnitOfWork (chunk-67DEV5DB.js?v=98640d77:19198:20)
+    at workLoopSync (chunk-67DEV5DB.js?v=98640d77:19137:13)
+    at renderRootSync (chunk-67DEV5DB.js?v=98640d77:19116:15)
+    at recoverFromConcurrentError (chunk-67DEV5DB.js?v=98640d77:18736:28)
+    at performConcurrentWorkOnRoot (chunk-67DEV5DB.js?v=98640d77:18684:30)
+AuthProvider @ AuthContext.tsx:230
+renderWithHooks @ chunk-67DEV5DB.js?v=98640d77:11548
+mountIndeterminateComponent @ chunk-67DEV5DB.js?v=98640d77:14926
+beginWork @ chunk-67DEV5DB.js?v=98640d77:15914
+beginWork$1 @ chunk-67DEV5DB.js?v=98640d77:19753
+performUnitOfWork @ chunk-67DEV5DB.js?v=98640d77:19198
+workLoopSync @ chunk-67DEV5DB.js?v=98640d77:19137
+renderRootSync @ chunk-67DEV5DB.js?v=98640d77:19116
+recoverFromConcurrentError @ chunk-67DEV5DB.js?v=98640d77:18736
+performConcurrentWorkOnRoot @ chunk-67DEV5DB.js?v=98640d77:18684
+workLoop @ chunk-67DEV5DB.js?v=98640d77:197
+flushWork @ chunk-67DEV5DB.js?v=98640d77:176
+performWorkUntilDeadline @ chunk-67DEV5DB.js?v=98640d77:384
