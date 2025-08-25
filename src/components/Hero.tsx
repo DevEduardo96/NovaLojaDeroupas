@@ -25,19 +25,29 @@ const Hero: React.FC = () => {
             </div>
 
             {/* Main Heading */}
-            <div className="space-y-2">
-              <h1 className="text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-bold text-black leading-none tracking-tight">
-                <span className="font-teko block">Nectix</span>
-              </h1>
-              <div className="text-right lg:text-left">
-                <span className="text-4xl sm:text-5xl lg:text-6xl font-light text-gray-400 font-teko">07</span>
-              </div>
-            </div>
+{/* Container principal com alinhamento vertical em telas menores */}
+<div className="flex flex-col lg:block space-y-4 lg:space-y-2">
+  {/* Main Heading */}
+  <div className="order-1 lg:order-none">
+    <h1 className="text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-bold text-black leading-none tracking-tight text-center lg:text-left">
+      <span className="font-teko block">
+        <img src="/grandelogo.webp" alt="" className="mx-auto lg:mx-0" />
+      </span>
+    </h1>
+  </div>
 
-            {/* Subtitle */}
-            <p className="text-lg text-gray-600 max-w-md mx-auto lg:mx-0 font-barlow leading-relaxed">
-              Qualidade premium em roupas personalizadas, camisetas e acessórios para todas as suas necessidades.
-            </p>
+  {/* Number 07 */}
+  <div className="order-2 lg:order-none text-center lg:text-right xl:text-left">
+    <span className="text-4xl sm:text-5xl lg:text-6xl font-light text-gray-400 font-teko">07</span>
+  </div>
+
+  {/* Subtitle */}
+  <div className="order-3 lg:order-none">
+    <p className="text-lg text-gray-600 max-w-md mx-auto lg:mx-0 font-barlow leading-relaxed text-center lg:text-left">
+      Qualidade premium em roupas personalizadas, camisetas e acessórios para todas as suas necessidades.
+    </p>
+  </div>
+</div>
 
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-2">
