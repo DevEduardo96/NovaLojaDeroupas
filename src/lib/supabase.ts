@@ -15,7 +15,10 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     autoRefreshToken: true,
     detectSessionInUrl: true,
     flowType: 'pkce',
-    debug: false
+    debug: false,
+    // Configurações para evitar loops de refresh
+    refreshThreshold: 30, // Refresh apenas 30s antes de expirar
+    maxRetries: 3 // Máximo 3 tentativas de refresh
   },
   global: {
     headers: {

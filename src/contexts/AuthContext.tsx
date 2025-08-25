@@ -22,18 +22,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const isInitialized = useRef(false);
-  const refreshCount = useRef(0);
   const lastRefreshTime = useRef(0);
+  const authListenerRef = useRef<any>(null);
 
   useEffect(() => {
     let isMounted = true;
-    let subscription: any = null;
 
-    // Get initial session
-    const getInitialSession = async () => {
+    const initializeAuth = async () => {
       if (isInitialized.current) return;
-      
+
       try {
+        // Buscar sessão inicial
         const { data: { session }, error } = await supabase.auth.getSession();
 
         if (!isMounted) return;
@@ -50,8 +49,54 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
             console.log("User is logged in:", session.user?.email);
           }
         }
+
+        // Configurar listener único
+        if (!authListenerRef.current) {
+          authListenerRef.current = supabase.auth.onAuthStateChange(
+            async (event, currentSession) => {
+              if (!isMounted) return;
+
+              console.log("Auth state changed:", event, currentSession?.user?.email);
+
+              // Implementar debouncing para TOKEN_REFRESHED
+              if (event === 'TOKEN_REFRESHED') {
+                const now = Date.now();
+                const timeSinceLastRefresh = now - lastRefreshTime.current;
+                
+                // Se refresh foi há menos de 30 segundos, ignore
+                if (timeSinceLastRefresh < 30000) {
+                  console.log("Ignoring rapid token refresh, last refresh was", timeSinceLastRefresh, "ms ago");
+                  return;
+                }
+                
+                lastRefreshTime.current = now;
+              }
+
+              // Atualizar estado apenas quando necessário
+              setSession(currentSession);
+              setUser(currentSession?.user ?? null);
+
+              // Persistir sessão no localStorage
+              if (currentSession) {
+                try {
+                  localStorage.setItem('supabase_session', JSON.stringify({
+                    access_token: currentSession.access_token,
+                    refresh_token: currentSession.refresh_token,
+                    expires_at: currentSession.expires_at,
+                    user: currentSession.user
+                  }));
+                } catch (error) {
+                  console.warn("Failed to save session to localStorage:", error);
+                }
+              } else {
+                localStorage.removeItem('supabase_session');
+              }
+            }
+          );
+        }
+
       } catch (error) {
-        console.error("Error in getInitialSession:", error);
+        console.error("Error in auth initialization:", error);
         if (isMounted) {
           setSession(null);
           setUser(null);
@@ -64,86 +109,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       }
     };
 
-    // Setup auth state listener
-    const setupAuthListener = () => {
-      subscription = supabase.auth.onAuthStateChange(async (event, currentSession) => {
-        if (!isMounted) return;
-
-        console.log("Auth state changed:", event, currentSession?.user?.email);
-
-        // Prevenir múltiplos refresh tokens em sequência
-        if (event === 'TOKEN_REFRESHED') {
-          const now = Date.now();
-          const timeSinceLastRefresh = now - lastRefreshTime.current;
-          
-          // Se houve refresh há menos de 30 segundos, ignore
-          if (timeSinceLastRefresh < 30000) {
-            refreshCount.current++;
-            
-            // Se já houveram muitos refreshes, force logout para evitar loop
-            if (refreshCount.current > 5) {
-              console.warn("Too many token refreshes, signing out");
-              await supabase.auth.signOut();
-              return;
-            }
-            
-            console.warn("Ignoring rapid token refresh");
-            return;
-          }
-          
-          // Reset contador se passou tempo suficiente
-          refreshCount.current = 0;
-          lastRefreshTime.current = now;
-        }
-
-        // Reset contador em outros eventos
-        if (event !== 'TOKEN_REFRESHED') {
-          refreshCount.current = 0;
-        }
-
-        // Atualizar estado
-        setSession(currentSession);
-        setUser(currentSession?.user ?? null);
-        
-        // Só atualizar loading se ainda não foi inicializado
-        if (!isInitialized.current) {
-          setLoading(false);
-          isInitialized.current = true;
-        }
-
-        // Persistir sessão no localStorage para recuperação
-        if (currentSession) {
-          try {
-            localStorage.setItem('supabase_session', JSON.stringify({
-              access_token: currentSession.access_token,
-              refresh_token: currentSession.refresh_token,
-              expires_at: currentSession.expires_at,
-              user: currentSession.user
-            }));
-          } catch (error) {
-            console.warn("Failed to save session to localStorage:", error);
-          }
-        } else {
-          localStorage.removeItem('supabase_session');
-        }
-      });
-    };
-
-    // Inicializar
-    getInitialSession().then(() => {
-      if (isMounted) {
-        setupAuthListener();
-      }
-    });
+    initializeAuth();
 
     // Cleanup
     return () => {
       isMounted = false;
-      if (subscription) {
-        subscription.unsubscribe();
+      if (authListenerRef.current) {
+        authListenerRef.current.unsubscribe();
+        authListenerRef.current = null;
       }
     };
-  }, []);
+  }, []); // Array vazio - executa apenas uma vez
 
   const signUp = async (email: string, password: string) => {
     try {
@@ -217,7 +193,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       if (!error) {
         setSession(null);
         setUser(null);
-        refreshCount.current = 0;
         lastRefreshTime.current = 0;
       }
 
