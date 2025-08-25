@@ -77,7 +77,7 @@ export const Header: React.FC<HeaderProps> = ({
                 <div className="w-20 h-15">
                   <img src="/ntix.webp" alt="Logo" />
                 </div>
-               
+
               </div>
             </Link>
           </div>
@@ -87,7 +87,7 @@ export const Header: React.FC<HeaderProps> = ({
             <Link to="/" className="hover:text-[#069b8b] transition-colors">
               INICIO
             </Link>
-           
+
             <Link
               to="/suporte"
               className="hover:text-[#069b8b] transition-colors"
@@ -116,7 +116,7 @@ export const Header: React.FC<HeaderProps> = ({
 
           {/* User Actions */}
           <div className="flex items-center space-x-4">
-           
+
 
             {/* Favorites */}
             <Link
@@ -132,10 +132,10 @@ export const Header: React.FC<HeaderProps> = ({
   className="p-2 rounded-full hover:bg-gray-100 transition-colors relative"
 >
   {/* Substituí o ícone pelo <img /> */}
-  <img 
-    src="/meu-carrinho.webp" 
-    alt="Carrinho de compras" 
-    className="h-7 w-7 object-contain" 
+  <img
+    src="/meu-carrinho.webp"
+    alt="Carrinho de compras"
+    className="h-7 w-7 object-contain"
   />
 
   {cartItemCount > 0 && (
@@ -210,7 +210,7 @@ export const Header: React.FC<HeaderProps> = ({
             >
               Início
             </Link>
-            
+
             <Link
               to="/suporte"
               onClick={() => setMobileMenuOpen(false)}

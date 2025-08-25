@@ -13,6 +13,7 @@ import {
   Loader2,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 
 interface LoginPageProps {
   onClose?: () => void;
@@ -28,7 +29,8 @@ interface FormErrors {
 }
 
 const LoginPage: React.FC<LoginPageProps> = ({ onClose, onSuccess }) => {
-  const navigate = useNavigate(); // Import useNavigate
+  const navigate = useNavigate();
+  const { signIn, signUp, loading } = useAuth();
   const [activeTab, setActiveTab] = useState<"login" | "register" | "forgot">(
     "login"
   );
@@ -147,7 +149,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onClose, onSuccess }) => {
     }
   }, [message]);
 
-  // LOGIN simulado (sem Supabase)
+  // LOGIN real com Supabase
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -159,44 +161,19 @@ const LoginPage: React.FC<LoginPageProps> = ({ onClose, onSuccess }) => {
     setMessage(null);
 
     try {
-      // Simular delay de requisição
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      const { error } = await signIn(loginForm.email, loginForm.password);
 
-      // Simular verificação de credenciais
-      const isValidCredentials =
-        loginForm.email === "teste@email.com" &&
-        loginForm.password === "Teste123";
-
-      if (!isValidCredentials) {
-        setMessage({ type: "error", text: "Email ou senha incorretos" });
+      if (error) {
+        setMessage({ type: "error", text: error.message });
       } else {
         setMessage({ type: "success", text: "Login realizado com sucesso!" });
 
         // Reset do formulário
         setLoginForm({ email: "", password: "", rememberMe: false });
 
-        // Simular dados do usuário
-        const userData = {
-          id: "user-123",
-          email: loginForm.email,
-          name: "Usuário Teste",
-        };
-
         // Callback de sucesso
         if (onSuccess) {
-          onSuccess(userData);
-        }
-
-        // Fechar modal apenas se fornecido
-        if (onClose) {
-          setTimeout(() => {
-            onClose();
-          }, 1000);
-        }
-
-        // Callback de sucesso
-        if (onSuccess) {
-          onSuccess(userData);
+          onSuccess(null);
         } else {
           // Verificar se havia checkout pendente
           const pendingCheckout = localStorage.getItem('pendingCheckout');
@@ -215,6 +192,13 @@ const LoginPage: React.FC<LoginPageProps> = ({ onClose, onSuccess }) => {
             }, 1000);
           }
         }
+
+        // Fechar modal após sucesso
+        if (onClose) {
+          setTimeout(() => {
+            onClose();
+          }, 1000);
+        }
       }
     } catch (error) {
       console.error("Erro no login:", error);
@@ -224,7 +208,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onClose, onSuccess }) => {
     }
   };
 
-  // REGISTRO simulado (sem Supabase)
+  // REGISTRO real com Supabase
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -236,14 +220,10 @@ const LoginPage: React.FC<LoginPageProps> = ({ onClose, onSuccess }) => {
     setMessage(null);
 
     try {
-      // Simular delay de requisição
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      const { error } = await signUp(registerForm.email, registerForm.password);
 
-      // Simular verificação se email já existe
-      const emailExists = registerForm.email === "existente@email.com";
-
-      if (emailExists) {
-        setMessage({ type: "error", text: "Este email já está registrado" });
+      if (error) {
+        setMessage({ type: "error", text: error.message });
       } else {
         setMessage({
           type: "success",
@@ -260,46 +240,14 @@ const LoginPage: React.FC<LoginPageProps> = ({ onClose, onSuccess }) => {
           newsletter: true,
         });
 
-        // Simular dados do usuário para callback
-        const userData = {
-          id: "new-user-123",
-          email: registerForm.email,
-          name: registerForm.name,
-        };
-
-        // Callback de sucesso
-        if (onSuccess) {
-          onSuccess(userData);
-        } else {
-          // Verificar se havia checkout pendente
-          const pendingCheckout = localStorage.getItem('pendingCheckout');
-          const cartItems = localStorage.getItem('digitalstore_cart');
-          const hasItemsInCart = cartItems && JSON.parse(cartItems).length > 0;
-
-          if (pendingCheckout && hasItemsInCart) {
-            localStorage.removeItem('pendingCheckout');
-            setTimeout(() => {
-              navigate("/checkout");
-            }, 2000);
-          } else {
-            // Se não há checkout pendente, ir para produtos
-            setTimeout(() => {
-              navigate("/produtos");
-            }, 2000);
-          }
-        }
-
-
-        // Só mudar de aba se não for um modal
-        if (!onClose) {
-          setTimeout(() => {
-            setActiveTab("login");
-            setMessage({
-              type: "info",
-              text: "Confirme seu email para fazer login",
-            });
-          }, 3000);
-        }
+        // Mudar para aba de login após cadastro
+        setTimeout(() => {
+          setActiveTab("login");
+          setMessage({
+            type: "info",
+            text: "Confirme seu email para fazer login",
+          });
+        }, 2000);
       }
     } catch (error) {
       console.error("Erro no registro:", error);
@@ -551,13 +499,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onClose, onSuccess }) => {
               </div>
             )}
 
-            {/* Demo Info */}
-            <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-              <p className="text-xs text-yellow-700">
-                <strong>Demo:</strong> Para testar o login, use: teste@email.com
-                / Teste123
-              </p>
-            </div>
+            
 
             {/* Login Form */}
             {activeTab === "login" && (
@@ -613,10 +555,10 @@ const LoginPage: React.FC<LoginPageProps> = ({ onClose, onSuccess }) => {
 
                 <button
                   type="submit"
-                  disabled={isLoading}
+                  disabled={isLoading || loading}
                   className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-lg font-medium hover:from-blue-700 hover:to-purple-700 transition-all duration-300 flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
                 >
-                  {isLoading ? (
+                  {(isLoading || loading) ? (
                     <Loader2 className="w-5 h-5 animate-spin" />
                   ) : (
                     <>
@@ -745,10 +687,10 @@ const LoginPage: React.FC<LoginPageProps> = ({ onClose, onSuccess }) => {
 
                 <button
                   type="submit"
-                  disabled={isLoading}
+                  disabled={isLoading || loading}
                   className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-lg font-medium hover:from-blue-700 hover:to-purple-700 transition-all duration-300 flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
                 >
-                  {isLoading ? (
+                  {(isLoading || loading) ? (
                     <Loader2 className="w-5 h-5 animate-spin" />
                   ) : (
                     <>
