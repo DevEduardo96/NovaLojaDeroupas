@@ -1,0 +1,49 @@
+AuthContext.tsx:59 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:68 Ignoring rapid token refresh, last refresh was 9924 ms ago
+@supabase_supabase-js.js?v=98640d77:4230  POST https://zsceradvdzzhqynfnchh.supabase.co/rest/v1/avaliacoes?select=* 409 (Conflict)
+(anonymous) @ @supabase_supabase-js.js?v=98640d77:4230
+(anonymous) @ @supabase_supabase-js.js?v=98640d77:4251
+fulfilled @ @supabase_supabase-js.js?v=98640d77:4203
+Promise.then
+step @ @supabase_supabase-js.js?v=98640d77:4216
+(anonymous) @ @supabase_supabase-js.js?v=98640d77:4218
+__awaiter6 @ @supabase_supabase-js.js?v=98640d77:4200
+(anonymous) @ @supabase_supabase-js.js?v=98640d77:4241
+then @ @supabase_supabase-js.js?v=98640d77:90
+supabase.ts:470 Error in createReview: {code: '23505', details: 'Key (user_id, product_id)=(8fb55e38-8adf-4c8f-b1f6-694e5dff039a, 9) already exists.', hint: null, message: 'duplicate key value violates unique constraint "avaliacoes_user_id_product_id_key"'}
+createReview @ supabase.ts:470
+await in createReview
+handleSubmitReview @ ProductReviews.tsx:85
+callCallback2 @ chunk-67DEV5DB.js?v=98640d77:3674
+invokeGuardedCallbackDev @ chunk-67DEV5DB.js?v=98640d77:3699
+invokeGuardedCallback @ chunk-67DEV5DB.js?v=98640d77:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-67DEV5DB.js?v=98640d77:3736
+executeDispatch @ chunk-67DEV5DB.js?v=98640d77:7014
+processDispatchQueueItemsInOrder @ chunk-67DEV5DB.js?v=98640d77:7034
+processDispatchQueue @ chunk-67DEV5DB.js?v=98640d77:7043
+dispatchEventsForPlugins @ chunk-67DEV5DB.js?v=98640d77:7051
+(anonymous) @ chunk-67DEV5DB.js?v=98640d77:7174
+batchedUpdates$1 @ chunk-67DEV5DB.js?v=98640d77:18913
+batchedUpdates @ chunk-67DEV5DB.js?v=98640d77:3579
+dispatchEventForPluginEventSystem @ chunk-67DEV5DB.js?v=98640d77:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-67DEV5DB.js?v=98640d77:5478
+dispatchEvent @ chunk-67DEV5DB.js?v=98640d77:5472
+dispatchDiscreteEvent @ chunk-67DEV5DB.js?v=98640d77:5449
+ProductReviews.tsx:102 Erro ao enviar avaliação: {code: '23505', details: 'Key (user_id, product_id)=(8fb55e38-8adf-4c8f-b1f6-694e5dff039a, 9) already exists.', hint: null, message: 'duplicate key value violates unique constraint "avaliacoes_user_id_product_id_key"'}
+handleSubmitReview @ ProductReviews.tsx:102
+await in handleSubmitReview
+callCallback2 @ chunk-67DEV5DB.js?v=98640d77:3674
+invokeGuardedCallbackDev @ chunk-67DEV5DB.js?v=98640d77:3699
+invokeGuardedCallback @ chunk-67DEV5DB.js?v=98640d77:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-67DEV5DB.js?v=98640d77:3736
+executeDispatch @ chunk-67DEV5DB.js?v=98640d77:7014
+processDispatchQueueItemsInOrder @ chunk-67DEV5DB.js?v=98640d77:7034
+processDispatchQueue @ chunk-67DEV5DB.js?v=98640d77:7043
+dispatchEventsForPlugins @ chunk-67DEV5DB.js?v=98640d77:7051
+(anonymous) @ chunk-67DEV5DB.js?v=98640d77:7174
+batchedUpdates$1 @ chunk-67DEV5DB.js?v=98640d77:18913
+batchedUpdates @ chunk-67DEV5DB.js?v=98640d77:3579
+dispatchEventForPluginEventSystem @ chunk-67DEV5DB.js?v=98640d77:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-67DEV5DB.js?v=98640d77:5478
+dispatchEvent @ chunk-67DEV5DB.js?v=98640d77:5472
+dispatchDiscreteEvent @ chunk-67DEV5DB.js?v=98640d77:5449
