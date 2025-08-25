@@ -37,7 +37,7 @@ export const useCart = () => {
         });
       }
 
-      return [...prevItems, { 
+      return [...prevItems, {
         product: product,
         quantity: 1,
         selectedSize: product.selectedSize,
@@ -61,11 +61,11 @@ export const useCart = () => {
       }
     });
 
-    const mostCommonColor = Object.keys(colorCount).reduce((a, b) => 
+    const mostCommonColor = Object.keys(colorCount).reduce((a, b) =>
       colorCount[a] > colorCount[b] ? a : b, ''
     );
-    
-    const mostCommonSize = Object.keys(sizeCount).reduce((a, b) => 
+
+    const mostCommonSize = Object.keys(sizeCount).reduce((a, b) =>
       sizeCount[a] > sizeCount[b] ? a : b, ''
     );
 

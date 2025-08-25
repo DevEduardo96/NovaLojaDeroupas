@@ -10,26 +10,11 @@ if (!supabaseUrl || !supabaseAnonKey) {
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
-    autoRefreshToken: true,
     persistSession: true,
-    detectSessionInUrl: true,
-    storageKey: "supabase.auth.token",
-    flowType: "pkce",
-    debug: false,
-  },
-  global: {
-    headers: {
-      "Content-Type": "application/json",
-    },
-  },
-  db: {
-    schema: "public",
-  },
-  realtime: {
-    params: {
-      eventsPerSecond: 10,
-    },
-  },
+    storage: localStorage,
+    autoRefreshToken: true,
+    detectSessionInUrl: true
+  }
 });
 
 // Types para as variações
@@ -89,7 +74,7 @@ export const productService = {
         console.error("Error fetching products:", error);
         throw new Error(`Erro ao buscar produtos: ${error.message}`);
       }
-      
+
       const products = data || [];
       setCachedData(cacheKey, products);
       return products;
@@ -140,7 +125,7 @@ export const productService = {
       if (error) {
         throw new Error(`Erro na busca: ${error.message}`);
       }
-      
+
       const products = data || [];
       setCachedData(cacheKey, products);
       return products;
@@ -216,10 +201,10 @@ export const productService = {
       if (error) {
         throw new Error(`Erro ao buscar categorias: ${error.message}`);
       }
-      
+
       const uniqueCategories = new Set(data?.map((item) => item.category) || []);
       const categories = Array.from(uniqueCategories).filter(Boolean).sort();
-      
+
       setCachedData(cacheKey, categories);
       return categories;
     } catch (error) {
@@ -277,7 +262,7 @@ export const productService = {
         .eq("id", id);
 
       if (error) throw error;
-      
+
       // Limpar cache relacionado
       this.clearCache();
     } catch (error) {
@@ -353,5 +338,3 @@ export const productService = {
     }
   },
 };
-
-

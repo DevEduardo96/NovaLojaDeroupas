@@ -18,7 +18,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const isRefreshing = useRef(false);
   const refreshPromise = useRef<Promise<any> | null>(null);
@@ -49,11 +48,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
           sessionPromise,
           timeoutPromise
         ]) as any;
-        
+
         clearTimeout(sessionTimeout);
-        
+
         if (!isMounted) return;
-        
+
         if (error) {
           console.error("Error getting initial session:", error);
           // Se houver erro de sessão, limpa o estado mas não falha silenciosamente
@@ -70,7 +69,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       } catch (error) {
         clearTimeout(sessionTimeout);
         console.error("Error in getInitialSession:", error);
-        
+
         if (isMounted) {
           // Se é timeout ou erro de rede, não limpa a sessão existente
           if (error instanceof Error && error.message.includes('timeout')) {
@@ -141,7 +140,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         email: email.trim().toLowerCase(), 
         password 
       });
-      
+
       return { error };
     } catch (error) {
       console.error("Error in signUp:", error);
@@ -158,7 +157,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
       // Limpa estados anteriores
       setLoading(true);
-      
+
       const { error } = await supabase.auth.signInWithPassword({
         email: email.trim().toLowerCase(),
         password,
@@ -191,13 +190,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     try {
       setLoading(true);
       const { error } = await supabase.auth.signOut();
-      
+
       if (!error) {
         // Limpa estados locais
         setSession(null);
         setUser(null);
       }
-      
+
       setLoading(false);
       return { error };
     } catch (error) {
@@ -209,18 +208,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const getUserInitial = (): string => {
     if (!user) return "";
-    
+
     // Tenta pegar o nome primeiro
     const fullName = user.user_metadata?.full_name || user.user_metadata?.name;
     if (fullName && typeof fullName === 'string') {
       return fullName.charAt(0).toUpperCase();
     }
-    
+
     // Se não tiver nome, usa a inicial do email
     if (user.email) {
       return user.email.charAt(0).toUpperCase();
     }
-    
+
     return "U"; // Fallback
   };
 

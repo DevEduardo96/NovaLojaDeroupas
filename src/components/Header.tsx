@@ -59,8 +59,8 @@ export const Header: React.FC<HeaderProps> = ({
 
   const handleSignOut = async () => {
     try {
-      await signOut();
       setShowUserMenu(false);
+      await signOut();
     } catch (error) {
       console.error('Erro ao fazer logout:', error);
     }

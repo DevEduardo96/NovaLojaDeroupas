@@ -1,4 +1,4 @@
-import { useState, createContext, useContext } from "react";
+import { useState, createContext, useContext, useEffect } from "react";
 import { Router, Route, Switch, useLocation } from "wouter";
 import { Header } from "./components/Header";
 import { Cart } from "./components/Cart";
@@ -215,6 +215,8 @@ function AppContent() {
 
 function App() {
   const [paymentData, setPaymentData] = useState<PaymentData | null>(null);
+  const location = useLocation();
+
 
   return (
     <Router>

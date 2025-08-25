@@ -1,6 +1,7 @@
 import React from "react";
 import { X, Plus, Minus, ShoppingBag } from "lucide-react";
 import { CartItem } from "../types";
+import { useNavigate } from 'react-router-dom'; // Importar useNavigate
 
 interface CartProps {
   items: CartItem[];
@@ -10,6 +11,8 @@ interface CartProps {
   onRemoveItem: (productId: number, selectedSize?: string, selectedColor?: string) => void;
   onCheckout: () => void;
   total: number;
+  user: any; // Assumindo que você tem um tipo para o usuário
+  setIsCheckoutOpen: (isOpen: boolean) => void; // Adicionar prop para controlar o estado do checkout
 }
 
 export const Cart: React.FC<CartProps> = ({
@@ -20,12 +23,33 @@ export const Cart: React.FC<CartProps> = ({
   onRemoveItem,
   onCheckout,
   total,
+  user, // Receber user como prop
+  setIsCheckoutOpen, // Receber setIsCheckoutOpen como prop
 }) => {
+  const navigate = useNavigate(); // Inicializar useNavigate
+
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("pt-BR", {
       style: "currency",
       currency: "BRL",
     }).format(price);
+  };
+
+  const handleCheckout = () => {
+    if (items.length === 0) {
+      alert('Adicione produtos ao carrinho antes de finalizar a compra');
+      return;
+    }
+
+    if (!user) {
+      // Salvar intenção de checkout no localStorage
+      localStorage.setItem('pendingCheckout', 'true');
+      // Se não estiver logado, redirecionar para login
+      navigate('/login');
+    } else {
+      // Se estiver logado, ir para checkout
+      setIsCheckoutOpen(true);
+    }
   };
 
   if (!isOpen) return null;
@@ -149,7 +173,7 @@ export const Cart: React.FC<CartProps> = ({
               </div>
 
               <button
-                onClick={onCheckout}
+                onClick={handleCheckout} // Usar a função handleCheckout
                 className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200"
               >
                 Finalizar Compra

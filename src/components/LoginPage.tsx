@@ -12,6 +12,7 @@ import {
   X,
   Loader2,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface LoginPageProps {
   onClose?: () => void;
@@ -27,6 +28,7 @@ interface FormErrors {
 }
 
 const LoginPage: React.FC<LoginPageProps> = ({ onClose, onSuccess }) => {
+  const navigate = useNavigate(); // Import useNavigate
   const [activeTab, setActiveTab] = useState<"login" | "register" | "forgot">(
     "login"
   );
@@ -191,6 +193,25 @@ const LoginPage: React.FC<LoginPageProps> = ({ onClose, onSuccess }) => {
             onClose();
           }, 1000);
         }
+
+        // Corrigir redirecionamento após login
+        if (userData) {
+          setMessage({ type: "success", text: "Login realizado com sucesso!" });
+
+          // Verificar se há intenção de checkout pendente
+          const pendingCheckout = localStorage.getItem('pendingCheckout');
+          const cartItems = localStorage.getItem('cart');
+          const hasItemsInCart = cartItems && JSON.parse(cartItems).length > 0;
+
+          setTimeout(() => {
+            if (pendingCheckout === 'true' && hasItemsInCart) {
+              localStorage.removeItem('pendingCheckout');
+              navigate("/", { state: { openCheckout: true } });
+            } else {
+              navigate("/");
+            }
+          }, 1000);
+        }
       }
     } catch (error) {
       console.error("Erro no login:", error);
@@ -235,6 +256,27 @@ const LoginPage: React.FC<LoginPageProps> = ({ onClose, onSuccess }) => {
           acceptTerms: false,
           newsletter: true,
         });
+
+        // Corrigir redirecionamento após registro
+        setMessage({
+          type: "success",
+          text: "Conta criada com sucesso! Verifique seu email.",
+        });
+
+        // Verificar se há intenção de checkout pendente
+        const pendingCheckout = localStorage.getItem('pendingCheckout');
+        const cartItems = localStorage.getItem('cart');
+        const hasItemsInCart = cartItems && JSON.parse(cartItems).length > 0;
+
+        setTimeout(() => {
+          if (pendingCheckout === 'true' && hasItemsInCart) {
+            localStorage.removeItem('pendingCheckout');
+            navigate("/", { state: { openCheckout: true } });
+          } else {
+            navigate("/");
+          }
+        }, 2000);
+
 
         // Só mudar de aba se não for um modal
         if (!onClose) {
@@ -332,6 +374,26 @@ const LoginPage: React.FC<LoginPageProps> = ({ onClose, onSuccess }) => {
           onClose();
         }, 1000);
       }
+
+      // Corrigir redirecionamento após login social
+      if (userData) {
+        setMessage({ type: "success", text: `Login com ${provider} realizado com sucesso!` });
+
+        // Verificar se há intenção de checkout pendente
+        const pendingCheckout = localStorage.getItem('pendingCheckout');
+        const cartItems = localStorage.getItem('cart');
+        const hasItemsInCart = cartItems && JSON.parse(cartItems).length > 0;
+
+        setTimeout(() => {
+          if (pendingCheckout === 'true' && hasItemsInCart) {
+            localStorage.removeItem('pendingCheckout');
+            navigate("/", { state: { openCheckout: true } });
+          } else {
+            navigate("/");
+          }
+        }, 1000);
+      }
+
     } catch (error) {
       console.error(`Erro no login ${provider}:`, error);
       setMessage({ type: "error", text: "Erro interno. Tente novamente." });
