@@ -393,7 +393,14 @@ export const reviewService = {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      return data || [];
+      
+      // For now, just return the reviews without user details
+      // You can enhance this later by creating a profiles table
+      return (data || []).map(review => ({
+        ...review,
+        user_email: `usuario${review.user_id.slice(-4)}@*****.com`, // Masked email for privacy
+        user_name: null
+      }));
     } catch (error) {
       console.error("Error in getProductReviews:", error);
       throw error;
@@ -452,7 +459,7 @@ export const reviewService = {
         .from("avaliacoes")
         .insert({
           ...review,
-          is_approved: false // Precisa de aprovação por padrão
+          is_approved: true // Auto-approve for now - you can change this later
         })
         .select()
         .single();
@@ -490,7 +497,7 @@ export const reviewService = {
         .from("avaliacoes")
         .update({
           ...updates,
-          is_approved: false // Precisa de nova aprovação após edição
+          is_approved: true // Auto-approve for now - you can change this later
         })
         .eq("id", reviewId)
         .select()

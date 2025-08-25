@@ -18,6 +18,7 @@ import {
   ShoppingCart,
 } from "lucide-react";
 import { Product } from "../types";
+import ProductReviews from "../components/ProductReviews";
 
 interface ProductDetailsProps {
   product: Product;
@@ -347,90 +348,10 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({
             )}
 
             {activeTab === "reviews" && (
-              <div className="space-y-6">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-semibold text-gray-900">
-                    Avaliações dos Clientes
-                  </h3>
-                  <div className="flex items-center space-x-2">
-                    {renderStars(4.8)}
-                    <span className="text-lg font-semibold">4.8</span>
-                    <span className="text-gray-600">(127 avaliações)</span>
-                  </div>
-                </div>
-
-                {/*<div className="space-y-4">
-                  {[
-                    {
-                      id: "1",
-                      userName: "Maria Silva",
-                      userAvatar:
-                        "https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&dpr=1",
-                      rating: 5,
-                      comment:
-                        "Produto excelente! Superou minhas expectativas. A qualidade é incrível e o suporte foi muito prestativo.",
-                      date: "2024-12-10",
-                      verified: true,
-                    },
-                    {
-                      id: "2",
-                      userName: "João Santos",
-                      userAvatar:
-                        "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&dpr=1",
-                      rating: 4,
-                      comment:
-                        "Muito bom produto. Fácil de usar e bem documentado. Recomendo!",
-                      date: "2024-12-08",
-                      verified: true,
-                    },
-                    {
-                      id: "3",
-                      userName: "Ana Costa",
-                      userAvatar:
-                        "https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&dpr=1",
-                      rating: 5,
-                      comment:
-                        "Perfeito para o que eu precisava. Download rápido e arquivos organizados.",
-                      date: "2024-12-05",
-                      verified: false,
-                    },
-                  ].map((review) => (
-                    <div
-                      key={review.id}
-                      className="p-6 bg-white rounded-lg shadow-sm border"
-                    >
-                      <div className="flex items-start space-x-4">
-                        <img
-                          src={review.userAvatar}
-                          alt={review.userName}
-                          className="w-12 h-12 rounded-full"
-                        />
-                        <div className="flex-1">
-                          <div className="flex items-center justify-between mb-2">
-                            <div className="flex items-center space-x-2">
-                              <span className="font-medium text-gray-900">
-                                {review.userName}
-                              </span>
-                              {review.verified && (
-                                <CheckCircle className="w-4 h-4 text-green-500" />
-                              )}
-                            </div>
-                            <div className="flex items-center space-x-2">
-                              {renderStars(review.rating)}
-                              <span className="text-sm text-gray-500">
-                                {new Date(review.date).toLocaleDateString(
-                                  "pt-BR"
-                                )}
-                              </span>
-                            </div>
-                          </div>
-                          <p className="text-gray-700">{review.comment}</p>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>*/}
-              </div>
+              <ProductReviews 
+                productId={product.id} 
+                productName={product.name} 
+              />
             )}
           </div>
         </div>
