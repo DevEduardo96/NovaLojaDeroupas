@@ -24,20 +24,28 @@ const Hero: React.FC = () => {
               <span>Roupas Personalizadas</span>
             </div>
 
-            {/* Main Heading */}
-            <div className="space-y-2">
-              <h1 className="text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-bold text-black leading-none tracking-tight">
-                <span className="font-teko block">Nectix</span>
-              </h1>
-              <div className="text-right lg:text-left">
-                <span className="text-4xl sm:text-5xl lg:text-6xl font-light text-gray-400 font-teko">07</span>
-              </div>
-            </div>
+{/* Container principal com layout flexível */}
+<div className="flex flex-col items-center lg:block space-y-4 lg:space-y-2">
+  {/* Main Heading */}
+  <h1 className="text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-bold text-black leading-none tracking-tight">
+    <span className="font-teko block">
+      <img src="/grandelogo.webp" alt="" />
+    </span>
+  </h1>
+  
+  {/* Number */}
+  <div className="text-center lg:text-right xl:text-left">
+    <span className="text-4xl sm:text-5xl lg:text-6xl font-light text-gray-400 font-teko">07</span>
+  </div>
+  
+  {/* Subtitle */}
+  <p className="text-lg text-gray-600 max-w-md mx-auto lg:mx-0 font-barlow leading-relaxed text-center lg:text-left">
+    Qualidade premium em roupas personalizadas, camisetas e acessórios para todas as suas necessidades.
+  </p>
+</div>
 
-            {/* Subtitle */}
-            <p className="text-lg text-gray-600 max-w-md mx-auto lg:mx-0 font-barlow leading-relaxed">
-              Qualidade premium em roupas personalizadas, camisetas e acessórios para todas as suas necessidades.
-            </p>
+
+
 
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-2">
