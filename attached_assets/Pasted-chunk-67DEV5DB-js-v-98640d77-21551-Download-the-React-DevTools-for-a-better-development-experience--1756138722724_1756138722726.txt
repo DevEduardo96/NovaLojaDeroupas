@@ -1,0 +1,71 @@
+chunk-67DEV5DB.js?v=98640d77:21551 Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools
+AuthContext.tsx:99 Auth state changed: INITIAL_SESSION undefined
+AuthContext.tsx:99 Auth state changed: SIGNED_IN eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+SupabaseProductDetail.tsx:79 Loading product with ID: 9
+SupabaseProductDetail.tsx:79 Loading product with ID: 9
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+SupabaseProductDetail.tsx:82 Loaded product data: Object
+SupabaseProductDetail.tsx:82 Loaded product data: Object
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+CheckoutPage.tsx:191 🔍 Debug render - showQRCode: false paymentData: null
+CheckoutPage.tsx:191 🔍 Debug render - showQRCode: false paymentData: null
+CheckoutPage.tsx:191 🔍 Debug render - showQRCode: false paymentData: null
+CheckoutPage.tsx:191 🔍 Debug render - showQRCode: false paymentData: null
+CheckoutPage.tsx:191 🔍 Debug render - showQRCode: false paymentData: null
+CheckoutPage.tsx:191 🔍 Debug render - showQRCode: false paymentData: null
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+CheckoutPage.tsx:191 🔍 Debug render - showQRCode: false paymentData: null
+CheckoutPage.tsx:191 🔍 Debug render - showQRCode: false paymentData: null
+CheckoutPage.tsx:191 🔍 Debug render - showQRCode: false paymentData: null
+CheckoutPage.tsx:191 🔍 Debug render - showQRCode: false paymentData: null
+CheckoutPage.tsx:191 🔍 Debug render - showQRCode: false paymentData: null
+CheckoutPage.tsx:191 🔍 Debug render - showQRCode: false paymentData: null
+SupabaseProductDetail.tsx:79 Loading product with ID: 9
+SupabaseProductDetail.tsx:79 Loading product with ID: 9
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+SupabaseProductDetail.tsx:82 Loaded product data: Object
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+SupabaseProductDetail.tsx:82 Loaded product data: Object
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+AuthContext.tsx:99 Auth state changed: TOKEN_REFRESHED eduardoaraujo_96@outlook.com
+zsceradvdzzhqynfnchh.supabase.co/auth/v1/token?grant_type=refresh_token:1  Failed to load resource: the server responded with a status of 429 ()
+AuthContext.tsx:99 Auth state changed: SIGNED_OUT undefined
