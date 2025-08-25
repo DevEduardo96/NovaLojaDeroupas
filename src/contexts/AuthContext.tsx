@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useEffect, useState, useRef } from "react";
 import { supabase } from "../lib/supabase";
 import type { User, Session } from "@supabase/supabase-js";
@@ -20,115 +21,132 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
-  const isRefreshing = useRef(false);
-  const refreshPromise = useRef<Promise<any> | null>(null);
-  const lastSessionCheck = useRef<number>(0);
+  const isInitialized = useRef(false);
+  const refreshCount = useRef(0);
+  const lastRefreshTime = useRef(0);
 
   useEffect(() => {
     let isMounted = true;
-    let sessionTimeout: NodeJS.Timeout;
+    let subscription: any = null;
 
     // Get initial session
     const getInitialSession = async () => {
-      const now = Date.now();
-      // Prevent excessive session checks - minimum 5 seconds between calls
-      if (now - lastSessionCheck.current < 5000 && !loading) {
-        setLoading(false);
-        return;
-      }
-      lastSessionCheck.current = now;
-
+      if (isInitialized.current) return;
+      
       try {
-        // Add timeout to session check
-        const sessionPromise = supabase.auth.getSession();
-        const timeoutPromise = new Promise((_, reject) => {
-          sessionTimeout = setTimeout(() => reject(new Error("Session check timeout")), 10000);
-        });
-
-        const { data: { session }, error } = await Promise.race([
-          sessionPromise,
-          timeoutPromise
-        ]) as any;
-
-        clearTimeout(sessionTimeout);
+        const { data: { session }, error } = await supabase.auth.getSession();
 
         if (!isMounted) return;
 
         if (error) {
           console.error("Error getting initial session:", error);
-          // Se houver erro de sessão, limpa o estado mas não falha silenciosamente
-          if (error.message?.includes('Invalid JWT') || error.message?.includes('expired')) {
-            // Token expirado, limpa e permite re-login
-            await supabase.auth.signOut();
-          }
           setSession(null);
           setUser(null);
         } else {
           setSession(session);
           setUser(session?.user ?? null);
+          
+          if (session) {
+            console.log("User is logged in:", session.user?.email);
+          }
         }
       } catch (error) {
-        clearTimeout(sessionTimeout);
         console.error("Error in getInitialSession:", error);
-
         if (isMounted) {
-          // Se é timeout ou erro de rede, não limpa a sessão existente
-          if (error instanceof Error && error.message.includes('timeout')) {
-            console.warn("Session check timeout, mantendo estado atual");
-          } else {
-            setSession(null);
-            setUser(null);
-          }
+          setSession(null);
+          setUser(null);
         }
       } finally {
         if (isMounted) {
           setLoading(false);
+          isInitialized.current = true;
         }
       }
     };
 
-    getInitialSession();
+    // Setup auth state listener
+    const setupAuthListener = () => {
+      subscription = supabase.auth.onAuthStateChange(async (event, currentSession) => {
+        if (!isMounted) return;
 
-    // Listen for auth state changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, currentSession) => {
-      if (!isMounted) return;
-
-      if (import.meta.env.DEV) {
         console.log("Auth state changed:", event, currentSession?.user?.email);
-      }
 
-      // Evita múltiplos refresh simultâneos
-      if (event === 'TOKEN_REFRESHED' && isRefreshing.current) {
-        return;
-      }
+        // Prevenir múltiplos refresh tokens em sequência
+        if (event === 'TOKEN_REFRESHED') {
+          const now = Date.now();
+          const timeSinceLastRefresh = now - lastRefreshTime.current;
+          
+          // Se houve refresh há menos de 30 segundos, ignore
+          if (timeSinceLastRefresh < 30000) {
+            refreshCount.current++;
+            
+            // Se já houveram muitos refreshes, force logout para evitar loop
+            if (refreshCount.current > 5) {
+              console.warn("Too many token refreshes, signing out");
+              await supabase.auth.signOut();
+              return;
+            }
+            
+            console.warn("Ignoring rapid token refresh");
+            return;
+          }
+          
+          // Reset contador se passou tempo suficiente
+          refreshCount.current = 0;
+          lastRefreshTime.current = now;
+        }
 
-      // Controla o refresh token para evitar múltiplas requisições
-      if (event === 'TOKEN_REFRESHED') {
-        isRefreshing.current = true;
-        setTimeout(() => {
-          isRefreshing.current = false;
-        }, 1000);
-      }
+        // Reset contador em outros eventos
+        if (event !== 'TOKEN_REFRESHED') {
+          refreshCount.current = 0;
+        }
 
-      setSession(currentSession);
-      setUser(currentSession?.user ?? null);
-      setLoading(false);
+        // Atualizar estado
+        setSession(currentSession);
+        setUser(currentSession?.user ?? null);
+        
+        // Só atualizar loading se ainda não foi inicializado
+        if (!isInitialized.current) {
+          setLoading(false);
+          isInitialized.current = true;
+        }
+
+        // Persistir sessão no localStorage para recuperação
+        if (currentSession) {
+          try {
+            localStorage.setItem('supabase_session', JSON.stringify({
+              access_token: currentSession.access_token,
+              refresh_token: currentSession.refresh_token,
+              expires_at: currentSession.expires_at,
+              user: currentSession.user
+            }));
+          } catch (error) {
+            console.warn("Failed to save session to localStorage:", error);
+          }
+        } else {
+          localStorage.removeItem('supabase_session');
+        }
+      });
+    };
+
+    // Inicializar
+    getInitialSession().then(() => {
+      if (isMounted) {
+        setupAuthListener();
+      }
     });
 
     // Cleanup
     return () => {
       isMounted = false;
-      subscription.unsubscribe();
-      isRefreshing.current = false;
-      refreshPromise.current = null;
+      if (subscription) {
+        subscription.unsubscribe();
+      }
     };
   }, []);
 
   const signUp = async (email: string, password: string) => {
     try {
-      // Validação de entrada
       if (!email || !password) {
         return { error: { message: "Email e senha são obrigatórios" } };
       }
@@ -151,12 +169,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const signIn = async (email: string, password: string) => {
     try {
-      // Validação de entrada
       if (!email || !password) {
         return { error: { message: "Email e senha são obrigatórios" } };
       }
 
-      // Limpa estados anteriores
       setLoading(true);
 
       const { error } = await supabase.auth.signInWithPassword({
@@ -166,6 +182,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
       if (error) {
         setLoading(false);
+        
         // Mensagens de erro mais amigáveis
         if (error.message.includes('Invalid login credentials')) {
           return { error: { message: "Email ou senha incorretos" } };
@@ -173,12 +190,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
           return { error: { message: "Por favor, confirme seu email antes de fazer login" } };
         } else if (error.message.includes('Too many requests')) {
           return { error: { message: "Muitas tentativas de login. Tente novamente em alguns minutos" } };
-        } else if (error.message.includes('Invalid email')) {
-          return { error: { message: "Formato de email inválido" } };
         }
         return { error: { message: error.message } };
       }
 
+      // Não setLoading(false) aqui, deixar o onAuthStateChange fazer isso
       return { error: null };
     } catch (error) {
       console.error("Error in signIn:", error);
@@ -190,12 +206,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const signOut = async () => {
     try {
       setLoading(true);
+      
+      // Limpar localStorage primeiro
+      localStorage.removeItem('supabase_session');
+      localStorage.removeItem('pendingCheckout');
+      localStorage.removeItem('digitalstore_cart');
+      
       const { error } = await supabase.auth.signOut();
 
       if (!error) {
-        // Limpa estados locais
         setSession(null);
         setUser(null);
+        refreshCount.current = 0;
+        lastRefreshTime.current = 0;
       }
 
       setLoading(false);
@@ -210,18 +233,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const getUserInitial = (): string => {
     if (!user) return "";
 
-    // Tenta pegar o nome primeiro
     const fullName = user.user_metadata?.full_name || user.user_metadata?.name;
     if (fullName && typeof fullName === 'string') {
       return fullName.charAt(0).toUpperCase();
     }
 
-    // Se não tiver nome, usa a inicial do email
     if (user.email) {
       return user.email.charAt(0).toUpperCase();
     }
 
-    return "U"; // Fallback
+    return "U";
   };
 
   return (
