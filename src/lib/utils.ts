@@ -81,21 +81,48 @@ export async function copyToClipboard(text: string): Promise<boolean> {
 }
 
 // Função para compartilhar conteúdo
-export async function shareContent(data: {
-  title?: string;
-  text?: string;
-  url?: string;
-}): Promise<boolean> {
-  if (navigator.share) {
+export const shareContent = async (content: ShareData): Promise<boolean> => {
+  if (navigator.share && navigator.canShare && navigator.canShare(content)) {
     try {
-      await navigator.share(data);
+      await navigator.share(content);
       return true;
     } catch (error) {
-      if ((error as Error).name !== "AbortError") {
-        console.error("Error sharing content:", error);
+      if ((error as Error).name !== 'AbortError') {
+        console.error('Error sharing content:', error);
       }
       return false;
     }
   }
   return false;
-}
+};
+
+export const formatDate = (dateString: string): string => {
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+
+  if (diffInSeconds < 60) {
+    return 'agora mesmo';
+  }
+
+  const diffInMinutes = Math.floor(diffInSeconds / 60);
+  if (diffInMinutes < 60) {
+    return `há ${diffInMinutes} minuto${diffInMinutes > 1 ? 's' : ''}`;
+  }
+
+  const diffInHours = Math.floor(diffInMinutes / 60);
+  if (diffInHours < 24) {
+    return `há ${diffInHours} hora${diffInHours > 1 ? 's' : ''}`;
+  }
+
+  const diffInDays = Math.floor(diffInHours / 24);
+  if (diffInDays < 7) {
+    return `há ${diffInDays} dia${diffInDays > 1 ? 's' : ''}`;
+  }
+
+  return date.toLocaleDateString('pt-BR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
+  });
+};

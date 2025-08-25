@@ -21,12 +21,13 @@ import {
   Minus,
   AlertCircle,
 } from "lucide-react";
-import { productService, type ProductWithVariations, type ProductVariation as SupabaseProductVariation } from "../lib/supabase";
+import { productService, reviewService, type ProductWithVariations, type ProductVariation as SupabaseProductVariation } from "../lib/supabase";
 import type { Product, ProductVariation } from "../types"; // Ensure ProductVariation from types is imported
 import { formatPrice, shareContent } from "../lib/utils";
 import { usePayments } from "../hooks/usePayments";
 import { Button } from "./ui/Button";
 import ProductVariationSelector from "./ProductVariationSelector"; // Import the new selector component
+import ProductReviews from "./ProductReviews";
 
 interface SupabaseProductDetailProps {
   productId: number | null;
@@ -44,6 +45,7 @@ export const SupabaseProductDetail: React.FC<SupabaseProductDetailProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [addedToCart, setAddedToCart] = useState(false);
+  const [productRating, setProductRating] = useState({ average: 4.8, total: 89 });
   // Removed old selectedSize and selectedColor states, as they will be managed by ProductVariationSelector
   const [activeTab, setActiveTab] = useState("description");
   const [, setImageError] = useState(false);
@@ -127,6 +129,18 @@ export const SupabaseProductDetail: React.FC<SupabaseProductDetailProps> = ({
       }
 
       setSelectedVariations(initialVariations);
+
+      // Carregar estatísticas de avaliação
+      try {
+        const ratingStats = await reviewService.getProductRatingStats(productData.id);
+        setProductRating({
+          average: ratingStats.averageRating || 4.8,
+          total: ratingStats.totalReviews || 89
+        });
+      } catch (ratingError) {
+        console.error("Error loading rating stats:", ratingError);
+        // Manter valores padrão em caso de erro
+      }
 
     } catch (err) {
       console.error("Error loading product:", err);
@@ -405,10 +419,10 @@ export const SupabaseProductDetail: React.FC<SupabaseProductDetailProps> = ({
               {/* Rating and Stats */}
               <div className="flex flex-wrap items-center gap-4 mb-6">
                 <div className="flex items-center space-x-1">
-                  {renderStars(4.8)}
-                  <span className="text-sm font-medium text-gray-700 ml-2">4.8</span>
+                  {renderStars(productRating.average)}
+                  <span className="text-sm font-medium text-gray-700 ml-2">{productRating.average.toFixed(1)}</span>
                 </div>
-                <span className="text-gray-500 text-sm">89 avaliações</span>
+                <span className="text-gray-500 text-sm">{productRating.total} avaliações</span>
                 <div className="flex items-center text-gray-500 text-sm">
                   <Users className="w-4 h-4 mr-1" />
                   256 vendidos
@@ -622,34 +636,10 @@ export const SupabaseProductDetail: React.FC<SupabaseProductDetailProps> = ({
               )}
 
               {activeTab === "reviews" && (
-                <div className="space-y-4">
-                  {/* Exemplo de review fixa, pode ser substituída por dados do Supabase */}
-                  <div className="border-b pb-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center space-x-1">
-                        {renderStars(5)}
-                        <span className="text-sm text-gray-500">(5/5)</span>
-                      </div>
-                      <span className="text-xs text-gray-400">há 2 dias</span>
-                    </div>
-                    <p className="text-gray-700 text-sm">Ótima qualidade, chegou super rápido e bem embalado. Recomendo!</p>
-                    <p className="mt-1 text-xs text-gray-500">– Ana Paula</p>
-                  </div>
-                  <div className="border-b pb-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center space-x-1">
-                        {renderStars(4)}
-                        <span className="text-sm text-gray-500">(4/5)</span>
-                      </div>
-                      <span className="text-xs text-gray-400">há 1 semana</span>
-                    </div>
-                    <p className="text-gray-700 text-sm">Produto bom, mas a cor é um pouco diferente da foto.</p>
-                    <p className="mt-1 text-xs text-gray-500">– João Silva</p>
-                  </div>
-                  <Button variant="outline" className="mt-4">
-                    Ver mais avaliações
-                  </Button>
-                </div>
+                <ProductReviews 
+                  productId={product.id} 
+                  productName={product.name} 
+                />
               )}
             </div>
           </div>

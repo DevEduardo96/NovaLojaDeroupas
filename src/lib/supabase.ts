@@ -49,6 +49,20 @@ export interface ProductVariation {
   updated_at: string;
 }
 
+// Types para avaliações
+export interface Review {
+  id: number;
+  user_id: string;
+  product_id: number;
+  rating: number;
+  comment: string | null;
+  is_approved: boolean;
+  created_at: string;
+  updated_at: string;
+  user_email?: string;
+  user_name?: string;
+}
+
 export interface ProductWithVariations extends Product {
   variations: ProductVariation[];
   sizes: ProductVariation[];
@@ -355,4 +369,154 @@ export const productService = {
       return false;
     }
   },
+};
+
+// Serviço de avaliações
+export const reviewService = {
+  // Buscar avaliações de um produto
+  async getProductReviews(productId: number): Promise<Review[]> {
+    try {
+      const { data, error } = await supabase
+        .from("avaliacoes")
+        .select(`
+          id,
+          user_id,
+          product_id,
+          rating,
+          comment,
+          is_approved,
+          created_at,
+          updated_at
+        `)
+        .eq("product_id", productId)
+        .eq("is_approved", true)
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      console.error("Error in getProductReviews:", error);
+      throw error;
+    }
+  },
+
+  // Buscar estatísticas de avaliações de um produto
+  async getProductRatingStats(productId: number): Promise<{
+    averageRating: number;
+    totalReviews: number;
+    ratingDistribution: { [key: number]: number };
+  }> {
+    try {
+      const { data, error } = await supabase
+        .from("avaliacoes")
+        .select("rating")
+        .eq("product_id", productId)
+        .eq("is_approved", true);
+
+      if (error) throw error;
+
+      const reviews = data || [];
+      const totalReviews = reviews.length;
+      
+      if (totalReviews === 0) {
+        return {
+          averageRating: 0,
+          totalReviews: 0,
+          ratingDistribution: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 }
+        };
+      }
+
+      const sum = reviews.reduce((acc, review) => acc + review.rating, 0);
+      const averageRating = sum / totalReviews;
+
+      const ratingDistribution = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+      reviews.forEach(review => {
+        ratingDistribution[review.rating as keyof typeof ratingDistribution]++;
+      });
+
+      return {
+        averageRating: Math.round(averageRating * 10) / 10,
+        totalReviews,
+        ratingDistribution
+      };
+    } catch (error) {
+      console.error("Error in getProductRatingStats:", error);
+      throw error;
+    }
+  },
+
+  // Criar uma nova avaliação
+  async createReview(review: Omit<Review, "id" | "created_at" | "updated_at" | "is_approved">): Promise<Review> {
+    try {
+      const { data, error } = await supabase
+        .from("avaliacoes")
+        .insert({
+          ...review,
+          is_approved: false // Precisa de aprovação por padrão
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error("Error in createReview:", error);
+      throw error;
+    }
+  },
+
+  // Verificar se o usuário já avaliou o produto
+  async hasUserReviewed(userId: string, productId: number): Promise<boolean> {
+    try {
+      const { data, error } = await supabase
+        .from("avaliacoes")
+        .select("id")
+        .eq("user_id", userId)
+        .eq("product_id", productId)
+        .maybeSingle();
+
+      if (error) throw error;
+      return !!data;
+    } catch (error) {
+      console.error("Error in hasUserReviewed:", error);
+      return false;
+    }
+  },
+
+  // Atualizar uma avaliação existente
+  async updateReview(reviewId: number, updates: Partial<Pick<Review, "rating" | "comment">>): Promise<Review> {
+    try {
+      const { data, error } = await supabase
+        .from("avaliacoes")
+        .update({
+          ...updates,
+          is_approved: false // Precisa de nova aprovação após edição
+        })
+        .eq("id", reviewId)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error("Error in updateReview:", error);
+      throw error;
+    }
+  },
+
+  // Deletar uma avaliação
+  async deleteReview(reviewId: number, userId: string): Promise<void> {
+    try {
+      const { error } = await supabase
+        .from("avaliacoes")
+        .delete()
+        .eq("id", reviewId)
+        .eq("user_id", userId);
+
+      if (error) throw error;
+    } catch (error) {
+      console.error("Error in deleteReview:", error);
+      throw error;
+    }
+  }
 };
