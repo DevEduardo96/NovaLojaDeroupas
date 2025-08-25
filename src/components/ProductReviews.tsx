@@ -97,10 +97,16 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ productId, productName 
     try {
       const existingReview = await reviewService.getUserReview(user.id, productId);
       setUserReview(existingReview);
+      
+      // If user has a review and form is open for new review, close it
+      if (existingReview && showReviewForm && !editingReview) {
+        setShowReviewForm(false);
+        setError('Você já avaliou este produto. Use o botão "Editar" para modificar sua avaliação.');
+      }
     } catch (error) {
       console.error('Erro ao verificar avaliação do usuário:', error);
     }
-  }, [user, productId]);
+  }, [user, productId, showReviewForm, editingReview]);
 
   const handleSubmitReview = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -110,12 +116,31 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ productId, productName 
       setSubmitting(true);
       setError(null);
 
-      if (editingReview || userReview) {
+      // Always check for existing user review before any operation
+      const existingReview = await reviewService.getUserReview(user.id, productId);
+      
+      if (existingReview && !editingReview) {
+        // User already has a review but form wasn't opened in edit mode
+        setError('Você já avaliou este produto. Use o botão "Editar" para modificar sua avaliação.');
+        setUserReview(existingReview);
+        setShowReviewForm(false);
+        return;
+      }
+
+      if (editingReview || existingReview) {
         // Update existing review
-        const reviewToUpdate = editingReview || userReview!;
+        const reviewToUpdate = editingReview || existingReview!;
         await reviewService.updateReview(reviewToUpdate.id, formData);
       } else {
-        // Create new review
+        // Create new review - double check one more time
+        const doubleCheck = await reviewService.getUserReview(user.id, productId);
+        if (doubleCheck) {
+          setError('Você já avaliou este produto. Use o botão "Editar" para modificar sua avaliação.');
+          setUserReview(doubleCheck);
+          setShowReviewForm(false);
+          return;
+        }
+        
         await reviewService.createReview({
           user_id: user.id,
           product_id: productId,
@@ -137,6 +162,9 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ productId, productName 
       // Handle specific error cases
       if (error.code === '23505') {
         setError('Você já avaliou este produto. Use o botão "Editar" para modificar sua avaliação.');
+        // Force reload user review to update state
+        await checkUserReview();
+        setShowReviewForm(false);
       } else {
         setError('Erro ao enviar avaliação. Tente novamente.');
       }
@@ -255,7 +283,14 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ productId, productName 
               </>
             ) : !showReviewForm && (
               <Button
-                onClick={() => {
+                onClick={async () => {
+                  // Double check if user has review before opening form
+                  const existingReview = await reviewService.getUserReview(user.id, productId);
+                  if (existingReview) {
+                    setUserReview(existingReview);
+                    setError('Você já avaliou este produto. Use o botão "Editar" para modificar sua avaliação.');
+                    return;
+                  }
                   setShowReviewForm(true);
                   setError(null);
                 }}
@@ -413,7 +448,14 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ productId, productName 
           </p>
           {user && !userReview && !showReviewForm && (
             <Button
-              onClick={() => {
+              onClick={async () => {
+                // Double check if user has review before opening form
+                const existingReview = await reviewService.getUserReview(user.id, productId);
+                if (existingReview) {
+                  setUserReview(existingReview);
+                  setError('Você já avaliou este produto. Use o botão "Editar" para modificar sua avaliação.');
+                  return;
+                }
                 setShowReviewForm(true);
                 setError(null);
               }}
