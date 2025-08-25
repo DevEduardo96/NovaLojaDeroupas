@@ -22,7 +22,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { productService, reviewService, type ProductWithVariations, type ProductVariation as SupabaseProductVariation } from "../lib/supabase";
-import type { Product, ProductVariation } from "../types"; // Ensure ProductVariation from types is imported
+import type { Product } from "../types"; // Ensure ProductVariation from types is imported
 import { formatPrice, shareContent } from "../lib/utils";
 import { usePayments } from "../hooks/usePayments";
 import { Button } from "./ui/Button";
