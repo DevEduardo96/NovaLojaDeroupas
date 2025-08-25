@@ -1,0 +1,44 @@
+chunk-67DEV5DB.js?v=98640d77:21551 Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools
+AuthContext.tsx:230 Uncaught ReferenceError: session is not defined
+    at AuthProvider (AuthContext.tsx:230:9)
+    at renderWithHooks (chunk-67DEV5DB.js?v=98640d77:11548:26)
+    at mountIndeterminateComponent (chunk-67DEV5DB.js?v=98640d77:14926:21)
+    at beginWork (chunk-67DEV5DB.js?v=98640d77:15914:22)
+    at HTMLUnknownElement.callCallback2 (chunk-67DEV5DB.js?v=98640d77:3674:22)
+    at Object.invokeGuardedCallbackDev (chunk-67DEV5DB.js?v=98640d77:3699:24)
+    at invokeGuardedCallback (chunk-67DEV5DB.js?v=98640d77:3733:39)
+    at beginWork$1 (chunk-67DEV5DB.js?v=98640d77:19765:15)
+    at performUnitOfWork (chunk-67DEV5DB.js?v=98640d77:19198:20)
+    at workLoopSync (chunk-67DEV5DB.js?v=98640d77:19137:13)
+AuthContext.tsx:230 Uncaught ReferenceError: session is not defined
+    at AuthProvider (AuthContext.tsx:230:9)
+    at renderWithHooks (chunk-67DEV5DB.js?v=98640d77:11548:26)
+    at mountIndeterminateComponent (chunk-67DEV5DB.js?v=98640d77:14926:21)
+    at beginWork (chunk-67DEV5DB.js?v=98640d77:15914:22)
+    at HTMLUnknownElement.callCallback2 (chunk-67DEV5DB.js?v=98640d77:3674:22)
+    at Object.invokeGuardedCallbackDev (chunk-67DEV5DB.js?v=98640d77:3699:24)
+    at invokeGuardedCallback (chunk-67DEV5DB.js?v=98640d77:3733:39)
+    at beginWork$1 (chunk-67DEV5DB.js?v=98640d77:19765:15)
+    at performUnitOfWork (chunk-67DEV5DB.js?v=98640d77:19198:20)
+    at workLoopSync (chunk-67DEV5DB.js?v=98640d77:19137:13)
+chunk-67DEV5DB.js?v=98640d77:14032 The above error occurred in the <AuthProvider> component:
+
+    at AuthProvider (http://localhost:5173/src/contexts/AuthContext.tsx:22:3)
+    at Router (http://localhost:5173/node_modules/.vite/deps/wouter.js?v=98640d77:235:17)
+    at App (http://localhost:5173/src/App.tsx:540:41)
+    at _a (http://localhost:5173/node_modules/.vite/deps/react-helmet-async.js?v=98640d77:624:5)
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+logCapturedError @ chunk-67DEV5DB.js?v=98640d77:14032
+chunk-67DEV5DB.js?v=98640d77:19413 Uncaught ReferenceError: session is not defined
+    at AuthProvider (AuthContext.tsx:230:9)
+    at renderWithHooks (chunk-67DEV5DB.js?v=98640d77:11548:26)
+    at mountIndeterminateComponent (chunk-67DEV5DB.js?v=98640d77:14926:21)
+    at beginWork (chunk-67DEV5DB.js?v=98640d77:15914:22)
+    at beginWork$1 (chunk-67DEV5DB.js?v=98640d77:19753:22)
+    at performUnitOfWork (chunk-67DEV5DB.js?v=98640d77:19198:20)
+    at workLoopSync (chunk-67DEV5DB.js?v=98640d77:19137:13)
+    at renderRootSync (chunk-67DEV5DB.js?v=98640d77:19116:15)
+    at recoverFromConcurrentError (chunk-67DEV5DB.js?v=98640d77:18736:28)
+    at performConcurrentWorkOnRoot (chunk-67DEV5DB.js?v=98640d77:18684:30)
