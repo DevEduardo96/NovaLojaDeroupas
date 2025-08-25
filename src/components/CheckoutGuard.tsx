@@ -32,9 +32,8 @@ export const CheckoutGuard: React.FC<CheckoutGuardProps> = ({ children }) => {
           localStorage.removeItem('pendingCheckout');
           
           if (hasItemsInCart) {
-            // Continuar para o checkout - sem redirecionar pois já estamos em /checkout
-            // O CheckoutGuard vai permitir a renderização do children
-            window.location.reload(); // Forçar recarregamento para atualizar o estado
+            // Recarregar a página para que o CheckoutGuard permita o acesso
+            window.location.reload();
           } else {
             // Se não há itens no carrinho, voltar para a loja
             setLocation("/produtos");

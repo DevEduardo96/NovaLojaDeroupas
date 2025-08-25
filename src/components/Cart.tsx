@@ -40,12 +40,13 @@ export const Cart: React.FC<CartProps> = ({
     if (!user) {
       // Salvar que o usuário estava tentando fazer checkout
       localStorage.setItem('pendingCheckout', 'true');
+      localStorage.setItem('digitalstore_cart', JSON.stringify(items));
 
       // Fechar o carrinho primeiro
       onClose();
 
-      // Redirecionar para checkout (que terá o CheckoutGuard)
-      onCheckout();
+      // Redirecionar para login em vez de checkout
+      window.location.href = '/login';
       return;
     }
 

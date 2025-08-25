@@ -7,12 +7,9 @@ const Hero: React.FC = () => {
   const [, setLocation] = useLocation();
   const { isAuthenticated } = useAuthCheck();
 
-  const handleExplorarProdutos = () => {
-    if (isAuthenticated) {
-      setLocation("/produtos");
-    } else {
-      setLocation("/produtos");
-    }
+  const handleExploreProducts = () => {
+    // Sempre permite acesso aos produtos, independente da autenticação
+    setLocation("/produtos");
   };
 
   return (
@@ -45,7 +42,7 @@ const Hero: React.FC = () => {
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-2">
               <button
-                onClick={handleExplorarProdutos}
+                onClick={handleExploreProducts}
                 className="flex items-center justify-center space-x-2 bg-black text-white px-8 py-4 rounded-none font-semibold text-base hover:bg-gray-800 transition-colors duration-300 font-barlow"
               >
                 <ShoppingBag className="h-5 w-5" />

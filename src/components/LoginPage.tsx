@@ -202,7 +202,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onClose, onSuccess }) => {
           const pendingCheckout = localStorage.getItem('pendingCheckout');
           const cartItems = localStorage.getItem('digitalstore_cart');
           const hasItemsInCart = cartItems && JSON.parse(cartItems).length > 0;
-          
+
           if (pendingCheckout && hasItemsInCart) {
             localStorage.removeItem('pendingCheckout');
             setTimeout(() => {
@@ -275,7 +275,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onClose, onSuccess }) => {
           const pendingCheckout = localStorage.getItem('pendingCheckout');
           const cartItems = localStorage.getItem('digitalstore_cart');
           const hasItemsInCart = cartItems && JSON.parse(cartItems).length > 0;
-          
+
           if (pendingCheckout && hasItemsInCart) {
             localStorage.removeItem('pendingCheckout');
             setTimeout(() => {
@@ -395,7 +395,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onClose, onSuccess }) => {
         const pendingCheckout = localStorage.getItem('pendingCheckout');
         const cartItems = localStorage.getItem('digitalstore_cart');
         const hasItemsInCart = cartItems && JSON.parse(cartItems).length > 0;
-        
+
         if (pendingCheckout && hasItemsInCart) {
           localStorage.removeItem('pendingCheckout');
           setTimeout(() => {
