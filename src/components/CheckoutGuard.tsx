@@ -28,11 +28,13 @@ export const CheckoutGuard: React.FC<CheckoutGuardProps> = ({ children }) => {
           const cartItems = localStorage.getItem('digitalstore_cart');
           const hasItemsInCart = cartItems && JSON.parse(cartItems).length > 0;
           
+          // Remover flag de checkout pendente
+          localStorage.removeItem('pendingCheckout');
+          
           if (hasItemsInCart) {
-            // Remover flag de checkout pendente
-            localStorage.removeItem('pendingCheckout');
-            // Continuar para o checkout
-            setLocation("/checkout");
+            // Continuar para o checkout - sem redirecionar pois já estamos em /checkout
+            // O CheckoutGuard vai permitir a renderização do children
+            window.location.reload(); // Forçar recarregamento para atualizar o estado
           } else {
             // Se não há itens no carrinho, voltar para a loja
             setLocation("/produtos");

@@ -198,10 +198,22 @@ const LoginPage: React.FC<LoginPageProps> = ({ onClose, onSuccess }) => {
         if (onSuccess) {
           onSuccess(userData);
         } else {
-          // Se não há callback, navegar para página inicial
-          setTimeout(() => {
-            navigate("/");
-          }, 1000);
+          // Verificar se havia checkout pendente
+          const pendingCheckout = localStorage.getItem('pendingCheckout');
+          const cartItems = localStorage.getItem('digitalstore_cart');
+          const hasItemsInCart = cartItems && JSON.parse(cartItems).length > 0;
+          
+          if (pendingCheckout && hasItemsInCart) {
+            localStorage.removeItem('pendingCheckout');
+            setTimeout(() => {
+              navigate("/checkout");
+            }, 1000);
+          } else {
+            // Se não há checkout pendente, ir para produtos
+            setTimeout(() => {
+              navigate("/produtos");
+            }, 1000);
+          }
         }
       }
     } catch (error) {
@@ -259,10 +271,22 @@ const LoginPage: React.FC<LoginPageProps> = ({ onClose, onSuccess }) => {
         if (onSuccess) {
           onSuccess(userData);
         } else {
-          // Se não há callback, navegar para página inicial
-          setTimeout(() => {
-            navigate("/");
-          }, 2000);
+          // Verificar se havia checkout pendente
+          const pendingCheckout = localStorage.getItem('pendingCheckout');
+          const cartItems = localStorage.getItem('digitalstore_cart');
+          const hasItemsInCart = cartItems && JSON.parse(cartItems).length > 0;
+          
+          if (pendingCheckout && hasItemsInCart) {
+            localStorage.removeItem('pendingCheckout');
+            setTimeout(() => {
+              navigate("/checkout");
+            }, 2000);
+          } else {
+            // Se não há checkout pendente, ir para produtos
+            setTimeout(() => {
+              navigate("/produtos");
+            }, 2000);
+          }
         }
 
 
@@ -367,10 +391,22 @@ const LoginPage: React.FC<LoginPageProps> = ({ onClose, onSuccess }) => {
       if (onSuccess) {
         onSuccess(userData);
       } else {
-        // Se não há callback, navegar para página inicial
-        setTimeout(() => {
-          navigate("/");
-        }, 1000);
+        // Verificar se havia checkout pendente
+        const pendingCheckout = localStorage.getItem('pendingCheckout');
+        const cartItems = localStorage.getItem('digitalstore_cart');
+        const hasItemsInCart = cartItems && JSON.parse(cartItems).length > 0;
+        
+        if (pendingCheckout && hasItemsInCart) {
+          localStorage.removeItem('pendingCheckout');
+          setTimeout(() => {
+            navigate("/checkout");
+          }, 1000);
+        } else {
+          // Se não há checkout pendente, ir para produtos
+          setTimeout(() => {
+            navigate("/produtos");
+          }, 1000);
+        }
       }
 
     } catch (error) {

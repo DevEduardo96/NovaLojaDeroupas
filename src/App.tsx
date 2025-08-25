@@ -121,12 +121,10 @@ function AppContent() {
               description="Suas peças favoritas salvas em um só lugar. Adicione produtos à lista de desejos e compre quando quiser."
               keywords="favoritos, lista desejos, produtos salvos, wishlist roupas"
             />
-            <ProtectedRoute>
-              <Favorites
-                onAddToCart={addToCart}
-                onProductClick={(product) => setLocation(`/produto/${product.id}`)}
-              />
-            </ProtectedRoute>
+            <Favorites
+              onAddToCart={addToCart}
+              onProductClick={(product) => setLocation(`/produto/${product.id}`)}
+            />
           </Route>
           <Route path="/checkout">
             <SEO 
