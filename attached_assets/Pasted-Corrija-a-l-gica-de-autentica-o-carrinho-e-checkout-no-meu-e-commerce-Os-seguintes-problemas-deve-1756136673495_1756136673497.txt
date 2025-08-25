@@ -1,0 +1,47 @@
+Corrija a lógica de autenticação, carrinho e checkout no meu e-commerce. Os seguintes problemas devem ser resolvidos:
+
+1. Regras de autenticação e sessão
+
+O usuário nunca deve ser deslogado ao navegar entre páginas (inclusive Detalhes) ou ao atualizar a página.
+
+A sessão deve ser persistida corretamente via localStorage, cookies ou token seguro.
+
+Se o usuário estiver logado, ele pode navegar livremente e adicionar produtos sem perder a sessão.
+
+2. Regras do carrinho
+
+O usuário pode navegar e adicionar produtos ao carrinho sem login.
+
+O carrinho deve ser salvo e mantido mesmo após login ou refresh da página.
+
+Se o usuário fizer login depois de ter produtos no carrinho, o carrinho continua intacto.
+
+3. Fluxo de checkout
+
+O cadastro/login só deve ser exigido quando o usuário clicar em 'Finalizar Compra'.
+
+Se não estiver logado, o usuário deve ser redirecionado ao login/cadastro.
+
+Após login/cadastro bem-sucedido, o usuário deve ser levado diretamente ao checkout, com o carrinho preservado.
+
+Se já estiver logado, o clique em 'Finalizar Compra' deve levar direto ao checkout.
+
+4. Erros a corrigir
+
+Erro 1: Quando o usuário cria uma conta, ele é direcionado para o checkout mesmo sem ter adicionado nenhum produto ao carrinho. → Corrigir para que, caso o carrinho esteja vazio, ele vá para a página inicial ou para a loja, e não para o checkout.
+
+Erro 2: Quando o usuário já está logado, adiciona produtos ao carrinho e clica em 'Finalizar Compra', ele não consegue ir para a página de checkout. → Corrigir para que o fluxo funcione corretamente.
+
+Erro anterior: Atualmente o usuário desloga ao acessar a página de detalhes e, ao clicar em 'Finalizar Compra', é redirecionado para a página inicial. → Corrigir para que a sessão seja mantida e o checkout aberto corretamente.
+
+Resumo esperado
+
+Sessão persistente e estável em todas as páginas.
+
+Carrinho preservado em todas as situações.
+
+Login/cadastro apenas exigido ao finalizar compra.
+
+Redirecionamento correto após login/cadastro (com carrinho intacto).
+
+Nunca levar para o checkout sem produtos no carrinho.
