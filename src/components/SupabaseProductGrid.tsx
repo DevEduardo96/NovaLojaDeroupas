@@ -9,8 +9,6 @@ import {
 import { productService } from "../lib/supabase";
 import type { Product } from "../types";
 import { formatPrice } from "../lib/utils";
-import { useAuth } from "../contexts/AuthContext";
-import { useFavorites } from "../contexts/FavoritesContext";
 import { Button } from "./ui/Button";
 
 interface SupabaseProductGridProps {
@@ -159,7 +157,7 @@ const SupabaseProductGrid: React.FC<SupabaseProductGridProps> = ({
               <div className="flex items-center gap-4">
                 <button
                   onClick={() => setIsFilterOpen(true)}
-                  className="inline-flex items-center gap-3 px-4 py-2 bg-white text-purple-600 border border-purple-600 hover:bg-purple-600 hover:text-white transition-all duration-200 text-sm font-medium uppercase tracking-wide"
+                  className="inline-flex items-center gap-3 px-4 py-2 bg-white text-[#000000] border border-[#000000] hover:bg-[#069b8b] hover:text-white transition-all duration-200 text-sm font-medium uppercase tracking-wide"
                 >
                   <div className="flex flex-col gap-0.5">
                     <div className="w-3 h-0.5 bg-current"></div>
@@ -255,8 +253,8 @@ const SupabaseProductGrid: React.FC<SupabaseProductGridProps> = ({
                       onClick={() => setSelectedCategory("")}
                                               className={`block text-left w-full py-2 text-sm transition-colors uppercase tracking-wider ${
                         selectedCategory === "" 
-                          ? "text-purple-600 font-bold border-l-2 border-purple-600 pl-2" 
-                          : "text-gray-600 hover:text-purple-600"
+                          ? "text-[#069b8b] font-bold border-l-2 border-[#069b8b] pl-2" 
+                          : "text-[#069b8b] hover:text-[#069b8b]"
                       }`}
                     >
                       All Categories
@@ -267,8 +265,8 @@ const SupabaseProductGrid: React.FC<SupabaseProductGridProps> = ({
                         onClick={() => setSelectedCategory(category)}
                         className={`block text-left w-full py-2 text-sm transition-colors uppercase tracking-wider ${
                           selectedCategory === category 
-                            ? "text-purple-600 font-bold border-l-2 border-purple-600 pl-2" 
-                            : "text-gray-600 hover:text-purple-600"
+                            ? "text-[#069b8b] font-bold border-l-2 border-[#069b8b] pl-2" 
+                            : "text-gray-600 hover:text-[#069b8b]"
                         }`}
                       >
                         {category}
@@ -285,18 +283,18 @@ const SupabaseProductGrid: React.FC<SupabaseProductGridProps> = ({
                   <div className="mb-4">
                     <div className="relative h-2 bg-gray-200 rounded-full">
                       <div 
-                        className="absolute h-2 bg-purple-600 rounded-full"
+                        className="absolute h-2 bg-[#069b8b] rounded-full"
                         style={{
                           left: `${(priceRange[0] / 1000) * 100}%`,
                           width: `${((priceRange[1] - priceRange[0]) / 1000) * 100}%`
                         }}
                       ></div>
                       <div 
-                        className="absolute w-4 h-4 bg-purple-600 rounded-full top-1/2 transform -translate-y-1/2 cursor-pointer border-2 border-white shadow-lg"
+                        className="absolute w-4 h-4 bg-[#069b8b] rounded-full top-1/2 transform -translate-y-1/2 cursor-pointer border-2 border-white shadow-lg"
                         style={{ left: `${(priceRange[0] / 1000) * 100}%` }}
                       ></div>
                       <div 
-                        className="absolute w-4 h-4 bg-purple-600 rounded-full top-1/2 transform -translate-y-1/2 cursor-pointer border-2 border-white shadow-lg"
+                        className="absolute w-4 h-4 bg-[#069b8b] rounded-full top-1/2 transform -translate-y-1/2 cursor-pointer border-2 border-white shadow-lg"
                         style={{ left: `${(priceRange[1] / 1000) * 100}%` }}
                       ></div>
                     </div>
@@ -308,7 +306,7 @@ const SupabaseProductGrid: React.FC<SupabaseProductGridProps> = ({
                       type="number"
                       value={priceRange[0]}
                       onChange={(e) => setPriceRange([parseInt(e.target.value) || 0, priceRange[1]])}
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-sm text-sm focus:outline-none focus:ring-1 focus:ring-purple-600 focus:border-purple-600"
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-sm text-sm focus:outline-none focus:ring-1 focus:ring-[#069b8b] focus:border-[#069b8b]"
                       min="0"
                       max="1000"
                     />
@@ -317,7 +315,7 @@ const SupabaseProductGrid: React.FC<SupabaseProductGridProps> = ({
                       type="number"
                       value={priceRange[1]}
                       onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value) || 1000])}
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-sm text-sm focus:outline-none focus:ring-1 focus:ring-purple-600 focus:border-purple-600"
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-sm text-sm focus:outline-none focus:ring-1 focus:ring-[#069b8b] focus:border-[#069b8b]"
                       min="0"
                       max="1000"
                     />
@@ -329,7 +327,7 @@ const SupabaseProductGrid: React.FC<SupabaseProductGridProps> = ({
 
                   <button 
                     onClick={() => setIsFilterOpen(false)}
-                    className="w-full px-4 py-3 bg-purple-600 text-white hover:bg-purple-700 transition-all duration-200 font-semibold uppercase tracking-wider text-sm"
+                    className="w-full px-4 py-3 bg-[#069b8b] text-white hover:bg-[#069b8b] transition-all duration-200 font-semibold uppercase tracking-wider text-sm"
                   >
                     Apply Filters
                   </button>
@@ -401,7 +399,7 @@ const SupabaseProductGrid: React.FC<SupabaseProductGridProps> = ({
                       {showActions && (
                         <button
                           onClick={(e) => handleAddToCart(product, e)}
-                          className="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-4 rounded-sm transition-all duration-200 shadow-lg flex items-center gap-2 uppercase tracking-wider text-sm"
+                          className="bg-[#069b8b] hover:bg-[#000000] text-white font-semibold py-2 px-4 rounded-sm transition-all duration-200 shadow-lg flex items-center gap-2 uppercase tracking-wider text-sm"
                         >
                           <ShoppingCart className="w-4 h-4" />
                           Cart
