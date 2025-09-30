@@ -2,7 +2,8 @@ import React from "react";
 import { ShoppingBag, Star } from "lucide-react";
 import { useLocation } from "wouter";
 import { useAuthCheck } from "../hooks/useAuthGuard";
-import GrandeLogo from "grandelogo.webp";
+import GrandeLogo from "./grandelogo.webp";
+
 
 const Hero: React.FC = () => {
   const [, setLocation] = useLocation();
