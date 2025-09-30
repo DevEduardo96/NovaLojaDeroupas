@@ -2,6 +2,7 @@ import React from "react";
 import { ShoppingBag, Star } from "lucide-react";
 import { useLocation } from "wouter";
 import { useAuthCheck } from "../hooks/useAuthGuard";
+import GrandeLogo from "grandelogo.webp";
 
 const Hero: React.FC = () => {
   const [, setLocation] = useLocation();
@@ -31,7 +32,7 @@ const Hero: React.FC = () => {
   <div className="order-1 lg:order-none">
     <h1 className="text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-bold text-black leading-none tracking-tight text-center lg:text-left">
       <span className="font-teko block">
-        <img src="/grandelogo.webp" alt="" className="mx-auto lg:mx-0" />
+        <img src={GrandeLogo} alt="" className="mx-auto lg:mx-0" />
       </span>
     </h1>
   </div>
